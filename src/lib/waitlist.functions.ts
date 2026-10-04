@@ -55,6 +55,8 @@ export const optOutWaitlist = createServerFn({ method: "POST" })
 export const getWaitlist = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { data: isOwner, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "owner" });
+    if (roleError || !isOwner) throw new Error("You don't have access to this list.");
     const { data, error } = await context.supabase.from("waitlist_signups")
       .select("id, studio_name, whatsapp_number, student_bucket, estimated_amount, created_at, source, utm_source, utm_medium, utm_campaign, utm_content, utm_term, opted_out_at")
       .order("created_at", { ascending: false }).limit(500);

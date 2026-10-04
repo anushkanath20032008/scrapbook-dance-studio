@@ -67,7 +67,10 @@ export const getWaitlist = createServerFn({ method: "GET" })
 export const activateOwnerAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: identity, error: identityError } = await context.supabase.auth.getUser();
+    const bearer = getRequestHeader("authorization");
+    const token = bearer?.startsWith("Bearer ") ? bearer.slice(7) : "";
+    if (!token) throw new Error("This account cannot access the waitlist.");
+    const { data: identity, error: identityError } = await context.supabase.auth.getUser(token);
     if (identityError || identity.user?.id !== context.userId || identity.user.email?.toLowerCase() !== "nath.anushka26@gmail.com" || !identity.user.email_confirmed_at) {
       throw new Error("This account cannot access the waitlist.");
     }

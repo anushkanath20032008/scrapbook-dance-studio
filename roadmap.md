@@ -1,4 +1,5 @@
 - [x] Rebuild landing page in Desktop × Scrapbook direction and preserve calculator/copy logic.
 - [x] Add consent-based waitlist storage, input validation, rate limits, and opt-out.
 - [x] Add studio account details and private owner list.
-- [ ] Verify browser flows and database test submission.
+- [ ] Assign owner access when the owner provides their account email.
+- [ ] Verify browser flows and database test submission, then remove the test row.

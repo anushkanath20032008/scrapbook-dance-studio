@@ -44,7 +44,7 @@ function Home() {
       gsap.registerPlugin(ScrollTrigger);
       ctx = gsap.context(() => {
         if (cutout.current && hero.current) gsap.to(cutout.current, { y: 70, rotation: -2, ease:"none", scrollTrigger:{ trigger:hero.current, start:"top top", end:"bottom top", scrub:true } });
-        if (problem.current) gsap.fromTo(problem.current, { clipPath:"inset(0 0 0 0)" }, { clipPath:"inset(0 0 0 0)", duration:.35, scrollTrigger:{ trigger:problem.current, start:"top 85%", toggleActions:"play none none none" } });
+        if (problem.current) gsap.fromTo(problem.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 70% 5%, 30% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 70% 97%, 30% 100%, 0 100%)", duration:.35, ease:"steps(5)", scrollTrigger:{ trigger:problem.current, start:"top 95%", toggleActions:"play none none none" } });
         if (solution.current) gsap.fromTo(solution.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration:.38, ease:"steps(4)", scrollTrigger:{ trigger:solution.current, start:"top 90%", toggleActions:"play none none none" } });
       });
     }).catch(() => {});

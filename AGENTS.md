@@ -11,3 +11,4 @@
 
 - Keep public waitlist writes in validated server functions and owner reads behind authenticated row policies, because visitor contact data must never be publicly readable.
 - Keep studio profile contact fields editable by their owner while billing fields remain server-managed, because an account must not self-assign plan or payment state.
+- Keep waitlist owner access in a separate role table checked by the server and row policies, because signup records must not be exposed by client-side identity checks.

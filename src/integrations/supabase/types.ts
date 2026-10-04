@@ -14,16 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      studio_profiles: {
+        Row: {
+          billing_status: string
+          city: string | null
+          created_at: string
+          name: string
+          phone: string | null
+          plan: string
+          studio_name: string
+          user_id: string
+        }
+        Insert: {
+          billing_status?: string
+          city?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          plan?: string
+          studio_name?: string
+          user_id: string
+        }
+        Update: {
+          billing_status?: string
+          city?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          plan?: string
+          studio_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      waitlist_signups: {
+        Row: {
+          consent: boolean
+          created_at: string
+          estimated_amount: number
+          id: string
+          ip_hash: string | null
+          late_percent: number
+          monthly_fee: number
+          opt_out_token: string
+          opted_out_at: string | null
+          source: string
+          student_bucket: string
+          studio_name: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          consent?: boolean
+          created_at?: string
+          estimated_amount?: number
+          id?: string
+          ip_hash?: string | null
+          late_percent?: number
+          monthly_fee?: number
+          opt_out_token?: string
+          opted_out_at?: string | null
+          source?: string
+          student_bucket: string
+          studio_name: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp_number: string
+        }
+        Update: {
+          consent?: boolean
+          created_at?: string
+          estimated_amount?: number
+          id?: string
+          ip_hash?: string | null
+          late_percent?: number
+          monthly_fee?: number
+          opt_out_token?: string
+          opted_out_at?: string | null
+          source?: string
+          student_bucket?: string
+          studio_name?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +269,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner"],
+    },
   },
 } as const

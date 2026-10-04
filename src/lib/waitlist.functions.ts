@@ -63,3 +63,19 @@ export const getWaitlist = createServerFn({ method: "GET" })
     if (error) throw new Error("You don't have access to this list.");
     return data;
   });
+
+export const activateOwnerAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const bearer = getRequestHeader("authorization");
+    const token = bearer?.startsWith("Bearer ") ? bearer.slice(7) : "";
+    if (!token) throw new Error("This account cannot access the waitlist.");
+    const { data: identity, error: identityError } = await context.supabase.auth.getUser(token);
+    if (identityError || identity.user?.id !== context.userId || identity.user.email?.toLowerCase() !== "nath.anushka26@gmail.com" || !identity.user.email_confirmed_at) {
+      throw new Error("This account cannot access the waitlist.");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("user_roles").upsert({ user_id: context.userId, role: "owner" }, { onConflict: "user_id,role" });
+    if (error) throw new Error("Could not activate owner access. Please try again.");
+    return { ok: true };
+  });

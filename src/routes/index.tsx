@@ -38,7 +38,7 @@ function Home() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setCount("5, 6, 7, 8"); return; }
     let n = 0; const values = ["5", "6", "7", "8", "5, 6, 7, 8"];
-    const timer = window.setInterval(() => { n++; setCount(values[n]); if(n === values.length-1) window.clearInterval(timer); }, 340);
+    const timer = window.setInterval(() => { n++; setCount(values[n] ?? "5, 6, 7, 8"); if(n === values.length-1) window.clearInterval(timer); }, 340);
     let ctx: { revert: () => void } | undefined;
     Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
       gsap.registerPlugin(ScrollTrigger);
@@ -58,7 +58,7 @@ function Home() {
       const params = new URLSearchParams(window.location.search);
       const result = await submit({ data: { studioName:studio, whatsappNumber:phone, studentBucket:bucket as "10-25"|"26-50"|"51-100"|"101-300", estimatedAmount:estimate, monthlyFee:fee, latePercent:late, consent:true, source:"landing", utmSource:params.get("utm_source"), utmMedium:params.get("utm_medium"), utmCampaign:params.get("utm_campaign"), utmContent:params.get("utm_content"), utmTerm:params.get("utm_term") } });
       setMessage("You're on the list. We'll be in touch about a demo."); setStudio(""); setPhone(""); setConsent(false);
-      sessionStorage.setItem("choreoOptOut", result.token);
+      localStorage.setItem("choreoOptOut", result.token);
     } catch (err) { setMessage(err instanceof Error ? err.message : "Could not save your request. Try again."); }
     finally { setBusy(false); }
   }

@@ -17,7 +17,7 @@ function Account(){
   const [message,setMessage]=useState(""), [busy,setBusy]=useState(false);
   const loadProfile=useServerFn(getProfile), save=useServerFn(saveProfile);
   useEffect(()=>{ let active=true; supabase.auth.getUser().then(({data})=>{if(active){setUser(data.user);setReady(true);}}); const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{if(active)setUser(session?.user??null)});return ()=>{active=false;subscription.unsubscribe()};},[]);
-  useEffect(()=>{ if(!user)return; loadProfile().then(p=>{if(p){setName(p.name);setStudioName(p.studio_name);setPhone(p.phone??"");setCity(p.city);}}).catch(()=>{}); },[user,loadProfile]);
+  useEffect(()=>{ if(!user)return; loadProfile().then(p=>{if(p){setName(p.name);setStudioName(p.studio_name);setPhone(p.phone??"");setCity(p.city??"");}}).catch(()=>{}); },[user,loadProfile]);
   async function handleAuth(e:FormEvent){e.preventDefault();setBusy(true);setMessage("");try{
     if(mode==="forgot"){const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:`${window.location.origin}/reset-password`});if(error)throw error;setMessage("Check your email for a password reset link.");}
     else if(mode==="register"){const {error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:`${window.location.origin}/account`}});if(error)throw error;setMessage("Check your email to confirm your account, then sign in to save your studio details.");}

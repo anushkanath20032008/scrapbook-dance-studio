@@ -1,0 +1,14 @@
+CREATE TABLE public.studio_profiles (user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE, name text NOT NULL DEFAULT '', studio_name text NOT NULL DEFAULT '', phone text, city text, plan text NOT NULL DEFAULT 'waitlist', billing_status text NOT NULL DEFAULT 'not_started', created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE ON public.studio_profiles TO authenticated;
+GRANT ALL ON public.studio_profiles TO service_role;
+ALTER TABLE public.studio_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Read own studio profile" ON public.studio_profiles FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Create own studio profile" ON public.studio_profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id AND plan = 'waitlist' AND billing_status = 'not_started');
+CREATE POLICY "Edit own studio contact" ON public.studio_profiles FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE TABLE public.waitlist_signups (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), studio_name text NOT NULL, whatsapp_number text NOT NULL, student_bucket text NOT NULL, estimated_amount integer NOT NULL DEFAULT 0, monthly_fee integer NOT NULL DEFAULT 2500, late_percent integer NOT NULL DEFAULT 20, created_at timestamptz NOT NULL DEFAULT now(), source text NOT NULL DEFAULT 'landing', utm_source text, utm_medium text, utm_campaign text, utm_content text, utm_term text, consent boolean NOT NULL DEFAULT false, opted_out_at timestamptz, opt_out_token uuid NOT NULL DEFAULT gen_random_uuid(), ip_hash text, CONSTRAINT signup_consent_check CHECK (consent = true), CONSTRAINT signup_amount_check CHECK (estimated_amount >= 0 AND estimated_amount <= 10000000));
+GRANT SELECT ON public.waitlist_signups TO authenticated;
+GRANT ALL ON public.waitlist_signups TO service_role;
+ALTER TABLE public.waitlist_signups ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Owner reads waitlist" ON public.waitlist_signups FOR SELECT TO authenticated USING ((auth.jwt() ->> 'email') = 'nath.anushka26@gmail.com');
+CREATE INDEX waitlist_signups_created_idx ON public.waitlist_signups (created_at DESC);
+CREATE INDEX waitlist_signups_ip_idx ON public.waitlist_signups (ip_hash, created_at DESC);

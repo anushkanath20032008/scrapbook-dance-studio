@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      studio_profiles: {
+        Row: {
+          billing_status: string
+          city: string | null
+          created_at: string
+          name: string
+          phone: string | null
+          plan: string
+          studio_name: string
+          user_id: string
+        }
+        Insert: {
+          billing_status?: string
+          city?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          plan?: string
+          studio_name?: string
+          user_id: string
+        }
+        Update: {
+          billing_status?: string
+          city?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          plan?: string
+          studio_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      waitlist_signups: {
+        Row: {
+          consent: boolean
+          created_at: string
+          estimated_amount: number
+          id: string
+          ip_hash: string | null
+          late_percent: number
+          monthly_fee: number
+          opt_out_token: string
+          opted_out_at: string | null
+          source: string
+          student_bucket: string
+          studio_name: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          whatsapp_number: string
+        }
+        Insert: {
+          consent?: boolean
+          created_at?: string
+          estimated_amount?: number
+          id?: string
+          ip_hash?: string | null
+          late_percent?: number
+          monthly_fee?: number
+          opt_out_token?: string
+          opted_out_at?: string | null
+          source?: string
+          student_bucket: string
+          studio_name: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp_number: string
+        }
+        Update: {
+          consent?: boolean
+          created_at?: string
+          estimated_amount?: number
+          id?: string
+          ip_hash?: string | null
+          late_percent?: number
+          monthly_fee?: number
+          opt_out_token?: string
+          opted_out_at?: string | null
+          source?: string
+          student_bucket?: string
+          studio_name?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -2,4 +2,4 @@
 - [x] Add consent-based waitlist storage, input validation, rate limits, and opt-out.
 - [x] Add studio account details and private owner list.
 - [ ] Assign owner access when the owner provides their account email.
-- [ ] Verify browser flows and database test submission, then remove the test row.
+- [x] Verify browser flows and database test submission, then remove the test row.

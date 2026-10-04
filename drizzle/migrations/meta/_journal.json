@@ -8,6 +8,13 @@
       "when": 1791114245630,
       "tag": "0000_choreo_waitlist_and_studio_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791114261373,
+      "tag": "0001_limit_studio_profile_updates",
+      "breakpoints": true
     }
   ]
 }

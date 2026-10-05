@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { joinWaitlist } from "@/lib/waitlist.functions";
-import shoeImage from "@/assets/hero-dance-shoes.png";
+import shoeImage from "@/assets/hero-ballet-slippers.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -66,7 +66,7 @@ function Home() {
     <main>
       <section className="hero" ref={hero} id="top">
         <div className="wrap site-nav"><a className="brand" href="#top">Choreo Studio</a><nav className="nav-links" aria-label="Main"><a href="#how">How it works</a><a href="#features">Features</a><a href="#faq">FAQ</a><a href="/account">Studio account</a></nav></div>
-        <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><img ref={cutout} className="hero-sticker" src={shoeImage} width={1024} height={1024} alt="Worn dance rehearsal shoes with yellow floor tape"/><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. Let WhatsApp do the chasing.</p></div>
+        <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><img ref={cutout} className="hero-sticker" src={shoeImage} width={1024} height={1024} alt="Gently worn pink ballet slippers crossed together"/><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. Let WhatsApp do the chasing.</p></div>
           <Window title="Choreo Studio / Arrive" className="hero-window" count={count}><div className="window-inner"><div className="screen-top"><span>SEPTEMBER FEES</span><span>12 of 40 pending</span></div><Student name="Anand K." batch="Hip-hop · Sat 5pm" amount="₹1,800" status="OVERDUE"/><Student name="Bela S." batch="Kathak · Tue 6pm" amount="₹2,500" status="DUE"/><Student name="Chirag R." batch="Bollywood · Thu 7pm" amount="₹2,100" status="PAID"/><Student name="Naina K." batch="Contemporary · Fri 5pm" amount="₹1,600" status="DUE"/><div className="screen-footer"><span>Sample student data</span><Button variant="retro" onClick={() => document.getElementById("join")?.scrollIntoView({ behavior:"smooth" })}>Join founding studios</Button></div></div></Window>
         </div>
       </section>

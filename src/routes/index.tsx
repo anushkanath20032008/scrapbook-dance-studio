@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { joinWaitlist } from "@/lib/waitlist.functions";
-import shoeImage from "@/assets/hero-ballet-slippers.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -30,7 +29,6 @@ function Home() {
   const [studio,setStudio] = useState(""), [phone,setPhone] = useState(""), [bucket,setBucket] = useState("26-50"), [consent,setConsent] = useState(false);
   const [message,setMessage] = useState(""), [busy,setBusy] = useState(false), [count,setCount] = useState("5");
   const [paid,setPaid] = useState(false);
-  const cutout = useRef<HTMLImageElement>(null);
   const hero = useRef<HTMLElement>(null);
   const problem = useRef<HTMLElement>(null);
   const solution = useRef<HTMLElement>(null);
@@ -43,7 +41,6 @@ function Home() {
     Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
       gsap.registerPlugin(ScrollTrigger);
       ctx = gsap.context(() => {
-        if (cutout.current && hero.current) gsap.to(cutout.current, { y: 70, rotation: -2, ease:"none", scrollTrigger:{ trigger:hero.current, start:"top top", end:"bottom top", scrub:true } });
         if (problem.current) gsap.fromTo(problem.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 70% 5%, 30% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 70% 97%, 30% 100%, 0 100%)", duration:.35, ease:"steps(5)", scrollTrigger:{ trigger:problem.current, start:"top 95%", toggleActions:"play none none none" } });
         if (solution.current) gsap.fromTo(solution.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration:.38, ease:"steps(4)", scrollTrigger:{ trigger:solution.current, start:"top 90%", toggleActions:"play none none none" } });
       });
@@ -66,7 +63,7 @@ function Home() {
     <main>
       <section className="hero" ref={hero} id="top">
         <div className="wrap site-nav"><a className="brand" href="#top">Choreo Studio</a><nav className="nav-links" aria-label="Main"><a href="#how">How it works</a><a href="#features">Features</a><a href="#faq">FAQ</a><a href="/account">Studio account</a></nav></div>
-        <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><img ref={cutout} className="hero-sticker" src={shoeImage} width={1024} height={1024} alt="Gently worn pink ballet slippers crossed together"/><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. Let WhatsApp do the chasing.</p></div>
+        <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. Let WhatsApp do the chasing.</p></div>
           <Window title="Choreo Studio / Arrive" className="hero-window" count={count}><div className="window-inner"><div className="screen-top"><span>SEPTEMBER FEES</span><span>12 of 40 pending</span></div><Student name="Anand K." batch="Hip-hop · Sat 5pm" amount="₹1,800" status="OVERDUE"/><Student name="Bela S." batch="Kathak · Tue 6pm" amount="₹2,500" status="DUE"/><Student name="Chirag R." batch="Bollywood · Thu 7pm" amount="₹2,100" status="PAID"/><Student name="Naina K." batch="Contemporary · Fri 5pm" amount="₹1,600" status="DUE"/><div className="screen-footer"><span>Sample student data</span><Button variant="retro" onClick={() => document.getElementById("join")?.scrollIntoView({ behavior:"smooth" })}>Join founding studios</Button></div></div></Window>
         </div>
       </section>

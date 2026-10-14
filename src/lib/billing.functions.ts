@@ -2,19 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import DodoPayments from "dodopayments";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { studioPlans, type StudioPlanId } from "@/lib/plans";
 
 const planSchema = z.enum(["starter", "growth", "studio"]);
-type Plan = z.infer<typeof planSchema>;
-
-const planLabels: Record<Plan, string> = {
-  starter: "Starter",
-  growth: "Growth",
-  studio: "Studio+",
-};
 
 // Product IDs and the API key stay in server-only environment variables.
-function productIdFor(plan: Plan) {
-  const ids: Record<Plan, string | undefined> = {
+function productIdFor(plan: StudioPlanId) {
+  const ids: Record<StudioPlanId, string | undefined> = {
     starter: process.env.DODO_PAYMENTS_STARTER_PRODUCT_ID,
     growth: process.env.DODO_PAYMENTS_GROWTH_PRODUCT_ID,
     studio: process.env.DODO_PAYMENTS_STUDIO_PRODUCT_ID,
@@ -28,8 +22,9 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const productId = productIdFor(data.plan);
     if (!productId || !process.env.DODO_PAYMENTS_API_KEY) {
+      const planName = studioPlans.find((plan) => plan.id === data.plan)?.name ?? "selected";
       throw new Error(
-        `The ${planLabels[data.plan]} plan isn't available for checkout yet. Please try again later or book a demo.`,
+        `The ${planName} plan isn't available for checkout yet. Please try again later or book a demo.`,
       );
     }
 

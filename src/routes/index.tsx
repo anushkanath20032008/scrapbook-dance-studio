@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
+import { studioPlans, subscriptionNote } from "@/lib/plans";
 import { joinWaitlist } from "@/lib/waitlist.functions";
 
 export const Route = createFileRoute("/")({
@@ -62,7 +63,7 @@ function Home() {
   return <>
     <main>
       <section className="hero" ref={hero} id="top">
-        <div className="wrap site-nav"><a className="brand" href="#top">Choreo Studio</a><nav className="nav-links" aria-label="Main"><a href="#how">How it works</a><a href="#features">Features</a><a href="#faq">FAQ</a><a href="/account">Studio account</a></nav></div>
+        <div className="wrap site-nav"><a className="brand" href="#top">Choreo Studio</a><nav className="nav-links" aria-label="Main"><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/account">Studio account</a></nav></div>
         <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. Let WhatsApp do the chasing.</p></div>
           <Window title="Choreo Studio / Arrive" className="hero-window" count={count}><div className="window-inner"><div className="screen-top"><span>SEPTEMBER FEES</span><span>12 of 40 pending</span></div><Student name="Anand K." batch="Hip-hop · Sat 5pm" amount="₹1,800" status="OVERDUE"/><Student name="Bela S." batch="Kathak · Tue 6pm" amount="₹2,500" status="DUE"/><Student name="Chirag R." batch="Bollywood · Thu 7pm" amount="₹2,100" status="PAID"/><Student name="Naina K." batch="Contemporary · Fri 5pm" amount="₹1,600" status="DUE"/><div className="screen-footer"><span>Sample student data</span><Button variant="retro" onClick={() => document.getElementById("join")?.scrollIntoView({ behavior:"smooth" })}>Join founding studios</Button></div></div></Window>
         </div>
@@ -83,6 +84,7 @@ function Home() {
         { icon:"↧",title:"Import",desc:"Send a photo of your register or a spreadsheet. We enter the details for you." },
       ].map(x=><a className="desktop-icon" href="#join" key={x.title}><span className="pixel-image" aria-hidden="true">{x.icon}</span><h3>{x.title}</h3><p>{x.desc}</p></a>)}</div></div></section>
       <section className="section offer" id="offer"><div className="wrap offer-layout"><div><h2 className="display">Founding studios: the first 10.</h2><p className="section-intro">Your evenings, back. No more Sunday-night reconciling from three notebooks.</p></div><Window title="Choreo_Studio_setup.exe" className="offer-window"><div className="window-inner"><h3>One simple plan.</h3><p>After your demo, pay the first month upfront. Cancel any time.</p><div className="segments" aria-hidden="true">{Array.from({length:10},(_,i)=><i key={i}/>)}</div><p><strong>Setting up your studio...</strong> Founding spots available.</p><ul><li>Batches and roster</li><li>One-tap attendance and missed-class log</li><li>Fee tracking and WhatsApp reminders with UPI links</li><li>Free setup on your own student list</li><li>A direct line to the founder</li><li>Your launch price locked for a year</li></ul><p>What we ask: a 15-minute feedback call each month, and permission to quote you only if you are happy.</p><Button variant="retro" onClick={()=>document.getElementById("join")?.scrollIntoView({behavior:"smooth"})}>Book a 15-minute demo</Button></div></Window></div></section>
+      <section className="section public-pricing" id="pricing"><div className="wrap"><h2 className="display">Plans for your studio.</h2><p className="section-intro">Pick the plan that fits how many students you teach. Move up as your studio grows.</p><div className="pricing-grid">{studioPlans.map((plan,i)=><article className="pricing-card" key={plan.id}><span className="chrome-font">plan_0{i+1}.exe</span><h3>{plan.name}</h3><p className="pricing-price">{plan.price}<span>/month</span></p><ul>{plan.features.map(f=><li key={f}>{f}</li>)}</ul><Button asChild variant={plan.id==="growth"?"retro":"retroPaper"}><a href="/account">Choose {plan.name}</a></Button></article>)}</div><p className="pricing-footnote">{subscriptionNote}</p></div></section>
       <section className="section faq" id="faq"><div className="wrap"><h2 className="display">Questions owners ask.</h2><div className="faq-list">{[
         ["Do parents need to install an app?","No. They get a WhatsApp message with a link, pay by UPI and receive a receipt."],
         ["Can you move my data from a register or spreadsheet?","Yes. Send a spreadsheet or a photo of your register and we enter it for you."],

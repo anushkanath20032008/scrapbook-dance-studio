@@ -5,7 +5,8 @@
 @theme inline {
   --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--foreground); --color-primary: var(--primary); --color-primary-foreground: var(--paper); --color-secondary: var(--secondary); --color-secondary-foreground: var(--ink); --color-muted: var(--grey); --color-muted-foreground: var(--ink); --color-accent: var(--accent); --color-accent-foreground: var(--ink); --color-border: var(--ink); --color-input: var(--ink); --color-ring: var(--blue); --color-destructive: var(--tomato); --color-destructive-foreground: var(--paper); --color-popover: var(--paper); --color-popover-foreground: var(--ink); --color-tomato: var(--tomato); --color-marigold: var(--marigold); --color-teal: var(--teal); --color-paper: var(--paper); --color-ink: var(--ink); --color-window: var(--grey); --color-chrome: var(--blue);
 }
-:root { --radius:0; --background:#F7E8DC; --foreground:#1A1A1A; --card:#F7E8DC; --primary:#273FA3; --secondary:#F0C24C; --accent:#E7AAA9; --tomato:#E7AAA9; --marigold:#F0C24C; --teal:#273FA3; --blue:#273FA3; --ink:#1A1A1A; --paper:#F7E8DC; --grey:#E7AAA9; color-scheme:light; }
+/* Riso Dance Office palette: warm white, ultramarine, tomato, butter, leaf, charcoal. --grey is a tomato screen tint; --teal is leaf (paid/present). */
+:root { --radius:0; --background:#FFF8ED; --foreground:#202020; --card:#FFF8ED; --primary:#142B67; --secondary:#F4D06F; --accent:#F8CFC5; --tomato:#F05A47; --marigold:#F4D06F; --teal:#5E9C76; --blue:#142B67; --ink:#202020; --paper:#FFF8ED; --grey:#F8CFC5; --ink-offset:var(--tomato); color-scheme:light; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; scroll-padding-top:85px; }
 body { margin:0; font-family:"DM Sans",Arial,sans-serif; background:var(--background); color:var(--foreground); }
@@ -15,13 +16,13 @@ button { cursor:pointer; }
 .display { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; line-height:.96; letter-spacing:0; text-transform:uppercase; }
 .chrome-font { font-family:VT323,monospace; font-size:24px; line-height:1; }
 .wrap { width:min(100% - 48px,1200px); margin-inline:auto; }
-.window { border:2px solid var(--ink); background:var(--paper); color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
+.window { border:2px solid var(--ink); background:var(--paper); color:var(--ink); box-shadow:5px 5px 0 var(--ink-offset); }
 .window-bar { min-height:37px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 10px 4px 14px; background:var(--blue); color:var(--paper); border-bottom:2px solid var(--ink); }
 .window-controls { display:flex; gap:5px; flex:none; }
 .window-controls i { width:15px; height:15px; display:block; border:2px solid var(--ink); background:var(--grey); }
 .window-controls i:last-child { background:var(--tomato); }
-.retro-button { border:2px solid var(--ink); border-radius:0; box-shadow:3px 3px 0 var(--ink); height:auto; padding:10px 17px; font-weight:800; font-size:14px; line-height:1.25; transition:transform .12s,box-shadow .12s; }
-.retro-button:active { transform:translate(3px,3px); box-shadow:0 0 0 var(--ink); }
+.retro-button { border:2px solid var(--ink); border-radius:0; box-shadow:3px 3px 0 var(--blue); height:auto; padding:10px 17px; font-weight:800; font-size:14px; line-height:1.25; transition:transform .12s,box-shadow .12s; }
+.retro-button:active { transform:translate(3px,3px); box-shadow:0 0 0 var(--blue); }
 .field { border:2px solid var(--ink); border-radius:0; background:var(--paper); min-height:44px; padding:8px 11px; width:100%; color:var(--ink); }
 .field::placeholder { color:var(--ink); opacity:.55; }
 .form-label { font-weight:800; font-size:13px; display:block; margin-bottom:5px; }
@@ -32,7 +33,7 @@ button { cursor:pointer; }
 .hero { background:var(--paper); overflow:hidden; }
 .hero-body { position:relative; display:grid; grid-template-columns: minmax(0,1.12fr) minmax(350px,.88fr); gap:26px; align-items:center; min-height:540px; padding-block:25px 30px; }
 .hero-type { position:relative; min-height:430px; display:flex; flex-direction:column; justify-content:center; }
-.hero-type h1 { position:relative; z-index:1; margin:0; font-size:clamp(66px,7vw,112px); line-height:.92; color:var(--blue); }
+.hero-type h1 { position:relative; z-index:1; margin:0; font-size:clamp(66px,7vw,112px); line-height:.92; color:var(--blue); text-shadow:.045em .045em 0 var(--tomato); }
 .hero-type h1 span { display:block; }
 .hero-sub { max-width:440px; margin:25px 0 0; font-size:17px; line-height:1.45; font-weight:600; background:var(--ink); color:var(--paper); padding:10px 13px; }
 .hero-sticker { position:absolute; z-index:2; width:min(56%,360px); left:40%; top:4%; transform:rotate(-9deg); filter:drop-shadow(7px 7px 0 var(--paper)); pointer-events:none; }
@@ -95,7 +96,7 @@ button { cursor:pointer; }
 .features { background:var(--paper); }
 .desktop-icons { display:grid; grid-template-columns:repeat(4,1fr); gap:25px; margin-top:55px; }
 .desktop-icon { display:block; text-decoration:none; color:var(--ink); text-align:center; padding:12px; }
-.pixel-image { width:93px; height:80px; margin:auto auto 15px; display:grid; place-items:center; border:3px solid var(--ink); background:var(--marigold); box-shadow:6px 6px 0 var(--ink); font-family:"DM Sans",Arial,sans-serif; font-weight:800; font-size:50px; line-height:1; }
+.pixel-image { width:93px; height:80px; margin:auto auto 15px; display:grid; place-items:center; border:3px solid var(--ink); background:var(--marigold); box-shadow:6px 6px 0 var(--blue); font-family:"DM Sans",Arial,sans-serif; font-weight:800; font-size:50px; line-height:1; }
 .desktop-icon:nth-child(2) .pixel-image { background:var(--teal); }.desktop-icon:nth-child(3) .pixel-image { background:var(--tomato); }.desktop-icon:nth-child(4) .pixel-image { background:var(--grey); }
 .desktop-icon h3 { font-family:"Space Grotesk",Arial,sans-serif; font-size:29px; font-weight:700; text-transform:uppercase; margin:0 0 7px; }
 .desktop-icon p { font-size:14px; line-height:1.5; max-width:230px; margin:auto; }
@@ -106,7 +107,7 @@ button { cursor:pointer; }
 .offer-window ul { padding-left:22px; line-height:1.8; font-size:15px; }
 .offer-window .segments i:nth-child(n+6) { background:var(--grey); }
 .offer-window .window-inner { padding:26px; }
-.faq { background:var(--blue); color:var(--paper); }
+.faq { background:var(--blue); color:var(--paper); --ink-offset:var(--marigold); }
 .faq-list { max-width:870px; display:grid; gap:18px; }
 .faq-list .window:nth-child(even) { margin-left:35px; }
 .faq-list details { padding:0 20px; }
@@ -117,12 +118,13 @@ button { cursor:pointer; }
 .footer { background:var(--ink); color:var(--paper); padding:40px 0; }
 .footer .wrap { display:flex; justify-content:space-between; gap:20px; align-items:center; flex-wrap:wrap; }
 .footer a { color:inherit; }
-.account-page { background:var(--teal); min-height:100vh; }
+.account-page { background:var(--blue); color:var(--paper); min-height:100vh; --ink-offset:var(--tomato); }
+.account-page > .wrap > a { color:var(--paper); }
 .account-wrap { max-width:650px; }
 .account-wrap h1,.account-title { font-size:64px; margin:30px 0; }
 .public-pricing { background:var(--background); border-top:3px solid var(--ink); }
 .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; align-items:stretch; }
-.pricing-card { display:flex; flex-direction:column; gap:12px; background:var(--paper); color:var(--ink); border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink); padding:22px; }
+.pricing-card { display:flex; flex-direction:column; gap:12px; background:var(--paper); color:var(--ink); border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink-offset); padding:22px; }
 .pricing-card:nth-child(2) { background:var(--marigold); transform:rotate(-1deg); }
 .pricing-card .chrome-font { align-self:flex-start; background:var(--blue); color:var(--paper); border:2px solid var(--ink); padding:2px 8px; font-size:20px; }
 .pricing-card h3 { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; text-transform:uppercase; font-size:34px; line-height:1; margin:0; }
@@ -134,12 +136,12 @@ button { cursor:pointer; }
 .account-pricing { margin-top:30px; padding-top:24px; border-top:3px solid var(--ink); }
 .account-pricing h2 { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; text-transform:uppercase; font-size:30px; margin:0 0 8px; }
 .account-pricing .pricing-grid { grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:16px; margin-top:18px; }
-.account-pricing .pricing-card { padding:16px; box-shadow:4px 4px 0 var(--ink); }
+.account-pricing .pricing-card { padding:16px; box-shadow:4px 4px 0 var(--ink-offset); }
 .account-pricing .pricing-card:nth-child(2) { transform:none; }
 .account-pricing .pricing-card h3 { font-size:24px; }
 .account-pricing .pricing-price { font-size:28px; }
 .account-pricing .pricing-footnote { margin:12px 0 0; }
-.admin-table { width:100%; border-collapse:collapse; background:var(--paper); }
+.admin-table { width:100%; border-collapse:collapse; background:var(--paper); color:var(--ink); }
 .admin-table th,.admin-table td { border:2px solid var(--ink); padding:10px; text-align:left; }
 .admin-table td:first-child { white-space:nowrap; }
 .glitch-tear:before { content:''; position:absolute; top:-3px; left:0; right:0; height:13px; background:var(--marigold); clip-path:polygon(0 0,12% 100%,24% 0,39% 80%,52% 0,69% 100%,87% 0,100% 90%,100% 0); }

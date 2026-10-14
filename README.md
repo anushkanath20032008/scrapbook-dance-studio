@@ -45,7 +45,7 @@ npm run build
 
 ## Environment variables
 
-Copy `.env.example` to `.env` for local work. In production, set them in Vercel under Project → Settings → Environment Variables.
+Copy `.env.example` to `.env.local` for local work (it's untracked, so secrets stay out of git). In production, set them in Vercel under Project → Settings → Environment Variables.
 
 | Variable | Where it's used |
 | --- | --- |
@@ -55,9 +55,11 @@ Copy `.env.example` to `.env` for local work. In production, set them in Vercel 
 | `DODO_PAYMENTS_WEBHOOK_KEY` | Server only. Reserved for verifying Dodo webhooks |
 | `DODO_PAYMENTS_ENVIRONMENT` | `test_mode` (default) or `live_mode` |
 | `DODO_PAYMENTS_STARTER_PRODUCT_ID`, `DODO_PAYMENTS_GROWTH_PRODUCT_ID`, `DODO_PAYMENTS_STUDIO_PRODUCT_ID` | Server only. One Dodo subscription product per plan |
-| `PUBLIC_APP_URL` | Base URL for the checkout return link, e.g. `https://www.choreostudio.live`. Falls back to localhost in development |
+| `PUBLIC_APP_URL` | Base URL for the checkout return link, e.g. `https://www.choreostudio.live`. Falls back to the origin of the incoming request |
 
-If a plan's product ID or the API key is missing, choosing that plan shows a "not available for checkout yet" message instead of failing silently.
+If a plan's product ID or the API key is missing, choosing that plan shows a "not available for checkout yet" message instead of failing silently. A studio whose `billing_status` is no longer `not_started` can't start a second checkout.
+
+`plan` and `billing_status` only change when a server-side writer updates them. A Dodo webhook that does this (verifying signatures with `DODO_PAYMENTS_WEBHOOK_KEY` and writing through the service role) is not built yet.
 
 ## Security
 

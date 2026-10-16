@@ -180,3 +180,27 @@ describe("getFamilyView", () => {
     });
   });
 });
+
+describe("getFamilyView balance", () => {
+  it("counts every entry in the balance even when only the newest are listed", async () => {
+    const charges = Array.from({ length: 30 }, (_, i) => ({
+      id: `c${i}`,
+      student_id: student,
+      period: `2026-${String((i % 12) + 1).padStart(2, "0")}-01`,
+      due_on: "2026-01-05",
+      amount_paise: 100,
+      fee_plan_name: "Monthly",
+    }));
+    const { client } = fakeSupabase((call) => {
+      if (call.table === "family_links") return { data: link };
+      if (call.table === "students") return { data: [{ id: student, name: "Aarav" }] };
+      if (call.table === "charges") return { data: charges };
+      if (call.table === "payments") return { data: [] };
+      if (call.fn === "student_ledger_status") return { data: [] };
+      return { data: [] };
+    });
+    const view = await getFamilyView(client, validToken);
+    expect(view.balance_paise).toBe(3000);
+    expect(view.students[0]?.charges).toHaveLength(24);
+  });
+});

@@ -152,22 +152,21 @@ export async function getFamilyView(admin: Db, token: string) {
       .eq("studio_id", link.studio_id)
       .in("student_id", studentIds)
       .is("voided_at", null)
-      .order("period", { ascending: false })
-      .limit(60),
+      .order("period", { ascending: false }),
     admin
       .from("payments")
       .select("id, student_id, amount_paise, method, paid_on")
       .eq("studio_id", link.studio_id)
       .in("student_id", studentIds)
       .is("voided_at", null)
-      .order("paid_on", { ascending: false })
-      .limit(60),
+      .order("paid_on", { ascending: false }),
   ]);
   const chargeRows = unwrap(charges);
   const paymentRows = unwrap(payments);
 
   // Status comes from the same SQL function the studio sees, so both sides show the same numbers.
-  const periods = [...new Set(chargeRows.map((charge) => charge.period))];
+  const SHOWN = 24;
+  const periods = [...new Set(chargeRows.slice(0, SHOWN).map((charge) => charge.period))];
   const statuses = new Map<string, Status>();
   for (const result of await Promise.all(
     periods.map((period) =>
@@ -238,14 +237,15 @@ export async function getFamilyView(admin: Db, token: string) {
           date: dateBySession.get(record.session_id) ?? null,
           present: record.present,
         })),
-      charges: studentCharges.map((charge) => ({
+      // The balance above counts every entry; only the newest are listed.
+      charges: studentCharges.slice(0, SHOWN).map((charge) => ({
         period: charge.period,
         due_on: charge.due_on,
         amount_paise: charge.amount_paise,
         plan: charge.fee_plan_name,
         status: statuses.get(charge.id)?.status ?? "due",
       })),
-      payments: studentPayments.map((payment) => ({
+      payments: studentPayments.slice(0, SHOWN).map((payment) => ({
         amount_paise: payment.amount_paise,
         method: payment.method,
         paid_on: payment.paid_on,

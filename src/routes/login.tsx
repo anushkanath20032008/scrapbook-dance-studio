@@ -32,6 +32,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   // Someone who is already signed in goes straight to the console.
@@ -39,10 +40,16 @@ function Login() {
     if (session.status === "signed-in") void navigate({ to: "/app" });
   }, [session.status, navigate]);
 
+  useEffect(() => {
+    setError("");
+    setMessage("");
+  }, [mode]);
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setMessage("");
+    setError("");
     try {
       if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -62,10 +69,10 @@ function Login() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? explainAuthError(error.message)
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? explainAuthError(caught.message)
           : "Something went wrong. Please try again.",
       );
     } finally {
@@ -76,10 +83,11 @@ function Login() {
   async function continueWithGoogle() {
     setBusy(true);
     setMessage("");
+    setError("");
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: `${window.location.origin}/app`,
     });
-    if (result.error) setMessage(result.error.message);
+    if (result.error) setError(result.error.message);
     setBusy(false);
   }
 
@@ -126,8 +134,14 @@ function Login() {
                   required
                   maxLength={255}
                   autoComplete="email"
+                  aria-invalid={error !== "" && mode === "forgot"}
                 />
               </label>
+              {error !== "" && mode === "forgot" && (
+                <p role="alert" className="login-error">
+                  {error}
+                </p>
+              )}
               {mode !== "forgot" && (
                 <label className="form-label login-field">
                   Password
@@ -135,11 +149,20 @@ function Login() {
                     className="field"
                     type="password"
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError("");
+                    }}
+                    aria-invalid={error !== ""}
                     required
                     autoComplete={mode === "register" ? "new-password" : "current-password"}
                   />
                 </label>
+              )}
+              {error !== "" && mode !== "forgot" && (
+                <p role="alert" className="login-error">
+                  {error}
+                </p>
               )}
               {mode === "register" && (
                 <ul className="login-rubric" aria-label="Password requirements">

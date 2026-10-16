@@ -43,7 +43,7 @@ function Home() {
     Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
       gsap.registerPlugin(ScrollTrigger);
       ctx = gsap.context(() => {
-        if (problem.current) gsap.fromTo(problem.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 70% 5%, 30% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 70% 97%, 30% 100%, 0 100%)", duration:.35, ease:"steps(5)", scrollTrigger:{ trigger:problem.current, start:"top 95%", toggleActions:"play none none none" } });
+        if (problem.current) gsap.fromTo(problem.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration:.35, ease:"steps(5)", scrollTrigger:{ trigger:problem.current, start:"top 95%", toggleActions:"play none none none" } });
         if (solution.current) gsap.fromTo(solution.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration:.38, ease:"steps(4)", scrollTrigger:{ trigger:solution.current, start:"top 90%", toggleActions:"play none none none" } });
       });
     }).catch(() => {});

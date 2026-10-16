@@ -32,13 +32,16 @@ export async function startSubscriptionCheckout(plan: StudioPlanId, context: Che
 
   const { data: profile, error } = await context.supabase
     .from("studio_profiles")
-    .select("studio_name, billing_status")
+    .select("studio_name, billing_status, plan")
     .eq("user_id", context.userId)
     .maybeSingle();
   if (error) throw new Error("Could not load your studio details.");
-  // billing_status is server-managed; anything past not_started means a subscription already exists.
+  // billing_status and plan are server-managed. Checkout is allowed for a new studio, or for one whose
+  // subscription ended (cancelled and expired back to the waitlist); a cancelled studio still holding a
+  // paid plan has time left and is refused.
   if (profile && profile.billing_status !== "not_started") {
-    throw new Error("Your studio already has a subscription.");
+    const ended = profile.billing_status === "cancelled" && profile.plan === "waitlist";
+    if (!ended) throw new Error("Your studio already has a subscription.");
   }
 
   const client = new DodoPayments({

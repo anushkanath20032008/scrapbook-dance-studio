@@ -43,6 +43,13 @@
       "when": 1791200200000,
       "tag": "0005_messaging_family_billing",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791200300000,
+      "tag": "0006_apply_billing_event",
+      "breakpoints": true
     }
   ]
 }

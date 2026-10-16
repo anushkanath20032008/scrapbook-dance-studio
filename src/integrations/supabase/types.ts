@@ -583,6 +583,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_billing_event: {
+        Args: {
+          p_customer_id: string | null
+          p_event_at: string | null
+          p_event_id: string
+          p_period_end: string | null
+          p_plan: string | null
+          p_status: string | null
+          p_subscription_id: string | null
+          p_user_id: string | null
+        }
+        Returns: string
+      }
       assign_fee_plan: {
         Args: { p_plan: string; p_starts_on: string; p_student: string }
         Returns: string

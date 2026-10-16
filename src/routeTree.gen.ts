@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
+import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ApiJobsSendRemindersRoute = ApiJobsSendRemindersRouteImport.update({
   path: '/api/jobs/send-reminders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksDodoRoute = ApiWebhooksDodoRouteImport.update({
+  id: '/api/webhooks/dodo',
+  path: '/api/webhooks/dodo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/opt-out'
     | '/reset-password'
     | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/opt-out'
     | '/reset-password'
     | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/opt-out'
     | '/reset-password'
     | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   OptOutRoute: typeof OptOutRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
+  ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiJobsSendRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/dodo': {
+      id: '/api/webhooks/dodo'
+      path: '/api/webhooks/dodo'
+      fullPath: '/api/webhooks/dodo'
+      preLoaderRoute: typeof ApiWebhooksDodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   OptOutRoute: OptOutRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
+  ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,7 +14,7 @@ vi.mock("dodopayments", () => ({
 
 const { startSubscriptionCheckout } = await import("@/lib/billing.server");
 
-type Profile = { studio_name: string; billing_status: string } | null;
+type Profile = { studio_name: string; billing_status: string; plan?: string } | null;
 
 // A signed-in owner whose studio_profiles lookup returns `profile`.
 function ownerContext(profile: Profile) {
@@ -101,6 +101,29 @@ describe("startSubscriptionCheckout", () => {
     await expect(
       checkout("growth", { studio_name: "Ghungroo Studio", billing_status: "active" }),
     ).rejects.toThrow("Your studio already has a subscription.");
+    expect(dodo.create).not.toHaveBeenCalled();
+  });
+
+  it("lets a studio whose subscription ended (cancelled, back on the waitlist) subscribe again", async () => {
+    await checkout("growth", {
+      studio_name: "Ghungroo Studio",
+      billing_status: "cancelled",
+      plan: "waitlist",
+    });
+
+    expect(dodo.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses a cancelled studio that still holds a paid plan, and on-hold or past-due studios", async () => {
+    for (const profile of [
+      { billing_status: "cancelled", plan: "growth" },
+      { billing_status: "on_hold", plan: "waitlist" },
+      { billing_status: "past_due", plan: "starter" },
+    ]) {
+      await expect(checkout("studio", { studio_name: "x", ...profile })).rejects.toThrow(
+        "already has a subscription",
+      );
+    }
     expect(dodo.create).not.toHaveBeenCalled();
   });
 

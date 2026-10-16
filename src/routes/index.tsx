@@ -22,7 +22,7 @@ function Window({ title, children, className = "", count }: { title:string; chil
 }
 function Student({ name, batch, amount, status }: { name:string; batch:string; amount:string; status:"PAID"|"DUE"|"OVERDUE" }) {
   const color = status === "PAID" ? "var(--teal)" : status === "DUE" ? "var(--marigold)" : "var(--tomato)";
-  const ink = status === "DUE" ? "var(--ink)" : "var(--paper)";
+  const ink = status === "PAID" ? "var(--paper)" : "var(--ink)";
   return <div className="screen-row" style={{ "--status": color, "--status-ink": ink } as React.CSSProperties}><span><strong>{name}</strong><small>{batch} · {amount}</small></span><b>{status}</b></div>;
 }
 function Home() {

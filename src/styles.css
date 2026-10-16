@@ -5,8 +5,7 @@
 @theme inline {
   --color-background: var(--background); --color-foreground: var(--foreground); --color-card: var(--card); --color-card-foreground: var(--foreground); --color-primary: var(--primary); --color-primary-foreground: var(--paper); --color-secondary: var(--secondary); --color-secondary-foreground: var(--ink); --color-muted: var(--grey); --color-muted-foreground: var(--ink); --color-accent: var(--accent); --color-accent-foreground: var(--ink); --color-border: var(--ink); --color-input: var(--ink); --color-ring: var(--blue); --color-destructive: var(--tomato); --color-destructive-foreground: var(--paper); --color-popover: var(--paper); --color-popover-foreground: var(--ink); --color-tomato: var(--tomato); --color-marigold: var(--marigold); --color-teal: var(--teal); --color-paper: var(--paper); --color-ink: var(--ink); --color-window: var(--grey); --color-chrome: var(--blue);
 }
-/* Riso Dance Office palette with solid black shadows. --grey is a tomato screen tint; --teal is leaf (paid/present). */
-:root { --radius:0; --background:#FFF8ED; --foreground:#202020; --card:#FFF8ED; --primary:#142B67; --secondary:#F4D06F; --accent:#F8CFC5; --tomato:#F05A47; --marigold:#F4D06F; --teal:#5E9C76; --blue:#142B67; --ink:#202020; --paper:#FFF8ED; --grey:#F8CFC5; color-scheme:light; }
+:root { --radius:0; --background:#F7E8DC; --foreground:#1A1A1A; --card:#F7E8DC; --primary:#273FA3; --secondary:#F0C24C; --accent:#E7AAA9; --tomato:#E7AAA9; --marigold:#F0C24C; --teal:#273FA3; --blue:#273FA3; --ink:#1A1A1A; --paper:#F7E8DC; --grey:#E7AAA9; color-scheme:light; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; scroll-padding-top:85px; }
 body { margin:0; font-family:"DM Sans",Arial,sans-serif; background:var(--background); color:var(--foreground); }
@@ -44,7 +43,7 @@ button { cursor:pointer; }
 .screen-row:before { content:''; position:absolute; left:0; top:0; bottom:0; width:10px; background:var(--status); border-right:1px solid var(--ink); }
 .screen-row strong { display:block; font-size:14px; }
 .screen-row small { display:block; margin-top:2px; }
-/* Status badge: tomato = overdue, butter = due, leaf = paid. */
+/* Status badge: pink = overdue, marigold = due, cobalt = paid. */
 .screen-row b { justify-self:end; font-size:11px; letter-spacing:.04em; background:var(--status); color:var(--status-ink); border:1.5px solid var(--ink); padding:3px 8px; box-shadow:2px 2px 0 var(--ink); }
 .screen-footer { padding-top:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; }
 .count-in { color:var(--marigold); display:inline-block; min-width:85px; text-align:right; }
@@ -119,8 +118,7 @@ button { cursor:pointer; }
 .footer { background:var(--ink); color:var(--paper); padding:40px 0; }
 .footer .wrap { display:flex; justify-content:space-between; gap:20px; align-items:center; flex-wrap:wrap; }
 .footer a { color:inherit; }
-.account-page { background:var(--blue); color:var(--paper); min-height:100vh; }
-.account-page > .wrap > a { color:var(--paper); }
+.account-page { background:var(--teal); min-height:100vh; }
 .account-wrap { max-width:650px; }
 .account-wrap h1,.account-title { font-size:64px; margin:30px 0; }
 .public-pricing { background:var(--background); border-top:3px solid var(--ink); }
@@ -142,7 +140,7 @@ button { cursor:pointer; }
 .account-pricing .pricing-card h3 { font-size:24px; }
 .account-pricing .pricing-price { font-size:28px; }
 .account-pricing .pricing-footnote { margin:12px 0 0; }
-.admin-table { width:100%; border-collapse:collapse; background:var(--paper); color:var(--ink); }
+.admin-table { width:100%; border-collapse:collapse; background:var(--paper); }
 .admin-table th,.admin-table td { border:2px solid var(--ink); padding:10px; text-align:left; }
 .admin-table td:first-child { white-space:nowrap; }
 .glitch-tear:before { content:''; position:absolute; top:-3px; left:0; right:0; height:13px; background:var(--marigold); clip-path:polygon(0 0,12% 100%,24% 0,39% 80%,52% 0,69% 100%,87% 0,100% 90%,100% 0); }

@@ -175,6 +175,16 @@ button { cursor:pointer; }
 .console-nav-item { display:block; padding:9px 11px; border:2px solid transparent; color:var(--ink); text-decoration:none; font-weight:800; font-size:14px; }
 .console-nav-item.active { background:var(--marigold); border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
 .console-nav-foot { margin-top:auto; display:flex; flex-direction:column; gap:8px; font-size:12px; }
+.console-plan { border:2px solid var(--ink); background:var(--paper); box-shadow:4px 4px 0 var(--ink); }
+.console-plan-bar { background:var(--blue); color:var(--paper); padding:6px 10px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.console-plan-body { display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; margin:0; padding:12px 10px; }
+.console-plan-body dt { font-size:12px; font-weight:800; }
+.console-plan-body dd { margin:0; justify-self:end; }
+.status-pill { display:inline-block; padding:3px 9px; border:2px solid var(--ink); font-size:12px; font-weight:800; text-transform:capitalize; background:var(--marigold); }
+.status-pill[data-tone="plan"] { background:var(--blue); color:var(--paper); }
+.status-pill[data-tone="good"] { background:#bfe3c0; }
+.status-pill[data-tone="warn"] { background:#f6c9c5; }
+.status-pill[data-tone="idle"] { background:var(--paper); }
 .console-main { padding:24px clamp(16px,3vw,32px); min-width:0; }
 .console-title { font-size:clamp(34px,5vw,52px); margin:0 0 20px; color:var(--blue); }
 @media (max-width:760px) {

@@ -28,6 +28,9 @@ const navItems: { to: "/app"; label: string; exact: boolean }[] = [
 
 const readable = (value: string) => value.replace(/_/g, " ");
 
+const billingTone = (status: string | undefined) =>
+  status === "active" ? "good" : status === undefined || status === "not_started" ? "idle" : "warn";
+
 function ConsoleLayout() {
   const navigate = useNavigate();
   const session = useOwnerSession();
@@ -82,11 +85,26 @@ function ConsoleLayout() {
             </Link>
           ))}
           <div className="console-nav-foot">
-            <p>
-              Plan: <strong>{readable(context.data?.plan ?? "waitlist")}</strong>
-              <br />
-              Billing: <strong>{readable(context.data?.billingStatus ?? "not_started")}</strong>
-            </p>
+            <section className="console-plan" aria-label="Your plan">
+              <div className="console-plan-bar chrome-font">Your plan</div>
+              <dl className="console-plan-body">
+                <dt>Plan</dt>
+                <dd>
+                  <span className="status-pill" data-tone="plan">
+                    {readable(context.data?.plan ?? "waitlist")}
+                  </span>
+                </dd>
+                <dt>Billing</dt>
+                <dd>
+                  <span
+                    className="status-pill"
+                    data-tone={billingTone(context.data?.billingStatus)}
+                  >
+                    {readable(context.data?.billingStatus ?? "not_started")}
+                  </span>
+                </dd>
+              </dl>
+            </section>
             <Link to="/account" className="console-nav-item">
               Account and plans
             </Link>

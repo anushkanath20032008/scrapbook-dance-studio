@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -63,7 +64,9 @@ function Login() {
       }
     } catch (error) {
       setMessage(
-        error instanceof Error ? error.message : "Something went wrong. Please try again.",
+        error instanceof Error
+          ? explainAuthError(error.message)
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setBusy(false);
@@ -134,13 +137,25 @@ function Login() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     required
-                    minLength={8}
                     autoComplete={mode === "register" ? "new-password" : "current-password"}
                   />
                 </label>
               )}
+              {mode === "register" && (
+                <ul className="login-rubric" aria-label="Password requirements">
+                  {checkPassword(password, email).map((rule) => (
+                    <li key={rule.id} data-met={rule.met}>
+                      {rule.met ? "✓" : "○"} {rule.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
               <div className="login-actions">
-                <Button variant="retro" type="submit" disabled={busy}>
+                <Button
+                  variant="retro"
+                  type="submit"
+                  disabled={busy || (mode === "register" && !passwordMeetsRubric(password, email))}
+                >
                   {mode === "forgot"
                     ? "Send reset link"
                     : mode === "register"

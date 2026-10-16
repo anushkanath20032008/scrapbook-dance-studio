@@ -21,6 +21,7 @@ function ResetPassword() {
   const [phase, setPhase] = useState<Phase>("checking");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -114,6 +115,23 @@ function ResetPassword() {
                     }}
                   />
                 </label>
+                <label className="form-label login-field">
+                  Re-enter new password
+                  <input
+                    className="field"
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                    value={confirm}
+                    aria-invalid={confirm !== "" && confirm !== password}
+                    onChange={(event) => setConfirm(event.target.value)}
+                  />
+                </label>
+                {confirm !== "" && confirm !== password && (
+                  <p role="alert" className="login-error">
+                    The two passwords don&apos;t match.
+                  </p>
+                )}
                 {error !== "" && (
                   <p role="alert" className="login-error">
                     {error}
@@ -130,7 +148,7 @@ function ResetPassword() {
                   <Button
                     variant="retro"
                     type="submit"
-                    disabled={busy || !passwordMeetsRubric(password, email)}
+                    disabled={busy || confirm !== password || !passwordMeetsRubric(password, email)}
                   >
                     Save new password
                   </Button>

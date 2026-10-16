@@ -3,7 +3,6 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
 
 export const Route = createFileRoute("/login")({
@@ -84,10 +83,11 @@ function Login() {
     setBusy(true);
     setMessage("");
     setError("");
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/app`,
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/app` },
     });
-    if (result.error) setError(result.error.message);
+    if (oauthError) setError(oauthError.message);
     setBusy(false);
   }
 

@@ -50,6 +50,13 @@
       "when": 1791200300000,
       "tag": "0006_apply_billing_event",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791200400000,
+      "tag": "0007_revoke_original_table_grants",
+      "breakpoints": true
     }
   ]
 }

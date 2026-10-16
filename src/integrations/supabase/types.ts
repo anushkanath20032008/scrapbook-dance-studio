@@ -14,11 +14,453 @@ export type Database = {
   }
   public: {
     Tables: {
+      attendance_records: {
+        Row: {
+          id: string
+          marked_at: string
+          present: boolean
+          session_id: string
+          student_id: string
+          studio_id: string
+        }
+        Insert: {
+          id?: string
+          marked_at?: string
+          present: boolean
+          session_id: string
+          student_id: string
+          studio_id: string
+        }
+        Update: {
+          id?: string
+          marked_at?: string
+          present?: boolean
+          session_id?: string
+          student_id?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      batch_members: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          joined_on: string
+          left_on: string | null
+          student_id: string
+          studio_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          id?: string
+          joined_on?: string
+          left_on?: string | null
+          student_id: string
+          studio_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          joined_on?: string
+          left_on?: string | null
+          student_id?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      batches: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          ends_at: string | null
+          id: string
+          name: string
+          room: string | null
+          starts_at: string | null
+          studio_id: string
+          trainer_name: string | null
+          weekdays: number[]
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name: string
+          room?: string | null
+          starts_at?: string | null
+          studio_id: string
+          trainer_name?: string | null
+          weekdays?: number[]
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          name?: string
+          room?: string | null
+          starts_at?: string | null
+          studio_id?: string
+          trainer_name?: string | null
+          weekdays?: number[]
+        }
+        Relationships: []
+      }
+      billing_events: {
+        Row: {
+          applied: boolean
+          event_at: string | null
+          id: string
+          payload: Json
+          received_at: string
+          type: string
+        }
+        Insert: {
+          applied?: boolean
+          event_at?: string | null
+          id: string
+          payload: Json
+          received_at?: string
+          type: string
+        }
+        Update: {
+          applied?: boolean
+          event_at?: string | null
+          id?: string
+          payload?: Json
+          received_at?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      charges: {
+        Row: {
+          amount_paise: number
+          created_at: string
+          due_on: string
+          fee_plan_id: string | null
+          fee_plan_name: string
+          id: string
+          period: string
+          student_id: string
+          studio_id: string
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount_paise: number
+          created_at?: string
+          due_on: string
+          fee_plan_id?: string | null
+          fee_plan_name: string
+          id?: string
+          period: string
+          student_id: string
+          studio_id: string
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount_paise?: number
+          created_at?: string
+          due_on?: string
+          fee_plan_id?: string | null
+          fee_plan_name?: string
+          id?: string
+          period?: string
+          student_id?: string
+          studio_id?: string
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Relationships: []
+      }
+      class_sessions: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          session_on: string
+          studio_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          id?: string
+          session_on: string
+          studio_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          session_on?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      family_links: {
+        Row: {
+          created_at: string
+          guardian_id: string
+          id: string
+          revoked_at: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Insert: {
+          created_at?: string
+          guardian_id: string
+          id?: string
+          revoked_at?: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Update: {
+          created_at?: string
+          guardian_id?: string
+          id?: string
+          revoked_at?: string | null
+          studio_id?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      fee_plan_assignments: {
+        Row: {
+          amount_paise: number
+          created_at: string
+          ends_on: string | null
+          fee_plan_id: string
+          id: string
+          starts_on: string
+          student_id: string
+          studio_id: string
+        }
+        Insert: {
+          amount_paise: number
+          created_at?: string
+          ends_on?: string | null
+          fee_plan_id: string
+          id?: string
+          starts_on: string
+          student_id: string
+          studio_id: string
+        }
+        Update: {
+          amount_paise?: number
+          created_at?: string
+          ends_on?: string | null
+          fee_plan_id?: string
+          id?: string
+          starts_on?: string
+          student_id?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      fee_plans: {
+        Row: {
+          amount_paise: number
+          archived_at: string | null
+          classes_per_week: number | null
+          created_at: string
+          id: string
+          name: string
+          studio_id: string
+        }
+        Insert: {
+          amount_paise: number
+          archived_at?: string | null
+          classes_per_week?: number | null
+          created_at?: string
+          id?: string
+          name: string
+          studio_id: string
+        }
+        Update: {
+          amount_paise?: number
+          archived_at?: string | null
+          classes_per_week?: number | null
+          created_at?: string
+          id?: string
+          name?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      guardians: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+          reminders_opted_out: boolean
+          studio_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string | null
+          reminders_opted_out?: boolean
+          studio_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          reminders_opted_out?: boolean
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount_paise: number
+          created_at: string
+          id: string
+          idempotency_key: string
+          method: string
+          note: string | null
+          paid_on: string
+          student_id: string
+          studio_id: string
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount_paise: number
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          method: string
+          note?: string | null
+          paid_on: string
+          student_id: string
+          studio_id: string
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount_paise?: number
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          method?: string
+          note?: string | null
+          paid_on?: string
+          student_id?: string
+          studio_id?: string
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          attempts: number
+          charge_id: string
+          created_at: string
+          dedupe_key: string
+          guardian_id: string
+          id: string
+          kind: string
+          last_error: string | null
+          lease_expires_at: string | null
+          next_attempt_at: string
+          payload: Json
+          provider_message_id: string | null
+          sent_at: string | null
+          status: string
+          student_id: string
+          studio_id: string
+          template_name: string
+        }
+        Insert: {
+          attempts?: number
+          charge_id: string
+          created_at?: string
+          dedupe_key: string
+          guardian_id: string
+          id?: string
+          kind: string
+          last_error?: string | null
+          lease_expires_at?: string | null
+          next_attempt_at?: string
+          payload: Json
+          provider_message_id?: string | null
+          sent_at?: string | null
+          status?: string
+          student_id: string
+          studio_id: string
+          template_name: string
+        }
+        Update: {
+          attempts?: number
+          charge_id?: string
+          created_at?: string
+          dedupe_key?: string
+          guardian_id?: string
+          id?: string
+          kind?: string
+          last_error?: string | null
+          lease_expires_at?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          provider_message_id?: string | null
+          sent_at?: string | null
+          status?: string
+          student_id?: string
+          studio_id?: string
+          template_name?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          guardian_id: string | null
+          id: string
+          name: string
+          studio_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          guardian_id?: string | null
+          id?: string
+          name: string
+          studio_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          guardian_id?: string | null
+          id?: string
+          name?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
       studio_profiles: {
         Row: {
           billing_status: string
+          billing_updated_at: string | null
           city: string | null
           created_at: string
+          current_period_end: string | null
+          dodo_customer_id: string | null
+          dodo_subscription_id: string | null
           name: string
           phone: string | null
           plan: string
@@ -27,8 +469,12 @@ export type Database = {
         }
         Insert: {
           billing_status?: string
+          billing_updated_at?: string | null
           city?: string | null
           created_at?: string
+          current_period_end?: string | null
+          dodo_customer_id?: string | null
+          dodo_subscription_id?: string | null
           name?: string
           phone?: string | null
           plan?: string
@@ -37,8 +483,12 @@ export type Database = {
         }
         Update: {
           billing_status?: string
+          billing_updated_at?: string | null
           city?: string | null
           created_at?: string
+          current_period_end?: string | null
+          dodo_customer_id?: string | null
+          dodo_subscription_id?: string | null
           name?: string
           phone?: string | null
           plan?: string
@@ -133,12 +583,55 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_fee_plan: {
+        Args: { p_plan: string; p_starts_on: string; p_student: string }
+        Returns: string
+      }
+      claim_due_reminders: {
+        Args: { p_lease_seconds?: number; p_limit: number }
+        Returns: Database["public"]["Tables"]["reminders"]["Row"][]
+      }
+      generate_monthly_charges: {
+        Args: { p_due_on?: string; p_period: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      ledger_overview: {
+        Args: { p_period: string; p_today?: string }
+        Returns: {
+          billed_paise: number
+          collected_paise: number
+          outstanding_paise: number
+          overdue_students: number
+          pending_students: number
+          total_students: number
+        }[]
+      }
+      queue_fee_reminders: {
+        Args: { p_period: string; p_today?: string }
+        Returns: number
+      }
+      student_ledger_status: {
+        Args: { p_period: string; p_student_ids?: string[]; p_today?: string }
+        Returns: {
+          allocated_paise: number
+          amount_paise: number
+          balance_paise: number
+          charge_id: string
+          due_on: string
+          fee_plan_name: string
+          outstanding_paise: number
+          period: string
+          status: string
+          student_id: string
+          student_name: string
+        }[]
       }
     }
     Enums: {

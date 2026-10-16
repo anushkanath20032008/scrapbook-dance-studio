@@ -40,11 +40,12 @@ button { cursor:pointer; }
 .hero-window { transform:rotate(1deg); z-index:3; background:var(--grey); }
 .window-inner { padding:17px; }
 .screen-top { display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; gap:12px; padding-bottom:10px; border-bottom:2px solid var(--ink); }
-.screen-row { display:grid; grid-template-columns:minmax(0,1fr) 80px; align-items:center; gap:6px; border-bottom:1px solid var(--ink); padding:10px 8px 10px 14px; position:relative; background:var(--paper); font-size:13px; }
-.screen-row:before { content:''; position:absolute; left:0; top:0; bottom:0; width:7px; background:var(--status); }
+.screen-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; border-bottom:1px solid var(--ink); padding:10px 8px 10px 18px; position:relative; background:color-mix(in srgb, var(--status) 16%, var(--paper)); font-size:13px; }
+.screen-row:before { content:''; position:absolute; left:0; top:0; bottom:0; width:10px; background:var(--status); border-right:1px solid var(--ink); }
 .screen-row strong { display:block; font-size:14px; }
 .screen-row small { display:block; margin-top:2px; }
-.screen-row b { text-align:right; font-size:11px; }
+/* Status badge: tomato = overdue, butter = due, leaf = paid. */
+.screen-row b { justify-self:end; font-size:11px; letter-spacing:.04em; background:var(--status); color:var(--status-ink); border:1.5px solid var(--ink); padding:3px 8px; box-shadow:2px 2px 0 var(--ink); }
 .screen-footer { padding-top:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; }
 .count-in { color:var(--marigold); display:inline-block; min-width:85px; text-align:right; }
 .signup-strip { background:var(--paper); padding:0 0 65px; }

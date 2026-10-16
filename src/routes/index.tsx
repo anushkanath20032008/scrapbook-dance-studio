@@ -22,7 +22,8 @@ function Window({ title, children, className = "", count }: { title:string; chil
 }
 function Student({ name, batch, amount, status }: { name:string; batch:string; amount:string; status:"PAID"|"DUE"|"OVERDUE" }) {
   const color = status === "PAID" ? "var(--teal)" : status === "DUE" ? "var(--marigold)" : "var(--tomato)";
-  return <div className="screen-row" style={{ "--status": color } as React.CSSProperties}><span><strong>{name}</strong><small>{batch} · {amount}</small></span><b>{status}</b></div>;
+  const ink = status === "DUE" ? "var(--ink)" : "var(--paper)";
+  return <div className="screen-row" style={{ "--status": color, "--status-ink": ink } as React.CSSProperties}><span><strong>{name}</strong><small>{batch} · {amount}</small></span><b>{status}</b></div>;
 }
 function Home() {
   const submit = useServerFn(joinWaitlist);

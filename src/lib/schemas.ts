@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { clockTime, optionalText, paise, personName, uuid } from "./validators";
+import {
+  clockTime,
+  firstOfMonth,
+  idempotencyKey,
+  isoDate,
+  optionalText,
+  paise,
+  personName,
+  uuid,
+} from "./validators";
 
 // Input schemas that carry rules worth testing on their own. Client-safe: no server imports.
 
@@ -35,3 +44,21 @@ export const feePlanInput = z.object({
     .nullish()
     .transform((value) => value ?? null),
 });
+
+export const paymentMethods = ["cash", "upi", "bank", "other"] as const;
+
+export const paymentInput = z.object({
+  studentId: uuid,
+  amountPaise: paise,
+  method: z.enum(paymentMethods),
+  paidOn: isoDate,
+  note: optionalText(500),
+  idempotencyKey,
+});
+
+export const generateChargesInput = z
+  .object({ period: isoDate, dueOn: isoDate.optional() })
+  .refine((input) => !input.dueOn || input.dueOn >= firstOfMonth(input.period), {
+    message: "The due date cannot be before the month it bills",
+    path: ["dueOn"],
+  });

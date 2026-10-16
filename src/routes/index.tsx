@@ -21,8 +21,8 @@ function Window({ title, children, className = "", count }: { title:string; chil
   return <div className={`window ${className}`}><div className="window-bar"><span className="chrome-font">{title}</span><span className="window-controls" aria-hidden="true">{count && <span className="chrome-font count-in">{count}</span>}<i/><i/></span></div>{children}</div>;
 }
 function Student({ name, batch, amount, status }: { name:string; batch:string; amount:string; status:"PAID"|"DUE"|"OVERDUE" }) {
-  const color = status === "PAID" ? "var(--teal)" : status === "DUE" ? "var(--marigold)" : "var(--tomato)";
-  const ink = status === "PAID" ? "var(--paper)" : "var(--ink)";
+  const color = status === "PAID" ? "var(--status-paid)" : status === "DUE" ? "var(--status-due)" : "var(--status-overdue)";
+  const ink = status === "DUE" ? "var(--ink)" : "var(--paper)";
   return <div className="screen-row" style={{ "--status": color, "--status-ink": ink } as React.CSSProperties}><span><strong>{name}</strong><small>{batch} · {amount}</small></span><b>{status}</b></div>;
 }
 function Home() {

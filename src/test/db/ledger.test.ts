@@ -242,4 +242,38 @@ describe("ledger: charges, payments and derived status", () => {
       expect(await db.query("anon", `SELECT 1 FROM public.${table}`).catch(() => [])).toEqual([]);
     }
   });
+
+  describe("record_payment", () => {
+    const record = (owner: string, student: string, amount: number, paidOn: string, key: string) =>
+      db.query<{ id: string; amount_paise: string }>(
+        { user: owner },
+        "SELECT id, amount_paise::text FROM public.record_payment($1, $2, 'upi', $3::date, 'note', $4)",
+        [student, amount, paidOn, key],
+      );
+
+    it("records a payment once and returns the same row for a repeated key", async () => {
+      const owner = await newStudio(db);
+      const s = await newStudent(db, owner, "Idem", { amountPaise: 100000 });
+      const first = await record(owner, s.id, 40000, "2026-10-06", "key-aaaa");
+      const again = await record(owner, s.id, 40000, "2026-10-06", "key-aaaa");
+      expect(again[0].id).toBe(first[0].id);
+      const [{ count }] = await db.query<{ count: number }>({ user: owner }, "SELECT count(*)::int AS count FROM public.payments");
+      expect(count).toBe(1);
+    });
+
+    it("refuses a repeated key that describes a different payment", async () => {
+      const owner = await newStudio(db);
+      const s = await newStudent(db, owner, "Idem", { amountPaise: 100000 });
+      await record(owner, s.id, 40000, "2026-10-06", "key-bbbb");
+      expect(await rejection(record(owner, s.id, 50000, "2026-10-06", "key-bbbb"))).toMatch(/different payment/i);
+    });
+
+    it("rejects future dates and other studios' students", async () => {
+      const owner = await newStudio(db);
+      const other = await newStudio(db);
+      const s = await newStudent(db, owner, "Dated", { amountPaise: 100000 });
+      expect(await rejection(record(owner, s.id, 100, "2099-01-01", "key-cccc"))).toMatch(/future/i);
+      expect(await rejection(record(other, s.id, 100, "2026-10-06", "key-dddd"))).toMatch(/not found/i);
+    });
+  });
 });

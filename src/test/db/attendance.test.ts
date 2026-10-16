@@ -77,4 +77,56 @@ describe("attendance: sessions and marks", () => {
     const sessionId = await session(owner, batch, "2026-10-15");
     expect(await rejection(db.query({ user: owner }, "DELETE FROM public.class_sessions WHERE id = $1", [sessionId]))).toMatch(/permission denied/i);
   });
+
+  describe("mark_attendance and batch_day", () => {
+    const today = () => new Date(Date.now() + 5.5 * 3600_000).toISOString().slice(0, 10);
+    const markDay = (owner: string, batch: string, date: string, marks: { student_id: string; present: boolean }[]) =>
+      db.query<{ n: number }>({ user: owner }, "SELECT public.mark_attendance($1, $2::date, $3::jsonb) AS n", [batch, date, JSON.stringify(marks)]).then((r) => r[0].n);
+    const day = (owner: string, batch: string, date: string) =>
+      db.query<{ student_name: string; present: boolean | null }>({ user: owner }, "SELECT student_name, present FROM public.batch_day($1, $2::date) ORDER BY student_name", [batch, date]);
+
+    it("marks a roster in one call, lists the day with unmarked students, and replaces marks on a second call", async () => {
+      const owner = await newStudio(db);
+      const batch = await newBatch(db, owner);
+      const a = await newStudent(db, owner, "Asha");
+      const b = await newStudent(db, owner, "Bela");
+      const c = await newStudent(db, owner, "Chirag");
+      for (const s of [a, b, c]) await db.admin("INSERT INTO public.batch_members (studio_id, batch_id, student_id, joined_on) VALUES ($1, $2, $3, DATE '2020-01-01')", [owner, batch, s.id]);
+      expect(await markDay(owner, batch, today(), [{ student_id: a.id, present: true }, { student_id: b.id, present: false }])).toBe(2);
+      expect(await day(owner, batch, today())).toEqual([
+        { student_name: "Asha", present: true },
+        { student_name: "Bela", present: false },
+        { student_name: "Chirag", present: null },
+      ]);
+      await markDay(owner, batch, today(), [{ student_id: b.id, present: true }]);
+      expect((await day(owner, batch, today())).find((r) => r.student_name === "Bela")?.present).toBe(true);
+      const [{ count }] = await db.query<{ count: number }>({ user: owner }, "SELECT count(*)::int AS count FROM public.attendance_records");
+      expect(count).toBe(2);
+    });
+
+    it("rejects the whole call and writes nothing when a student was not on the roster that day", async () => {
+      const owner = await newStudio(db);
+      const batch = await newBatch(db, owner);
+      const member = await newStudent(db, owner, "Member");
+      const left = await newStudent(db, owner, "Left");
+      await db.admin("INSERT INTO public.batch_members (studio_id, batch_id, student_id, joined_on) VALUES ($1, $2, $3, DATE '2020-01-01')", [owner, batch, member.id]);
+      await db.admin("INSERT INTO public.batch_members (studio_id, batch_id, student_id, joined_on, left_on) VALUES ($1, $2, $3, DATE '2020-01-01', DATE '2021-01-01')", [owner, batch, left.id]);
+      const message = await rejection(markDay(owner, batch, today(), [{ student_id: member.id, present: true }, { student_id: left.id, present: true }]));
+      expect(message).toMatch(/roster/i);
+      expect(await db.query({ user: owner }, "SELECT 1 FROM public.attendance_records")).toEqual([]);
+      expect(await db.query({ user: owner }, "SELECT 1 FROM public.class_sessions")).toEqual([]);
+    });
+
+    it("rejects dates far outside the allowed window and batches from other studios", async () => {
+      const owner = await newStudio(db);
+      const other = await newStudio(db);
+      const batch = await newBatch(db, owner);
+      const s = await newStudent(db, owner, "Dated");
+      await db.admin("INSERT INTO public.batch_members (studio_id, batch_id, student_id, joined_on) VALUES ($1, $2, $3, DATE '2000-01-01')", [owner, batch, s.id]);
+      const marks = [{ student_id: s.id, present: true }];
+      expect(await rejection(markDay(owner, batch, "2099-01-01", marks))).toMatch(/date/i);
+      expect(await rejection(markDay(owner, batch, "2000-01-01", marks))).toMatch(/date/i);
+      expect(await rejection(markDay(other, batch, today(), marks))).toMatch(/not found/i);
+    });
+  });
 });

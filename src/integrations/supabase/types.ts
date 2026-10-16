@@ -587,6 +587,14 @@ export type Database = {
         Args: { p_plan: string; p_starts_on: string; p_student: string }
         Returns: string
       }
+      batch_day: {
+        Args: { p_batch: string; p_on: string }
+        Returns: {
+          present: boolean | null
+          student_id: string
+          student_name: string
+        }[]
+      }
       claim_due_reminders: {
         Args: { p_lease_seconds?: number; p_limit: number }
         Returns: Database["public"]["Tables"]["reminders"]["Row"][]
@@ -613,9 +621,24 @@ export type Database = {
           total_students: number
         }[]
       }
+      mark_attendance: {
+        Args: { p_batch: string; p_marks: Json; p_session_on: string }
+        Returns: number
+      }
       queue_fee_reminders: {
         Args: { p_period: string; p_today?: string }
         Returns: number
+      }
+      record_payment: {
+        Args: {
+          p_amount_paise: number
+          p_idempotency_key: string
+          p_method: string
+          p_note: string | null
+          p_paid_on: string
+          p_student: string
+        }
+        Returns: Database["public"]["Tables"]["payments"]["Row"]
       }
       student_ledger_status: {
         Args: { p_period: string; p_student_ids?: string[]; p_today?: string }

@@ -223,3 +223,105 @@ $$;
 
 REVOKE ALL ON FUNCTION public.generate_monthly_charges(date, date), public.student_ledger_status(date, date, uuid[]), public.ledger_overview(date, date) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.generate_monthly_charges(date, date), public.student_ledger_status(date, date, uuid[]), public.ledger_overview(date, date) TO authenticated, service_role;
+
+-- Record a payment the studio received outside ChoreoStudio. A repeated idempotency key returns the original
+-- row, so a double click or a retry is recorded once; reusing a key for a different payment is refused.
+CREATE FUNCTION public.record_payment(
+  p_student uuid, p_amount_paise bigint, p_method text, p_paid_on date, p_note text, p_idempotency_key text
+)
+RETURNS public.payments
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+DECLARE
+  v_studio uuid;
+  v_row public.payments;
+BEGIN
+  SELECT studio_id INTO v_studio FROM public.students WHERE id = p_student;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'student not found';
+  END IF;
+  IF p_paid_on > (now() AT TIME ZONE 'Asia/Kolkata')::date THEN
+    RAISE EXCEPTION 'the payment date cannot be in the future';
+  END IF;
+  INSERT INTO public.payments (studio_id, student_id, amount_paise, method, paid_on, note, idempotency_key)
+  VALUES (v_studio, p_student, p_amount_paise, p_method, p_paid_on, p_note, p_idempotency_key)
+  ON CONFLICT (studio_id, idempotency_key) DO NOTHING
+  RETURNING * INTO v_row;
+  IF v_row.id IS NULL THEN
+    SELECT * INTO v_row FROM public.payments WHERE studio_id = v_studio AND idempotency_key = p_idempotency_key;
+    IF v_row.student_id <> p_student OR v_row.amount_paise <> p_amount_paise OR v_row.paid_on <> p_paid_on THEN
+      RAISE EXCEPTION 'that payment key was already used for a different payment';
+    END IF;
+  END IF;
+  RETURN v_row;
+END $$;
+
+-- Mark a batch's attendance for a day in one atomic call. Every student must be on the roster that day, or
+-- nothing is written. p_marks is a JSON array of {student_id, present}. The date must be within a year back
+-- and a week ahead of today in India.
+CREATE FUNCTION public.mark_attendance(p_batch uuid, p_session_on date, p_marks jsonb)
+RETURNS integer
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+DECLARE
+  v_studio uuid;
+  v_today date := (now() AT TIME ZONE 'Asia/Kolkata')::date;
+  v_session uuid;
+  v_missing text;
+  v_count integer;
+BEGIN
+  SELECT studio_id INTO v_studio FROM public.batches WHERE id = p_batch;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'batch not found';
+  END IF;
+  IF p_session_on < v_today - 366 OR p_session_on > v_today + 7 THEN
+    RAISE EXCEPTION 'the date must be within the last year or the coming week';
+  END IF;
+  IF jsonb_typeof(p_marks) <> 'array' OR jsonb_array_length(p_marks) = 0 THEN
+    RAISE EXCEPTION 'at least one attendance mark is required';
+  END IF;
+
+  SELECT string_agg(coalesce(s.name, m.student_id::text), ', ') INTO v_missing
+  FROM jsonb_to_recordset(p_marks) AS m(student_id uuid, present boolean)
+  LEFT JOIN public.students s ON s.id = m.student_id AND s.studio_id = v_studio
+  WHERE NOT EXISTS (
+    SELECT 1 FROM public.batch_members bm
+    WHERE bm.batch_id = p_batch AND bm.student_id = m.student_id AND bm.studio_id = v_studio
+      AND bm.joined_on <= p_session_on AND (bm.left_on IS NULL OR bm.left_on >= p_session_on)
+  );
+  IF v_missing IS NOT NULL THEN
+    RAISE EXCEPTION 'not on the roster for that date: %', v_missing;
+  END IF;
+
+  INSERT INTO public.class_sessions (studio_id, batch_id, session_on) VALUES (v_studio, p_batch, p_session_on)
+  ON CONFLICT (batch_id, session_on) DO UPDATE SET session_on = EXCLUDED.session_on
+  RETURNING id INTO v_session;
+
+  INSERT INTO public.attendance_records (studio_id, session_id, student_id, present)
+  SELECT v_studio, v_session, m.student_id, m.present
+  FROM jsonb_to_recordset(p_marks) AS m(student_id uuid, present boolean)
+  ON CONFLICT (session_id, student_id) DO UPDATE SET present = EXCLUDED.present, marked_at = now();
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  RETURN v_count;
+END $$;
+
+-- A batch's roster for one day with each student's mark (null when not yet marked).
+CREATE FUNCTION public.batch_day(p_batch uuid, p_on date)
+RETURNS TABLE (student_id uuid, student_name text, present boolean)
+LANGUAGE sql
+STABLE
+SET search_path = public
+AS $$
+  SELECT s.id, s.name, ar.present
+  FROM public.batch_members bm
+  JOIN public.students s ON s.id = bm.student_id AND s.studio_id = bm.studio_id
+  LEFT JOIN public.class_sessions cs ON cs.batch_id = bm.batch_id AND cs.session_on = p_on
+  LEFT JOIN public.attendance_records ar ON ar.session_id = cs.id AND ar.student_id = s.id
+  WHERE bm.batch_id = p_batch AND bm.joined_on <= p_on AND (bm.left_on IS NULL OR bm.left_on >= p_on)
+  ORDER BY s.name
+$$;
+
+REVOKE ALL ON FUNCTION public.record_payment(uuid, bigint, text, date, text, text), public.mark_attendance(uuid, date, jsonb), public.batch_day(uuid, date) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.record_payment(uuid, bigint, text, date, text, text), public.mark_attendance(uuid, date, jsonb), public.batch_day(uuid, date) TO authenticated, service_role;

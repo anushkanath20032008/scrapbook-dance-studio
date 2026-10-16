@@ -52,14 +52,42 @@ Copy `.env.example` to `.env.local` for local work (it's untracked, so secrets s
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Server functions |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser client (publishable values only) |
 | `DODO_PAYMENTS_API_KEY` | Server only. Creates checkout sessions |
-| `DODO_PAYMENTS_WEBHOOK_KEY` | Server only. Reserved for verifying Dodo webhooks |
+| `DODO_PAYMENTS_WEBHOOK_KEY` | Server only. Verifies the signature on Dodo webhooks |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server only. Webhook, reminder job and the public family view |
+| `RENDER_JOB_SECRET` | Server only. Bearer secret the scheduler sends to the reminder job |
+| `WHATSAPP_PROVIDER_URL`, `WHATSAPP_PROVIDER_TOKEN` | Server only. The WhatsApp provider the reminder job posts to. Unset means reminders stay queued |
 | `DODO_PAYMENTS_ENVIRONMENT` | `test_mode` (default) or `live_mode` |
 | `DODO_PAYMENTS_STARTER_PRODUCT_ID`, `DODO_PAYMENTS_GROWTH_PRODUCT_ID`, `DODO_PAYMENTS_STUDIO_PRODUCT_ID` | Server only. One Dodo subscription product per plan |
 | `PUBLIC_APP_URL` | Base URL for the checkout return link, e.g. `https://www.choreostudio.live`. Falls back to the origin of the incoming request |
 
-If a plan's product ID or the API key is missing, choosing that plan shows a "not available for checkout yet" message instead of failing silently. A studio whose `billing_status` is no longer `not_started` can't start a second checkout.
+If a plan's product ID or the API key is missing, choosing that plan shows a "not available for checkout yet" message instead of failing silently. A studio with a live subscription can't start a second checkout; one whose subscription has expired (cancelled, back on the waitlist) can subscribe again.
 
-`plan` and `billing_status` only change when a server-side writer updates them. A Dodo webhook that does this (verifying signatures with `DODO_PAYMENTS_WEBHOOK_KEY` and writing through the service role) is not built yet.
+`plan` and `billing_status` only change through the Dodo webhook (below), which writes with the service role. Owners can edit their contact details but never their plan or billing state.
+
+## Backend
+
+Everything is a TanStack Start server function (`src/lib/*.functions.ts`) that loads its logic from `src/lib/*.server.ts` inside the handler, so no secret reaches the browser bundle. Rules that must never be bypassed (the ledger, attendance, reminders, billing state) live in SQL (`drizzle/migrations/0003` to `0006`) behind row-level security, and are tested against a real in-process Postgres.
+
+| Area | What it does |
+| --- | --- |
+| Directory | Guardians, students, batches with dated rosters, fee plans assigned per student (separate from batch membership) |
+| Ledger | Monthly charges and payments the studio records (cash, UPI, bank). ChoreoStudio never processes student payments. Charges keep the plan and amount that created them; entries are corrected by voiding with a reason, never edited |
+| Attendance | One mark per student per class date, only for students on that batch's roster |
+| Reminders | `queueReminders` adds a WhatsApp reminder for each due or overdue charge (once per charge per day). The send job delivers them with retries |
+| Family view | Studios create a private link per guardian; the page behind it shows classes, attendance, charges, payments and balance. Only a hash of the link is stored, and it can be revoked |
+| Billing | `POST /api/webhooks/dodo` turns verified Dodo events into the studio's plan and status |
+
+### Reminder job
+
+`POST /api/jobs/send-reminders` sends one batch of due reminders. Schedule it every few minutes (for example a Render cron job) with the header `Authorization: Bearer <RENDER_JOB_SECRET>`. Failed sends are retried with growing delays and give up after five attempts. If the provider settings are missing the job answers 503 and leaves every reminder queued. Creating the schedule is a deployment step, not part of the code.
+
+### Dodo webhook
+
+In the Dodo dashboard add a webhook pointing to `https://<your domain>/api/webhooks/dodo` with the subscription events, and copy its signing secret into `DODO_PAYMENTS_WEBHOOK_KEY`. The signature is checked on the raw body before anything is read. Each event is applied once, only if it is newer than the last one applied, and only for the studio's own subscription.
+
+### Database changes
+
+The migrations in `drizzle/migrations` are additive. Apply `0003` to `0006` to the database, then run `drizzle/verify/rollout-checks.sql` against it: it must return no rows. Apply the migrations before deploying the code that uses them.
 
 ## Security
 

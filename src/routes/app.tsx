@@ -1,0 +1,110 @@
+import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useOwnerSession } from "@/hooks/use-owner";
+import { supabase } from "@/integrations/supabase/client";
+import { getConsoleContext } from "@/lib/console.functions";
+
+export const Route = createFileRoute("/app")({
+  head: () => ({
+    meta: [
+      { title: "Console | Choreo Studio" },
+      {
+        name: "description",
+        content: "Run your dance studio: fees, batches, students and attendance.",
+      },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
+  component: ConsoleLayout,
+});
+
+// Each screen is added to this list as it ships.
+const navItems: { to: "/app"; label: string; exact: boolean }[] = [
+  { to: "/app", label: "Overview", exact: true },
+];
+
+const readable = (value: string) => value.replace(/_/g, " ");
+
+function ConsoleLayout() {
+  const navigate = useNavigate();
+  const session = useOwnerSession();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const loadContext = useServerFn(getConsoleContext);
+  const context = useQuery({
+    queryKey: ["console-context"],
+    queryFn: () => loadContext(),
+    enabled: session.status === "signed-in",
+  });
+
+  useEffect(() => {
+    if (session.status === "signed-out") void navigate({ to: "/login" });
+  }, [session.status, navigate]);
+
+  if (session.status !== "signed-in") {
+    return (
+      <main className="console-loading">
+        <p>Loading your studio…</p>
+      </main>
+    );
+  }
+
+  return (
+    <div className="console">
+      <header className="console-topbar">
+        <button
+          type="button"
+          className="console-menu-button"
+          aria-label="Open navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          ☰
+        </button>
+        <span className="brand">Choreo Studio</span>
+        <span className="console-studio">{context.data?.studioName || session.email}</span>
+      </header>
+      <div className="console-body">
+        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Console navigation">
+          <span className="console-nav-label">Manage</span>
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              activeOptions={{ exact: item.exact }}
+              activeProps={{ className: "active" }}
+              className="console-nav-item"
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <div className="console-nav-foot">
+            <p>
+              Plan: <strong>{readable(context.data?.plan ?? "waitlist")}</strong>
+              <br />
+              Billing: <strong>{readable(context.data?.billingStatus ?? "not_started")}</strong>
+            </p>
+            <Link to="/account" className="console-nav-item">
+              Account and plans
+            </Link>
+            {context.data?.isPlatformOwner && (
+              <Link to="/admin" className="console-nav-item">
+                Waitlist
+              </Link>
+            )}
+            <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
+              Sign out
+            </Button>
+          </div>
+        </nav>
+        <main className="console-main">
+          {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}

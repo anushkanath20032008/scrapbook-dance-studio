@@ -146,3 +146,35 @@ button { cursor:pointer; }
 @media(max-width:800px){ .hero-body,.problem-grid,.calc-body,.offer-layout { grid-template-columns:1fr; } .hero-body { min-height:0; gap:32px; padding-top:15px; } .hero-type { min-height:310px; } .hero-type h1 { font-size:clamp(66px,15vw,110px); } .hero-sticker { width:44%; left:49%; top:0; } .hero-window { max-width:600px; } .signup-grid { grid-template-columns:1fr 1fr; } .signup-grid .submit { grid-column:span 2; } .sequence { grid-template-columns:1fr 1fr; } .sequence .window:nth-child(3) { margin-top:5px; } .desktop-icons { grid-template-columns:repeat(2,1fr); } .nav-links { gap:12px; } .pricing-grid { grid-template-columns:1fr; max-width:520px; } .pricing-card:nth-child(2) { transform:none; } }
 @media(max-width:540px){ .wrap { width:min(100% - 32px,1200px); } .site-nav { height:61px; } .site-nav .brand { font-size:23px; } .nav-links a:not(:last-child) { display:none; } .hero-type { min-height:290px; } .hero-type h1 { font-size:clamp(56px,16vw,82px); } .hero-sticker { width:55%; left:43%; top:0; } .hero-sub { margin-top:18px; font-size:14px; } .hero-window { transform:none; } .signup-strip { padding-bottom:42px; } .signup-dialog .window-inner { padding:17px; } .signup-grid,.sequence { grid-template-columns:1fr; } .signup-grid .submit { grid-column:auto; } .section { padding:62px 0 70px; } .section h2 { font-size:clamp(45px,12vw,66px); } .sequence .window:nth-child(n) { margin:0; transform:none; } .step-content { min-height:0; } .desktop-icons { gap:10px; } .desktop-icon { padding:5px; } .desktop-icon h3 { font-size:24px; } .pixel-image { width:70px; height:68px; font-size:48px; } .faq-list .window:nth-child(even) { margin-left:0; } .offer-window h3 { font-size:37px; } }
 @media(prefers-reduced-motion:reduce){ *,*:before,*:after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+
+/* Sign-in page */
+.login-page { min-height:100vh; padding-block:40px; }
+.login-wrap { max-width:560px; }
+.login-title { font-size:clamp(44px,9vw,72px); margin:26px 0; color:var(--blue); }
+.login-tabs { display:flex; gap:10px; margin-bottom:18px; }
+.login-field { margin-top:12px; }
+.login-actions { margin-top:18px; }
+.login-links { margin:18px 0 0; font-weight:700; }
+.login-message { margin:12px 0 0; min-height:1.4em; font-weight:700; }
+
+/* Studio console */
+.console { min-height:100vh; background:var(--background); }
+.console-loading { min-height:100vh; display:grid; place-items:center; font-weight:800; }
+.console-topbar { height:56px; display:flex; align-items:center; gap:14px; padding-inline:16px; background:var(--blue); color:var(--paper); border-bottom:2px solid var(--ink); }
+.console-topbar .brand { font-family:"Space Grotesk",Arial,sans-serif; font-size:20px; text-transform:uppercase; font-weight:700; }
+.console-studio { margin-left:auto; font-size:13px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:45vw; }
+.console-menu-button { display:none; background:var(--paper); color:var(--ink); border:2px solid var(--ink); width:40px; height:36px; font-size:18px; }
+.console-body { display:grid; grid-template-columns:230px minmax(0,1fr); min-height:calc(100vh - 56px); }
+.console-nav { display:flex; flex-direction:column; gap:6px; padding:18px 14px; border-right:2px solid var(--ink); background:var(--paper); }
+.console-nav-label { font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px; }
+.console-nav-item { display:block; padding:9px 11px; border:2px solid transparent; color:var(--ink); text-decoration:none; font-weight:800; font-size:14px; }
+.console-nav-item.active { background:var(--marigold); border-color:var(--ink); box-shadow:3px 3px 0 var(--ink); }
+.console-nav-foot { margin-top:auto; display:flex; flex-direction:column; gap:8px; font-size:12px; }
+.console-main { padding:24px clamp(16px,3vw,32px); min-width:0; }
+.console-title { font-size:clamp(34px,5vw,52px); margin:0 0 20px; color:var(--blue); }
+@media (max-width:760px) {
+  .console-menu-button { display:inline-block; }
+  .console-body { grid-template-columns:minmax(0,1fr); }
+  .console-nav { display:none; border-right:0; border-bottom:2px solid var(--ink); }
+  .console-nav.open { display:flex; }
+}

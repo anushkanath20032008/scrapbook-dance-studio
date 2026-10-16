@@ -12,8 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 
@@ -32,6 +35,16 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OptOutRoute = OptOutRouteImport.update({
   id: '/opt-out',
   path: '/opt-out',
@@ -41,6 +54,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
 } as any)
 const ApiJobsSendRemindersRoute = ApiJobsSendRemindersRouteImport.update({
   id: '/api/jobs/send-reminders',
@@ -57,8 +75,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -66,8 +87,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -76,8 +99,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -87,8 +113,11 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/app'
+    | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   fileRoutesByTo: FileRoutesByTo
@@ -96,8 +125,10 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   id:
@@ -105,8 +136,11 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/app'
+    | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   fileRoutesById: FileRoutesById
@@ -115,6 +149,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
   OptOutRoute: typeof OptOutRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
@@ -144,6 +180,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/opt-out': {
       id: '/opt-out'
       path: '/opt-out'
@@ -157,6 +207,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
     '/api/jobs/send-reminders': {
       id: '/api/jobs/send-reminders'
@@ -175,10 +232,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
   OptOutRoute: OptOutRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,

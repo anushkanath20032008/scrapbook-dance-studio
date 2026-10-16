@@ -31,20 +31,27 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon, au
 
 export type Actor = { user: string } | "service" | "anon";
 
+/** Rows from a query. Typed as non-empty so tests can read the first row; a missing row fails the test with a TypeError. */
+export type Rows<T> = [T, ...T[]];
+
 export interface TestDb {
   pg: PGlite;
   /** Insert a user into the auth.users stub and return its id. */
   addUser(email?: string): Promise<string>;
   /** Run one statement as the actor, in its own transaction. Errors propagate. */
-  query<T = Record<string, unknown>>(actor: Actor, sql: string, params?: unknown[]): Promise<T[]>;
+  query<T = Record<string, unknown>>(
+    actor: Actor,
+    sql: string,
+    params?: unknown[],
+  ): Promise<Rows<T>>;
   /** Run several statements as the actor inside one transaction. */
   transaction<T>(actor: Actor, fn: (run: Run) => Promise<T>): Promise<T>;
   /** Run SQL as the database owner, bypassing every grant and policy (fixtures only). */
-  admin<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]>;
+  admin<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<Rows<T>>;
   close(): Promise<void>;
 }
 
-type Run = <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]>;
+type Run = <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<Rows<T>>;
 
 function actorSql(actor: Actor): string {
   if (actor === "service") return "SET LOCAL ROLE service_role";
@@ -55,7 +62,9 @@ function actorSql(actor: Actor): string {
 }
 
 function migrationFiles(): string[] {
-  const journal = JSON.parse(readFileSync(join(MIGRATIONS_DIR, "meta", "_journal.json"), "utf8")) as {
+  const journal = JSON.parse(
+    readFileSync(join(MIGRATIONS_DIR, "meta", "_journal.json"), "utf8"),
+  ) as {
     entries: { tag: string }[];
   };
   return journal.entries.map((entry) => join(MIGRATIONS_DIR, `${entry.tag}.sql`));
@@ -83,7 +92,9 @@ export async function createDb(options: { migrate?: boolean } = {}): Promise<Tes
         "INSERT INTO auth.users (email, email_confirmed_at) VALUES ($1, now()) RETURNING id",
         [email],
       );
-      return rows[0].id;
+      const row = rows[0];
+      if (!row) throw new Error("could not create a test user");
+      return row.id;
     },
     query: (actor, sql, params) => transaction(actor, (run) => run(sql, params)),
     transaction,

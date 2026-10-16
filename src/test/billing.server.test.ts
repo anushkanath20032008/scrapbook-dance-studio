@@ -107,7 +107,7 @@ describe("startSubscriptionCheckout", () => {
   it("lets an owner without a saved profile check out", async () => {
     await checkout("starter", null);
 
-    expect(dodo.create.mock.calls[0][0].metadata).toEqual({
+    expect(dodo.create.mock.calls[0]?.[0]?.metadata).toEqual({
       user_id: "user-1",
       plan: "starter",
       studio_name: "",
@@ -119,7 +119,7 @@ describe("startSubscriptionCheckout", () => {
 
     await checkout("starter");
 
-    expect(dodo.create.mock.calls[0][0].return_url).toBe(
+    expect(dodo.create.mock.calls[0]?.[0]?.return_url).toBe(
       "https://choreostudio.live/account?billing=success",
     );
   });

@@ -6,9 +6,9 @@ import { studioPlans, type StudioPlanId } from "@/lib/plans";
 // Product IDs and the API key stay in server-only environment variables.
 function productIdFor(plan: StudioPlanId) {
   const ids: Record<StudioPlanId, string | undefined> = {
-    starter: process.env.DODO_PAYMENTS_STARTER_PRODUCT_ID,
-    growth: process.env.DODO_PAYMENTS_GROWTH_PRODUCT_ID,
-    studio: process.env.DODO_PAYMENTS_STUDIO_PRODUCT_ID,
+    starter: process.env["DODO_PAYMENTS_STARTER_PRODUCT_ID"],
+    growth: process.env["DODO_PAYMENTS_GROWTH_PRODUCT_ID"],
+    studio: process.env["DODO_PAYMENTS_STUDIO_PRODUCT_ID"],
   };
   return ids[plan]?.trim() || undefined;
 }
@@ -23,7 +23,7 @@ type CheckoutContext = {
 // The checkout logic behind createSubscriptionCheckout, for an already-authenticated studio owner.
 export async function startSubscriptionCheckout(plan: StudioPlanId, context: CheckoutContext) {
   const productId = productIdFor(plan);
-  if (!productId || !process.env.DODO_PAYMENTS_API_KEY) {
+  if (!productId || !process.env["DODO_PAYMENTS_API_KEY"]) {
     const planName = studioPlans.find((p) => p.id === plan)?.name ?? "selected";
     throw new Error(
       `The ${planName} plan isn't available for checkout yet. Please try again later or book a demo.`,
@@ -42,10 +42,11 @@ export async function startSubscriptionCheckout(plan: StudioPlanId, context: Che
   }
 
   const client = new DodoPayments({
-    bearerToken: process.env.DODO_PAYMENTS_API_KEY,
-    environment: process.env.DODO_PAYMENTS_ENVIRONMENT === "live_mode" ? "live_mode" : "test_mode",
+    bearerToken: process.env["DODO_PAYMENTS_API_KEY"],
+    environment:
+      process.env["DODO_PAYMENTS_ENVIRONMENT"] === "live_mode" ? "live_mode" : "test_mode",
   });
-  const baseUrl = (process.env.PUBLIC_APP_URL || context.requestOrigin).replace(/\/+$/, "");
+  const baseUrl = (process.env["PUBLIC_APP_URL"] || context.requestOrigin).replace(/\/+$/, "");
   let checkoutUrl: string | null | undefined;
   try {
     const session = await client.checkoutSessions.create({

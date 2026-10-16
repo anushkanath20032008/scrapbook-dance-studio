@@ -17,6 +17,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppBatchesRouteImport } from './routes/app.batches'
+import { Route as AppPlansRouteImport } from './routes/app.plans'
+import { Route as AppSetupRouteImport } from './routes/app.setup'
+import { Route as AppStudentsRouteImport } from './routes/app.students'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 
@@ -60,6 +64,26 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBatchesRoute = AppBatchesRouteImport.update({
+  id: '/batches',
+  path: '/batches',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlansRoute = AppPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSetupRoute = AppSetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppStudentsRoute = AppStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiJobsSendRemindersRoute = ApiJobsSendRemindersRouteImport.update({
   id: '/api/jobs/send-reminders',
   path: '/api/jobs/send-reminders',
@@ -79,6 +103,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
   '/app/': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -90,6 +118,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
   '/app': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -103,6 +135,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
   '/app/': typeof AppIndexRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -117,6 +153,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/batches'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
     | '/app/'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -128,6 +168,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/batches'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
     | '/app'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -140,6 +184,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/batches'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
     | '/app/'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -215,6 +263,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/batches': {
+      id: '/app/batches'
+      path: '/batches'
+      fullPath: '/app/batches'
+      preLoaderRoute: typeof AppBatchesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/plans': {
+      id: '/app/plans'
+      path: '/plans'
+      fullPath: '/app/plans'
+      preLoaderRoute: typeof AppPlansRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/setup': {
+      id: '/app/setup'
+      path: '/setup'
+      fullPath: '/app/setup'
+      preLoaderRoute: typeof AppSetupRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/students': {
+      id: '/app/students'
+      path: '/students'
+      fullPath: '/app/students'
+      preLoaderRoute: typeof AppStudentsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/jobs/send-reminders': {
       id: '/api/jobs/send-reminders'
       path: '/api/jobs/send-reminders'
@@ -233,10 +309,18 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppBatchesRoute: typeof AppBatchesRoute
+  AppPlansRoute: typeof AppPlansRoute
+  AppSetupRoute: typeof AppSetupRoute
+  AppStudentsRoute: typeof AppStudentsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBatchesRoute: AppBatchesRoute,
+  AppPlansRoute: AppPlansRoute,
+  AppSetupRoute: AppSetupRoute,
+  AppStudentsRoute: AppStudentsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

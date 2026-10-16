@@ -235,7 +235,7 @@ describe("directory schema: guardians, students, batches, rosters, fee plans", (
     expect(duplicate).toMatch(/unique|duplicate/i);
     await db.query(
       { user: a },
-      "UPDATE public.batch_members SET left_on = current_date WHERE batch_id = $1 AND student_id = $2 AND left_on IS NULL",
+      "UPDATE public.batch_members SET left_on = (now() AT TIME ZONE 'Asia/Kolkata')::date WHERE batch_id = $1 AND student_id = $2 AND left_on IS NULL",
       [ids.batch, ids.ananya],
     );
     await db.query(

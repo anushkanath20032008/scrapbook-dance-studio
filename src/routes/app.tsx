@@ -22,8 +22,16 @@ export const Route = createFileRoute("/app")({
 });
 
 // Each screen is added to this list as it ships.
-const navItems: { to: "/app"; label: string; exact: boolean }[] = [
+const navItems: {
+  to: "/app" | "/app/setup" | "/app/students" | "/app/batches" | "/app/plans";
+  label: string;
+  exact: boolean;
+}[] = [
   { to: "/app", label: "Overview", exact: true },
+  { to: "/app/setup", label: "Setup", exact: false },
+  { to: "/app/students", label: "Students", exact: false },
+  { to: "/app/batches", label: "Batches", exact: false },
+  { to: "/app/plans", label: "Fee plans", exact: false },
 ];
 
 const readable = (value: string) => value.replace(/_/g, " ");

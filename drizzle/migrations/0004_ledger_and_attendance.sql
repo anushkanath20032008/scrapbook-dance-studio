@@ -325,3 +325,28 @@ $$;
 
 REVOKE ALL ON FUNCTION public.record_payment(uuid, bigint, text, date, text, text), public.mark_attendance(uuid, date, jsonb), public.batch_day(uuid, date) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.record_payment(uuid, bigint, text, date, text, text), public.mark_attendance(uuid, date, jsonb), public.batch_day(uuid, date) TO authenticated, service_role;
+
+-- A student's attendance marks across batches for a date range of at most a year, newest first.
+CREATE FUNCTION public.student_attendance(p_student uuid, p_from date, p_to date)
+RETURNS TABLE (session_on date, batch_id uuid, batch_name text, present boolean)
+LANGUAGE plpgsql
+STABLE
+SET search_path = public
+AS $$
+BEGIN
+  IF p_to < p_from THEN
+    RAISE EXCEPTION 'the end date cannot be before the start date';
+  END IF;
+  IF p_to - p_from > 366 THEN
+    RAISE EXCEPTION 'choose a range of at most one year';
+  END IF;
+  RETURN QUERY
+  SELECT cs.session_on, cs.batch_id, b.name, ar.present
+  FROM public.attendance_records ar
+  JOIN public.class_sessions cs ON cs.id = ar.session_id AND cs.studio_id = ar.studio_id
+  JOIN public.batches b ON b.id = cs.batch_id AND b.studio_id = cs.studio_id
+  WHERE ar.student_id = p_student AND cs.session_on BETWEEN p_from AND p_to
+  ORDER BY cs.session_on DESC, b.name;
+END $$;
+REVOKE ALL ON FUNCTION public.student_attendance(uuid, date, date) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.student_attendance(uuid, date, date) TO authenticated, service_role;

@@ -194,4 +194,43 @@ describe("attendance: sessions and marks", () => {
       expect(await rejection(markDay(other, batch, today(), marks))).toMatch(/not found/i);
     });
   });
+
+  describe("student_attendance", () => {
+    it("returns a student's marks across batches in date order, within the range, and nothing for other studios", async () => {
+      const owner = await newStudio(db);
+      const other = await newStudio(db);
+      const s = await newStudent(db, owner, "Kabir");
+      const hipHop = await newBatch(db, owner, "Hip Hop");
+      const kathak = await newBatch(db, owner, "Kathak");
+      for (const [batch, date, present] of [
+        [hipHop, "2026-10-12", true],
+        [kathak, "2026-10-13", false],
+        [hipHop, "2026-09-01", true],
+      ] as const) {
+        const sessionId = await session(owner, batch, date);
+        await mark(owner, sessionId, s.id, present);
+      }
+      const rows = await db.query<{ session_on: string; batch_name: string; present: boolean }>(
+        { user: owner },
+        "SELECT session_on::text, batch_name, present FROM public.student_attendance($1, DATE '2026-10-01', DATE '2026-10-31')",
+        [s.id],
+      );
+      expect(rows).toEqual([
+        { session_on: "2026-10-13", batch_name: "Kathak", present: false },
+        { session_on: "2026-10-12", batch_name: "Hip Hop", present: true },
+      ]);
+      expect(
+        await db.query({ user: other }, "SELECT * FROM public.student_attendance($1, DATE '2026-10-01', DATE '2026-10-31')", [s.id]),
+      ).toEqual([]);
+    });
+
+    it("rejects a range longer than a year", async () => {
+      const owner = await newStudio(db);
+      const s = await newStudent(db, owner, "Wide");
+      const message = await rejection(
+        db.query({ user: owner }, "SELECT * FROM public.student_attendance($1, DATE '2024-01-01', DATE '2026-01-01')", [s.id]),
+      );
+      expect(message).toMatch(/year/i);
+    });
+  });
 });

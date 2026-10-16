@@ -640,6 +640,15 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["payments"]["Row"]
       }
+      student_attendance: {
+        Args: { p_from: string; p_student: string; p_to: string }
+        Returns: {
+          batch_id: string
+          batch_name: string
+          present: boolean
+          session_on: string
+        }[]
+      }
       student_ledger_status: {
         Args: { p_period: string; p_student_ids?: string[]; p_today?: string }
         Returns: {

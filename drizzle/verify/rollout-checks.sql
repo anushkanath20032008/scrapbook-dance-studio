@@ -85,7 +85,7 @@ WHERE p.pronamespace = 'public'::regnamespace
                     'unpaid_students', 'studio_snapshot', 'payment_check', 'student_charge_ledger', 'attendance_by_student',
                     'attendance_by_batch', 'monthly_trend', 'preview_fee_reminders', 'reminder_targets',
                     'submit_payment_claim', 'claim_screenshots_to_purge', 'confirm_payment_claim',
-                    'reject_payment_claim', 'payment_claim_queue')
+                    'reject_payment_claim', 'payment_claim_queue', 'has_role')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

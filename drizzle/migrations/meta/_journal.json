@@ -99,6 +99,13 @@
       "when": 1791201300000,
       "tag": "0013_payment_claims",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791201400000,
+      "tag": "0014_harden_functions",
+      "breakpoints": true
     }
   ]
 }

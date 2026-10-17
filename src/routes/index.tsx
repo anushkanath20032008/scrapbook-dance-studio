@@ -29,16 +29,14 @@ function Home() {
   const submit = useServerFn(joinWaitlist);
   const [students,setStudents] = useState(60), [fee,setFee] = useState(2500), [late,setLate] = useState(20);
   const [studio,setStudio] = useState(""), [phone,setPhone] = useState(""), [bucket,setBucket] = useState("26-50"), [consent,setConsent] = useState(false);
-  const [message,setMessage] = useState(""), [busy,setBusy] = useState(false), [count,setCount] = useState("5");
+  const [message,setMessage] = useState(""), [busy,setBusy] = useState(false);
   const [paid,setPaid] = useState(false);
   const hero = useRef<HTMLElement>(null);
   const problem = useRef<HTMLElement>(null);
   const solution = useRef<HTMLElement>(null);
   const estimate = Math.round(students * fee * late / 100);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setCount("5, 6, 7, 8"); return; }
-    let n = 0; const values = ["5", "6", "7", "8", "5, 6, 7, 8"];
-    const timer = window.setInterval(() => { n++; setCount(values[n] ?? "5, 6, 7, 8"); if(n === values.length-1) window.clearInterval(timer); }, 340);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let ctx: { revert: () => void } | undefined;
     Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
       gsap.registerPlugin(ScrollTrigger);
@@ -47,7 +45,7 @@ function Home() {
         if (solution.current) gsap.fromTo(solution.current, { clipPath:"polygon(0 0, 100% 0, 100% 0, 0 0)" }, { clipPath:"polygon(0 0, 100% 0, 100% 100%, 0 100%)", duration:.38, ease:"steps(4)", scrollTrigger:{ trigger:solution.current, start:"top 90%", toggleActions:"play none none none" } });
       });
     }).catch(() => {});
-    return () => { window.clearInterval(timer); ctx?.revert(); };
+    return () => { ctx?.revert(); };
   }, []);
   async function handleSubmit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault(); setMessage("");
@@ -66,7 +64,7 @@ function Home() {
       <section className="hero" ref={hero} id="top">
         <div className="wrap site-nav"><a className="brand" href="#top">Choreo Studio</a><nav className="nav-links" aria-label="Main"><a className="nav-hide" href="#how">How it works</a><a className="nav-hide" href="#features">Features</a><a className="nav-hide" href="#pricing">Pricing</a><a className="nav-hide" href="#faq">FAQ</a><a href="/login">Log in</a><a className="nav-cta" href="#join">Join waitlist</a></nav></div>
         <div className="wrap hero-body"><div className="hero-type"><h1 className="display"><span>Less</span><span>chasing.</span><span>More</span><span>dancing.</span></h1><p className="hero-sub">Fees, attendance and batches for independent dance studios in India. See who hasn't paid and remind them on WhatsApp in one tap.</p><div className="hero-actions"><Button asChild variant="retro"><a href="/login">Log in / Start your studio</a></Button><Button asChild variant="retroPaper"><a href="#join">Book a demo</a></Button></div></div>
-          <Window title="Choreo Studio / Arrive" className="hero-window" count={count}><div className="window-inner"><div className="screen-top"><span>SEPTEMBER FEES</span><span>12 of 40 pending</span></div><Student name="Anand K." batch="Hip-hop · Sat 5pm" amount="₹1,800" status="OVERDUE"/><Student name="Bela S." batch="Kathak · Tue 6pm" amount="₹2,500" status="DUE"/><Student name="Chirag R." batch="Bollywood · Thu 7pm" amount="₹2,100" status="PAID"/><Student name="Naina K." batch="Contemporary · Fri 5pm" amount="₹1,600" status="DUE"/><div className="screen-footer"><span>Sample student data</span><Button variant="retro" onClick={() => document.getElementById("join")?.scrollIntoView({ behavior:"smooth" })}>Join founding studios</Button></div></div></Window>
+          <Window title="Choreo Studio / Arrive" className="hero-window"><div className="window-inner"><div className="screen-top"><span>SEPTEMBER FEES</span><span>12 of 40 pending</span></div><Student name="Anand K." batch="Hip-hop · Sat 5pm" amount="₹1,800" status="OVERDUE"/><Student name="Bela S." batch="Kathak · Tue 6pm" amount="₹2,500" status="DUE"/><Student name="Chirag R." batch="Bollywood · Thu 7pm" amount="₹2,100" status="PAID"/><Student name="Naina K." batch="Contemporary · Fri 5pm" amount="₹1,600" status="DUE"/><div className="screen-footer"><span>Sample student data</span><Button variant="retro" onClick={() => document.getElementById("join")?.scrollIntoView({ behavior:"smooth" })}>Join founding studios</Button></div></div></Window>
         </div>
       </section>
       <div className="signup-strip" id="join"><div className="wrap"><Window title="Join_Founding_Studios.dialog" className="signup-dialog"><div className="window-inner"><h2 className="signup-heading">Join the founding studios</h2><p>Tell us about your studio. We'll set up a 15-minute demo on your own student list. Setup is free for founding studios.</p><form onSubmit={handleSubmit}><div className="signup-grid"><div><label className="form-label" htmlFor="studio">Studio name</label><input className="field" id="studio" value={studio} onChange={e=>setStudio(e.target.value)} maxLength={120} required autoComplete="organization" placeholder="Your studio"/></div><div><label className="form-label" htmlFor="phone">WhatsApp number</label><input className="field" id="phone" type="tel" value={phone} onChange={e=>setPhone(e.target.value)} required maxLength={18} inputMode="tel" placeholder="+91 ..."/></div><div><label className="form-label" htmlFor="bucket">Students</label><select className="field" id="bucket" value={bucket} onChange={e=>setBucket(e.target.value)}><option value="10-25">10–25</option><option value="26-50">26–50</option><option value="51-100">51–100</option><option value="101-300">101–300</option></select></div></div><label className="consent"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>I agree to be contacted by Choreo Studio about the demo and founding waitlist. My details are used for this request; I can <a href="/opt-out">opt out</a> any time.</span></label><div style={{ marginTop:16 }}><Button variant="retro" type="submit" disabled={busy}>{busy?"Saving...":"Book a 15-minute demo"}</Button></div><p className="status-line" role="status">{message}</p></form></div></Window></div></div>

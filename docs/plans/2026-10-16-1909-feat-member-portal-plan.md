@@ -16,7 +16,7 @@ status: approved
 - **Objective:** A dancer enrolled at a studio redeems an invite from the studio owner, signs in with their own account, and sees only that studio's records about them: classes, attendance, charges, payments and balance. They can report a payment (the claim form from owner-console unit U5) from the same place.
 - **Product authority:** The user's brief of 2026-10-16. Standing rules from the handoff bind this plan: fees are ledger-only, `plan`/`billing_status` are server-managed, the waitlist owner role stays in `user_roles`, no pushed history is rewritten, no migration is applied and nothing is pushed without the user's go-ahead.
 - **Active scope:** The dancer login, invites, the dancer's read-only view, membership in several studios, row-level security, and the claim-a-payment form. All dancers are adults (user decision, 2026-10-17): there are no separate guardians, and each dancer is their own contact. The owner console (U1 to U8) is not changed except where this plan names a seam.
-- **Status:** Approved by the user, 2026-10-16. Nothing is built yet. All questions settled.
+- **Status:** Approved by the user, 2026-10-16. Built 2026-10-18 as migration 0016 (not applied); see docs/handoff/2026-10-18-member-portal-handoff.md for the deliberate differences.
 
 ## Product Contract
 

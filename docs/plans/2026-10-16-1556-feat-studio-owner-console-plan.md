@@ -6,6 +6,7 @@ topic: studio-owner-console
 artifact_contract: ce-unified-plan/v1
 product_contract_source: ce-brainstorm
 execution: code
+updated: 2026-10-17
 ---
 
 # Studio Owner Console - Plan
@@ -135,7 +136,7 @@ Payments reach a studio in loose forms: cash in hand, a UPI transfer, a screensh
 - Sign-in with email, password and Google already works in `src/routes/account.tsx`; it moves to its own page.
 - A guardian already has a private family link, so claims need no guardian account.
 - The WhatsApp provider is not chosen; reminders stay queued until `WHATSAPP_PROVIDER_URL` and `WHATSAPP_PROVIDER_TOKEN` are set.
-- The migrations `0003` to `0006` still have to be applied to the live database before any slice can be tested there.
+- Migrations `0003` to `0006` were applied on 2026-10-16. On 2026-10-17 the database and sign-in moved from Lovable Cloud to the user's own Supabase project and migrations `0000` to `0014` were applied there (KTD13).
 
 ### Legal and privacy notes (not legal advice)
 
@@ -165,14 +166,14 @@ This plan covers the studio owner console. The breakdown below is the current un
 
 ## Planning Contract
 
-**Product Contract preservation:** Product Contract unchanged; every R, A, F and AE ID keeps its meaning.
+**Product Contract preservation:** Product Contract unchanged in substance; every R, A, F and AE ID keeps its meaning. One terminology change after the user's decision on 2026-10-17: dancers are adults, so "student" and "guardian" read as "dancer" in the console (see KTD12). A2 is the dancer, who reports a payment from their own private link.
 
 ### Key Technical Decisions
 
 - KTD1. **Console routes live under `/app`, with sign-in at `/login`.** `/app` is a layout route with child routes for Home, setup, students, batches, fee plans, billing, attendance, messages and verify. The sign-in page replaces the form inside `src/routes/account.tsx`, which keeps profile and plans. Authorization is still enforced by the server functions' auth middleware; the client redirect to `/login` is a convenience. Serves R1, R2.
 - KTD2. **Screens read through React Query over the existing server functions.** `@tanstack/react-query` is already installed and provided in `src/routes/__root.tsx`; each screen wraps a server function with `useServerFn` the way `src/routes/admin.tsx` does. Money is stored and moved as whole paise and formatted for display by one shared helper.
 - KTD3. **Reporting and the payment gate are SQL functions, not TypeScript.** Unpaid list with days overdue, monthly trend, studio snapshot and the amount-versus-owed comparison are new invoker functions beside `student_ledger_status`, so the owner's numbers, the family view and the gate cannot disagree. Serves R4, R5, R6, R10, R15.
-- KTD4. **The gate lives inside `record_payment` and the claim-confirm function.** Both call one comparison that returns owed, remaining and excess, and refuse an excess unless the caller passes an acknowledgment flag. The existing six-argument `record_payment` is dropped and recreated with two defaulted arguments (`reference`, `acknowledge_excess`), so callers that pass six arguments still work. Existing ledger tests that overpay are updated to acknowledge. Serves R10, R13.
+- KTD4. **The gate lives inside `record_payment` and the claim-confirm function.** Both call one comparison that returns owed, remaining and excess, and refuse an excess unless the caller passes an acknowledgment flag. The existing six-argument `record_payment` is dropped and recreated with two defaulted arguments (`reference`, `acknowledge_excess`), so callers that pass six arguments still work. Existing ledger tests that overpay are updated to acknowledge. Built as `record_payment(..., reference, acknowledge_excess)` plus `payment_check` and `student_charge_ledger`. Serves R10, R13.
 - KTD5. **A claim is its own record and never touches the ledger until confirmed.** A `payment_claims` table holds amount, method, reference number, optional screenshot path, status (pending, confirmed, rejected), decision reason and the payment it became. Confirming runs through the same idempotent payment path using the claim id as the idempotency key. Serves R12, R13.
 - KTD6. **Duplicate references are flagged, not silently blocked.** A reference number found on a live payment or on another pending claim marks the claim "possible duplicate" in the review screen; the owner decides. Serves R13.
 - KTD7. **Claims arrive through a public server function authorized by the family token.** It reuses the token hashing in `src/lib/family.server.ts`, limits each guardian to five pending claims, and accepts only a student that belongs to that guardian. It is rate-limited in SQL, not in the browser. Serves R12.
@@ -180,6 +181,11 @@ This plan covers the studio owner console. The breakdown below is the current un
 - KTD9. **The setup checklist is derived from data, not stored.** Each step is complete when the matching rows exist (fee plan, batch, student, assignment, generated charges), so it cannot drift and needs no table. Serves R3.
 - KTD10. **Reminders are queued by the owner's click and delivered by the existing job.** Add an optional student filter to the queue function and a preview that lists recipients, amounts and opt-outs before anything is queued. The console shows queued, sent and failed honestly; while no WhatsApp provider is configured it says reminders are queued, not sent. Serves R14.
 - KTD11. **Layouts work on a phone first.** Owners check dues on mobile in the studio; every console screen is usable at 375 px width, and the unpaid list collapses to cards. Serves R4, R7.
+
+- KTD12. **A dancer is an adult and their own contact.** The console says "dancer" (name, phone) and never "guardian". Each dancer has one `guardians` row with the same name and phone, created and kept in step by the dancer form, so reminders, family links and claims work unchanged. Fee plan names are studio-side; dancers see the monthly amount and classes per week. (session-settled: user-directed, 2026-10-17. Rejected: a child plus guardian model. Reason: all dancers will be adults.) Serves R3, R8.
+- KTD13. **The database and sign-in run on the user's own Supabase project.** Email, password and Google sign-in use Supabase Auth directly (no Lovable wrapper), redirect URLs and the Google provider are set in the Supabase dashboard, and `.env.local` (untracked) points local runs at the project. (session-settled: user-directed, 2026-10-17. Rejected: staying on Lovable Cloud. Reason: the owner wants GitHub, Vercel and Supabase only and needs control of auth redirect settings.) Serves R1.
+- KTD14. **Add and edit open in pop-up forms; classes per week is a 0 to 7 dropdown.** A form above a long list went unnoticed during testing, so every add and edit opens a dialog. Classes per week offers 0 to 7 and stores 0 as no fixed classes (null), so the existing 1 to 14 database check is unchanged. Monthly fee is a dropdown of the studio's own amounts, with "Other amount". Serves R8.
+- KTD15. **Reminder targets are decided once in SQL.** `reminder_targets` returns who would be messaged and why anyone is skipped (no contact, opted out, no phone, already queued today); the preview the owner reviews and the queueing both read it, so the screen is exactly what is sent. Serves R14.
 
 ### Assumptions
 
@@ -214,12 +220,24 @@ flowchart TB
 | U0 | Live database ready | `drizzle/migrations/0003`-`0006`, `drizzle/verify/rollout-checks.sql` | none |
 | U1 | Sign-in and console shell | `src/routes/login.tsx`, `src/routes/app.tsx` | U0 |
 | U2 | Guided setup | `src/routes/app.setup.tsx`, `src/routes/app.plans.tsx` | U1 |
-| U3 | Home | `drizzle/migrations/0007_console_reports.sql`, `src/routes/app.index.tsx` | U2 |
-| U4 | Payment gate and record payment | `drizzle/migrations/0008_payment_gate.sql`, `src/routes/app.billing.tsx` | U3 |
-| U5 | Claims and To verify | `drizzle/migrations/0009_payment_claims.sql`, `src/routes/family.$token.tsx` | U4 |
-| U6 | Reminders | `src/routes/app.messages.tsx` | U4 |
-| U7 | Attendance | `src/routes/app.attendance.tsx` | U2 |
-| U8 | Trend and batch insights | `src/routes/app.insights.tsx` | U4 |
+| U3 | Home | `drizzle/migrations/0008_console_reports.sql`, `src/routes/app.index.tsx` | U2 |
+| U4 | Payment gate and record payment | `drizzle/migrations/0009_payment_gate.sql`, `src/routes/app.billing.tsx` | U3 |
+| U5 | Claims and To verify | `drizzle/migrations/0013_payment_claims.sql`, `src/routes/family.$token.tsx`, `src/routes/app.verify.tsx` | U4 |
+| U6 | Reminders | `drizzle/migrations/0012_reminder_preview.sql`, `src/routes/app.messages.tsx` | U4 |
+| U7 | Attendance | `drizzle/migrations/0010_attendance_summary.sql`, `src/routes/app.attendance.tsx` | U2 |
+| U8 | Trend and batch insights | `drizzle/migrations/0011_monthly_trend.sql`, `src/routes/app.insights.tsx` | U4 |
+
+### Changes since planning (2026-10-17)
+
+All of U0 to U8 are built. Differences from the unit text below, which keeps its original wording:
+
+- **Migration numbers.** `0007_revoke_original_table_grants` (default Supabase grants on the three original tables) took the number planned for U3, so U3 is `0008`, U4 `0009`, U7's summaries `0010`, U8 `0011`, U6's preview `0012` and U5's claims `0013`. `0014_harden_functions` revokes anon access to `has_role` and fixes two trigger search paths.
+- **Dancers, not guardians** (KTD12). The students screen is Dancers; the form takes a name and a phone. Guardian wording in the units below reads as dancer.
+- **Pop-up forms and dropdowns** (KTD14). Fee plans pick a fee and 0 to 7 classes from dropdowns; dancers pick a monthly fee, not a plan name.
+- **U1.** Sign-in shows a live password checklist and field-level errors; the reset page asks for the new password twice and works from the emailed link.
+- **U5.** The family page route exists (`/family/$token`), owners create and revoke a dancer's private link from Manage, and the purge job is `POST /api/jobs/purge-screenshots` behind the reminder job's bearer secret.
+- **U6.** Reminders also skip a dancer with no phone number, and `queue_fee_reminders` takes an optional dancer and an overdue-only choice (KTD15).
+- **U0 and auth** (KTD13). Applied to the user's own Supabase project instead of Lovable Cloud.
 
 ### U0. Live database ready
 

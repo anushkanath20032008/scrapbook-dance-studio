@@ -678,6 +678,34 @@ export type Database = {
           student_name: string
         }[]
       }
+      studio_snapshot: {
+        Args: { p_period: string; p_today?: string }
+        Returns: {
+          active_students: number
+          billed_paise: number
+          charged_students: number
+          collected_paise: number
+          missing_paise: number
+          not_yet_due_paise: number
+          ongoing_batches: number
+          overdue_paise: number
+          paid_students: number
+        }[]
+      }
+      unpaid_students: {
+        Args: { p_period: string; p_today?: string }
+        Returns: {
+          amount_paise: number
+          charge_id: string
+          days_overdue: number
+          due_on: string
+          outstanding_paise: number
+          phone: string
+          status: string
+          student_id: string
+          student_name: string
+        }[]
+      }
     }
     Enums: {
       app_role: "owner"

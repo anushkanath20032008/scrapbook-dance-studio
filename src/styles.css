@@ -168,6 +168,22 @@ button { cursor:pointer; }
 .console-notice { margin:0 0 12px; padding:8px 12px; border:2px solid var(--ink); background:#dcefdc; font-weight:800; font-size:.9rem; }
 .console-dialog > button[class*="absolute"] { color:var(--paper); top:9px; right:12px; opacity:1; }
 .console-dialog { max-width:min(560px, calc(100vw - 24px)); }
+.totals { display:grid; gap:12px; margin:0 0 20px; }
+.totals-headline { border:2px solid var(--ink); box-shadow:4px 4px 0 var(--ink); padding:16px; display:grid; gap:2px; background:var(--paper); }
+.totals-headline[data-tone="warn"] { background:#f6c9c5; }
+.totals-headline[data-tone="good"] { background:#dcefdc; }
+.totals-headline strong { font-family:"Space Grotesk",Arial,sans-serif; font-size:clamp(34px,6vw,54px); line-height:1; }
+.totals-label { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+.totals-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin:0; }
+.totals-grid > div { border:2px solid var(--ink); background:var(--paper); padding:10px 12px; }
+.totals-grid dt { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
+.totals-grid dd { margin:2px 0 0; font-weight:800; font-size:1.15rem; }
+.unpaid-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:14px; align-items:center; }
+.unpaid-owed { display:grid; gap:4px; justify-items:end; }
+.generate-card, .setup-card { margin:0 0 20px; }
+.month-field { width:auto; min-width:180px; }
+.console-inline-label { display:flex; align-items:center; gap:10px; font-weight:800; font-size:14px; }
+@media (max-width: 640px) { .unpaid-row { grid-template-columns:minmax(0,1fr); } .unpaid-owed { justify-items:start; } }
 .console-form { display:grid; gap:14px; }
 .console-field { display:grid; gap:5px; margin:0; border:0; padding:0; min-width:0; }
 .console-field-error { color:#7a1812; font-weight:700; font-size:.85rem; }

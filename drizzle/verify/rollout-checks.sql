@@ -1,4 +1,4 @@
--- Read-only checks to run after applying migrations 0003 to 0006. It returns one row per problem and no rows
+-- Read-only checks to run after applying migrations 0003 to 0008. It returns one row per problem and no rows
 -- when everything is as designed. Run it with a role that can read the catalogs (the database owner).
 WITH new_tables(name) AS (
   VALUES ('guardians'), ('students'), ('batches'), ('batch_members'), ('fee_plans'),
@@ -81,7 +81,8 @@ FROM pg_proc p
 WHERE p.pronamespace = 'public'::regnamespace
   AND p.proname IN ('assign_fee_plan', 'batch_day', 'claim_due_reminders', 'generate_monthly_charges',
                     'ledger_overview', 'mark_attendance', 'queue_fee_reminders', 'record_payment',
-                    'student_attendance', 'student_ledger_status', 'apply_billing_event')
+                    'student_attendance', 'student_ledger_status', 'apply_billing_event',
+                    'unpaid_students', 'studio_snapshot')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

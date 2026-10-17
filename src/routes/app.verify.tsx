@@ -13,6 +13,7 @@ import {
   listClaimQueue,
   rejectClaim,
 } from "@/lib/claims.functions";
+import { formatDay, paymentMethodLabel } from "@/lib/format";
 import { formatRupees, parseRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/verify")({
@@ -22,15 +23,6 @@ export const Route = createFileRoute("/app/verify")({
 
 type Claim = Awaited<ReturnType<typeof listClaimQueue>>[number];
 type Mode = "confirm" | "adjust" | "reject";
-
-const methodLabel: Record<string, string> = {
-  cash: "cash",
-  upi: "UPI",
-  bank: "bank transfer",
-  other: "other",
-};
-const dayLabel = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 
 function Verify() {
   const queryClient = useQueryClient();
@@ -77,7 +69,7 @@ function Verify() {
               <div>
                 <strong>{claim.student_name}</strong>
                 <span className="console-hint">
-                  {dayLabel(claim.paid_on)} · {methodLabel[claim.method] ?? claim.method}
+                  {formatDay(claim.paid_on)} · {paymentMethodLabel(claim.method)}
                   {claim.reference ? ` · ref ${claim.reference}` : ""}
                 </span>
               </div>

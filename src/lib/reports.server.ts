@@ -16,8 +16,12 @@ const emptySnapshot = {
 /** The Home screen's data for one month: the money totals and who still owes, from the database's report functions. */
 export async function getHomeReport({ supabase }: StudioContext, input: { period: string }) {
   const period = firstOfMonth(input.period);
-  const snapshots = unwrap(await supabase.rpc("studio_snapshot", { p_period: period }));
-  const unpaid = unwrap(await supabase.rpc("unpaid_students", { p_period: period }));
+  const [snapshotResult, unpaidResult] = await Promise.all([
+    supabase.rpc("studio_snapshot", { p_period: period }),
+    supabase.rpc("unpaid_students", { p_period: period }),
+  ]);
+  const snapshots = unwrap(snapshotResult);
+  const unpaid = unwrap(unpaidResult);
   return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid };
 }
 

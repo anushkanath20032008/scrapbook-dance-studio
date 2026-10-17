@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { VoidDialog, type VoidTarget } from "@/components/console/void-dialog";
 import { getStudentCharges, getStudentLedger } from "@/lib/ledger.functions";
+import { formatDayWithYear, formatMonthLong, paymentMethodLabel } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
 
@@ -13,21 +14,6 @@ export const Route = createFileRoute("/app/billing")({
   head: () => ({ meta: [{ title: "Billing | Choreo Studio" }] }),
   component: Billing,
 });
-
-const monthLabel = (period: string) =>
-  new Date(`${period}T00:00:00`).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
-const dayLabel = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-const methodLabel: Record<string, string> = {
-  cash: "cash",
-  upi: "UPI",
-  bank: "bank transfer",
-  other: "other",
-};
 
 function Billing() {
   const listStudents = useServerFn(listStudentOverview);
@@ -126,13 +112,13 @@ function Billing() {
                 data-archived={charge.status === "voided"}
               >
                 <div>
-                  <strong>{monthLabel(charge.period)}</strong>
+                  <strong>{formatMonthLong(charge.period)}</strong>
                   <span className="console-hint">
-                    {formatRupees(charge.amount_paise)} · due {dayLabel(charge.due_on)}
+                    {formatRupees(charge.amount_paise)} · due {formatDayWithYear(charge.due_on)}
                     {charge.status === "voided"
                       ? ` · voided: ${charge.void_reason ?? ""}`
                       : charge.settled_on
-                        ? ` · settled ${dayLabel(charge.settled_on)} by ${methodLabel[charge.settled_method ?? "other"] ?? charge.settled_method}`
+                        ? ` · settled ${formatDayWithYear(charge.settled_on)} by ${paymentMethodLabel(charge.settled_method ?? "other")}`
                         : charge.allocated_paise > 0
                           ? ` · ${formatRupees(charge.allocated_paise)} paid, ${formatRupees(charge.outstanding_paise)} left`
                           : ""}
@@ -159,7 +145,7 @@ function Billing() {
                         setVoiding({
                           kind: "charge",
                           id: charge.charge_id,
-                          label: `the ${monthLabel(charge.period)} charge`,
+                          label: `the ${formatMonthLong(charge.period)} charge`,
                         })
                       }
                     >
@@ -185,7 +171,7 @@ function Billing() {
                 <div>
                   <strong>{formatRupees(payment.amount_paise)}</strong>
                   <span className="console-hint">
-                    {dayLabel(payment.paid_on)} · {methodLabel[payment.method] ?? payment.method}
+                    {formatDayWithYear(payment.paid_on)} · {paymentMethodLabel(payment.method)}
                     {payment.reference ? ` · ref ${payment.reference}` : ""}
                     {payment.note ? ` · ${payment.note}` : ""}
                     {payment.voided_at ? ` · voided: ${payment.void_reason ?? ""}` : ""}

@@ -14,8 +14,14 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { listMyClaims, submitClaim } from "@/lib/claims.functions";
 import { getFamilyView } from "@/lib/family.functions";
+import { formatDayWithYear } from "@/lib/format";
 import { formatRupees, parseRupees } from "@/lib/money";
-import { MAX_SCREENSHOT_BYTES, claimInput, screenshotMimeTypes } from "@/lib/schemas";
+import {
+  MAX_SCREENSHOT_BYTES,
+  SCREENSHOT_BUCKET,
+  claimInput,
+  screenshotMimeTypes,
+} from "@/lib/schemas";
 import { todayInIndia } from "@/lib/validators";
 
 export const Route = createFileRoute("/family/$token")({
@@ -35,12 +41,6 @@ const methods = [
   { value: "other", label: "Other" },
 ] as const;
 
-const dayLabel = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
 const clock = (value: string | null) => (value ? value.slice(0, 5) : "");
 
 function FamilyPage() {
@@ -137,7 +137,7 @@ function FamilyPage() {
                     <p key={index} className="family-line">
                       <strong>{formatRupees(payment.amount_paise)}</strong>
                       <span className="console-hint">
-                        {dayLabel(payment.paid_on)} · {payment.method}
+                        {formatDayWithYear(payment.paid_on)} · {payment.method}
                       </span>
                     </p>
                   ))}
@@ -156,7 +156,7 @@ function FamilyPage() {
                   <div>
                     <strong>{formatRupees(claim.amount_paise)}</strong>
                     <span className="console-hint">
-                      {dayLabel(claim.paid_on)} · {claim.method}
+                      {formatDayWithYear(claim.paid_on)} · {claim.method}
                       {claim.status === "rejected" && claim.decision_reason
                         ? ` · ${claim.decision_reason}`
                         : ""}
@@ -226,7 +226,7 @@ function ClaimForm({
       let uploadFailed = false;
       if (file && result.upload) {
         const { error } = await supabase.storage
-          .from("claim-screenshots")
+          .from(SCREENSHOT_BUCKET)
           .uploadToSignedUrl(result.upload.path, result.upload.token, file, {
             contentType: file.type,
           });

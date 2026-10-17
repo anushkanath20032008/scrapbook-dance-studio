@@ -15,6 +15,7 @@ import { weekdayNames } from "@/components/console/form-utils";
 import { getAttendanceSummary } from "@/lib/attendance.functions";
 import { rangeFor } from "@/lib/attendance-stats";
 import { listBatches } from "@/lib/batches.functions";
+import { formatMonthShort } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { getMonthlyTrend } from "@/lib/reports.functions";
 import { todayInIndia } from "@/lib/validators";
@@ -23,9 +24,6 @@ export const Route = createFileRoute("/app/insights")({
   head: () => ({ meta: [{ title: "Insights | Choreo Studio" }] }),
   component: Insights,
 });
-
-const shortMonth = (period: string) =>
-  new Date(`${period}T00:00:00`).toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
 
 function Insights() {
   const trendFn = useServerFn(getMonthlyTrend);
@@ -44,7 +42,7 @@ function Insights() {
   });
 
   const data = (trend.data ?? []).map((row) => ({
-    month: shortMonth(row.period),
+    month: formatMonthShort(row.period),
     Billed: row.billed_paise / 100,
     Collected: row.collected_paise / 100,
   }));
@@ -94,7 +92,7 @@ function Insights() {
               <tbody>
                 {trend.data.map((row) => (
                   <tr key={row.period}>
-                    <th scope="row">{shortMonth(row.period)}</th>
+                    <th scope="row">{formatMonthShort(row.period)}</th>
                     <td>{formatRupees(row.billed_paise)}</td>
                     <td>{formatRupees(row.collected_paise)}</td>
                     <td>{formatRupees(row.missing_paise)}</td>

@@ -1,16 +1,14 @@
 import { Button } from "@/components/ui/button";
+import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import type { getHomeReport } from "@/lib/reports.functions";
 
 type Unpaid = Awaited<ReturnType<typeof getHomeReport>>["unpaid"][number];
 
-const shortDate = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-
 function dueText(row: Unpaid) {
   if (row.status === "overdue")
     return `${row.days_overdue} day${row.days_overdue === 1 ? "" : "s"} overdue`;
-  return `Due ${shortDate(row.due_on)}`;
+  return `Due ${formatDay(row.due_on)}`;
 }
 
 /** Everyone who still owes for the month, oldest overdue first. */
@@ -32,7 +30,7 @@ export function UnpaidList({
           <div>
             <strong>{row.student_name}</strong>
             <span className="console-hint">
-              {row.phone ?? "No phone"} · due {shortDate(row.due_on)}
+              {row.phone ?? "No phone"} · due {formatDay(row.due_on)}
             </span>
           </div>
           <div className="unpaid-owed">

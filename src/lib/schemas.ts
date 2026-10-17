@@ -66,6 +66,7 @@ export const generateChargesInput = z
   });
 
 export const screenshotMimeTypes = ["image/png", "image/jpeg", "image/webp"] as const;
+export const SCREENSHOT_BUCKET = "claim-screenshots";
 export const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
 
 /** What a dancer sends from their private link. UPI and bank payments need a reference number. */

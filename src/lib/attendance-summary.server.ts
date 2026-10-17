@@ -7,8 +7,12 @@ export async function getAttendanceSummary(
   input: { from: string; to: string },
 ) {
   const args = { p_from: input.from, p_to: input.to };
-  const students = unwrap(await supabase.rpc("attendance_by_student", args));
-  const batches = unwrap(await supabase.rpc("attendance_by_batch", args));
+  const [studentsResult, batchesResult] = await Promise.all([
+    supabase.rpc("attendance_by_student", args),
+    supabase.rpc("attendance_by_batch", args),
+  ]);
+  const students = unwrap(studentsResult);
+  const batches = unwrap(batchesResult);
   return {
     students: students.map((row) => ({
       id: row.student_id,

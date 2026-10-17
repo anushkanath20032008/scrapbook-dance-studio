@@ -11,6 +11,7 @@ import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { UnpaidList } from "@/components/console/unpaid-list";
+import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
@@ -20,9 +21,6 @@ import { firstOfMonth, todayInIndia } from "@/lib/validators";
 export const Route = createFileRoute("/app/")({
   component: Overview,
 });
-
-const monthName = (period: string) =>
-  new Date(`${period}T00:00:00`).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
 
 function Overview() {
   const queryClient = useQueryClient();
@@ -52,7 +50,7 @@ function Overview() {
       setNotice(
         created === 0
           ? "No charges created. Dancers need a monthly fee that covers this month."
-          : `${created} charge${created === 1 ? "" : "s"} created for ${monthName(period)}.`,
+          : `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
       );
       void queryClient.invalidateQueries({ queryKey: ["home-report"] });
     },
@@ -93,7 +91,7 @@ function Overview() {
           <div className="window-bar chrome-font">Charges.dialog</div>
           <div className="window-inner console-form">
             <p>
-              <strong>{monthName(period)}</strong> has no charges yet.
+              <strong>{formatMonthLong(period)}</strong> has no charges yet.
               {snapshot.active_students === 0 && " Add dancers with a monthly fee first."}
             </p>
             <label className="form-label console-field">
@@ -113,7 +111,7 @@ function Overview() {
                 disabled={generateMutation.isPending || snapshot.active_students === 0}
                 onClick={() => generateMutation.mutate()}
               >
-                Generate {monthName(period)} charges
+                Generate {formatMonthLong(period)} charges
               </Button>
               {snapshot.active_students === 0 && (
                 <Link to="/app/students" className="setup-go">
@@ -139,7 +137,7 @@ function Overview() {
               variant="retroPaper"
               type="button"
               onClick={() => setReminding({ period })}
-              disabled={(snapshot?.overdue_paise ?? 0) === 0}
+              disabled={snapshot.overdue_paise === 0}
             >
               Remind everyone overdue
             </Button>

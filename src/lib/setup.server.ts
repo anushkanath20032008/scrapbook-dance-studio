@@ -7,41 +7,40 @@ const MAX_ROWS = 1000;
 export async function getSetupCounts(context: StudioContext): Promise<SetupCounts> {
   const { supabase } = await ensureStudio(context);
 
-  const plans = unwrap(
-    await supabase.from("fee_plans").select("id").is("archived_at", null).limit(MAX_ROWS),
-  );
-  const batches = unwrap(
-    await supabase.from("batches").select("id").is("archived_at", null).limit(MAX_ROWS),
-  );
-  const students = unwrap(
-    await supabase
-      .from("students")
-      .select("id, guardian_id")
-      .is("archived_at", null)
-      .limit(MAX_ROWS),
-  );
-  const guardians = unwrap(
-    await supabase
+  const [
+    plansResult,
+    batchesResult,
+    studentsResult,
+    guardiansResult,
+    membersResult,
+    assignmentsResult,
+  ] = await Promise.all([
+    supabase.from("fee_plans").select("id").is("archived_at", null).limit(MAX_ROWS),
+    supabase.from("batches").select("id").is("archived_at", null).limit(MAX_ROWS),
+    supabase.from("students").select("id, guardian_id").is("archived_at", null).limit(MAX_ROWS),
+    supabase
       .from("guardians")
       .select("id")
       .is("archived_at", null)
       .not("phone", "is", null)
       .limit(MAX_ROWS),
-  );
-  const members = unwrap(
-    await supabase
+    supabase
       .from("batch_members")
       .select("student_id, batch_id")
       .is("left_on", null)
       .limit(MAX_ROWS * 5),
-  );
-  const assignments = unwrap(
-    await supabase
+    supabase
       .from("fee_plan_assignments")
       .select("student_id")
       .is("ends_on", null)
       .limit(MAX_ROWS * 5),
-  );
+  ]);
+  const plans = unwrap(plansResult);
+  const batches = unwrap(batchesResult);
+  const students = unwrap(studentsResult);
+  const guardians = unwrap(guardiansResult);
+  const members = unwrap(membersResult);
+  const assignments = unwrap(assignmentsResult);
 
   const activeStudents = new Set(students.map((student) => student.id));
   const activeBatches = new Set(batches.map((batch) => batch.id));

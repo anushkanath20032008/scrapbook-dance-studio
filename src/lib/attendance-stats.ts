@@ -1,3 +1,5 @@
+import { firstOfMonth } from "./validators";
+
 // Pure date and percentage helpers for the attendance screen. Client-safe.
 
 /** Present marks over marked sessions as a whole percent; null when nothing was marked, never 0%. */
@@ -31,7 +33,7 @@ export const rangeLabels: Record<RangeKind, string> = {
 /** The date range for a choice, relative to today (an India date). */
 export function rangeFor(kind: RangeKind, today: string): { from: string; to: string } {
   if (kind === "month") {
-    const first = `${today.slice(0, 7)}-01`;
+    const first = firstOfMonth(today);
     const next = day(first);
     next.setUTCMonth(next.getUTCMonth() + 1);
     return { from: first, to: iso(new Date(next.getTime() - 86_400_000)) };

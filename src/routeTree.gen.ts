@@ -21,6 +21,7 @@ import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
 import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
+import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
@@ -87,6 +88,11 @@ const AppInsightsRoute = AppInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/app/batches'
     | '/app/billing'
     | '/app/insights'
+    | '/app/messages'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/app/batches'
     | '/app/billing'
     | '/app/insights'
+    | '/app/messages'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/app/batches'
     | '/app/billing'
     | '/app/insights'
+    | '/app/messages'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -327,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInsightsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/messages': {
+      id: '/app/messages'
+      path: '/messages'
+      fullPath: '/app/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -370,6 +389,7 @@ interface AppRouteChildren {
   AppBatchesRoute: typeof AppBatchesRoute
   AppBillingRoute: typeof AppBillingRoute
   AppInsightsRoute: typeof AppInsightsRoute
+  AppMessagesRoute: typeof AppMessagesRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
@@ -381,6 +401,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBatchesRoute: AppBatchesRoute,
   AppBillingRoute: AppBillingRoute,
   AppInsightsRoute: AppInsightsRoute,
+  AppMessagesRoute: AppMessagesRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,

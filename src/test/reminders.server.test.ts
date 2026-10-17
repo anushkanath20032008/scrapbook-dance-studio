@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { listReminders, queueReminders } from "@/lib/reminders.server";
+import {
+  getMessagingStatus,
+  listReminders,
+  previewReminders,
+  queueReminders,
+} from "@/lib/reminders.server";
 import {
   backoffMinutes,
   MAX_ATTEMPTS,
@@ -156,5 +161,52 @@ describe("runReminderJob", () => {
   it("backs off 5, 10, 20 minutes and caps at six hours", () => {
     expect([1, 2, 3].map(backoffMinutes)).toEqual([5, 10, 20]);
     expect(backoffMinutes(20)).toBe(360);
+  });
+});
+
+describe("reminder preview and choices", () => {
+  it("sends the student and overdue-only choices only when given", async () => {
+    const { client, calls } = fakeSupabase(() => ({ data: 1 }));
+    const studentId = "33333333-3333-4333-8333-333333333333";
+    await queueReminders({ supabase: client, userId: user }, { period: "2026-10-17", studentId });
+    await queueReminders(
+      { supabase: client, userId: user },
+      { period: "2026-10-17", onlyOverdue: true },
+    );
+    expect(calls[0]?.args?.[0]).toMatchObject({ p_period: "2026-10-01", p_student: studentId });
+    expect(calls[0]?.args?.[0]).not.toHaveProperty("p_only_overdue");
+    expect(calls[1]?.args?.[0]).toMatchObject({ p_only_overdue: true });
+    expect(calls[1]?.args?.[0]).not.toHaveProperty("p_student");
+  });
+
+  it("previews with the same arguments the queue would use", async () => {
+    const rows = [{ student_name: "Asha", skip_reason: null }];
+    const { client, calls } = fakeSupabase(() => ({ data: rows }));
+    expect(
+      await previewReminders(
+        { supabase: client, userId: user },
+        { period: "2026-10-17", onlyOverdue: true },
+      ),
+    ).toEqual(rows);
+    expect(calls[0]?.fn).toBe("preview_fee_reminders");
+    expect(calls[0]?.args?.[0]).toMatchObject({ p_period: "2026-10-01", p_only_overdue: true });
+  });
+
+  it("reports whether a WhatsApp provider is configured", () => {
+    const url = process.env["WHATSAPP_PROVIDER_URL"];
+    const token = process.env["WHATSAPP_PROVIDER_TOKEN"];
+    try {
+      delete process.env["WHATSAPP_PROVIDER_URL"];
+      delete process.env["WHATSAPP_PROVIDER_TOKEN"];
+      expect(getMessagingStatus()).toEqual({ providerConfigured: false });
+      process.env["WHATSAPP_PROVIDER_URL"] = "https://provider.example";
+      process.env["WHATSAPP_PROVIDER_TOKEN"] = "token";
+      expect(getMessagingStatus()).toEqual({ providerConfigured: true });
+    } finally {
+      if (url === undefined) delete process.env["WHATSAPP_PROVIDER_URL"];
+      else process.env["WHATSAPP_PROVIDER_URL"] = url;
+      if (token === undefined) delete process.env["WHATSAPP_PROVIDER_TOKEN"];
+      else process.env["WHATSAPP_PROVIDER_TOKEN"] = token;
+    }
   });
 });

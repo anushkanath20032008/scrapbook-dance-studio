@@ -659,8 +659,30 @@ export type Database = {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number
       }
+      preview_fee_reminders: {
+        Args: {
+          p_only_overdue?: boolean
+          p_period: string
+          p_student?: string
+          p_today?: string
+        }
+        Returns: {
+          due_on: string
+          outstanding_paise: number
+          phone: string
+          skip_reason: string
+          status: string
+          student_id: string
+          student_name: string
+        }[]
+      }
       queue_fee_reminders: {
-        Args: { p_period: string; p_today?: string }
+        Args: {
+          p_only_overdue?: boolean
+          p_period: string
+          p_student?: string
+          p_today?: string
+        }
         Returns: number
       }
       monthly_trend: {

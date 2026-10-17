@@ -9,6 +9,7 @@ import { messageOf } from "@/components/console/form-utils";
 import { MonthTotals } from "@/components/console/month-totals";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
+import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { UnpaidList } from "@/components/console/unpaid-list";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
@@ -35,6 +36,7 @@ function Overview() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [paying, setPaying] = useState<PayingStudent | null>(null);
+  const [reminding, setReminding] = useState<RemindTarget | null>(null);
 
   const report = useQuery({
     queryKey: ["home-report", period],
@@ -133,14 +135,33 @@ function Overview() {
         <>
           <div className="console-list-head">
             <h2>Who hasn&apos;t paid</h2>
+            <Button
+              variant="retroPaper"
+              type="button"
+              onClick={() => setReminding({ period })}
+              disabled={(snapshot?.overdue_paise ?? 0) === 0}
+            >
+              Remind everyone overdue
+            </Button>
           </div>
           <UnpaidList
             rows={report.data?.unpaid ?? []}
             onRecord={(row) => setPaying({ id: row.student_id, name: row.student_name })}
+            onRemind={(row) =>
+              setReminding({ period, studentId: row.student_id, name: row.student_name })
+            }
           />
         </>
       )}
 
+      <RemindDialog
+        target={reminding}
+        onClose={() => setReminding(null)}
+        onQueued={(message) => {
+          setError("");
+          setNotice(message);
+        }}
+      />
       <RecordPaymentDialog
         student={paying}
         onClose={() => setPaying(null)}

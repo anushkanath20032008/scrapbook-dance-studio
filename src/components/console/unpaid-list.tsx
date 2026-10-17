@@ -11,6 +11,16 @@ function dueText(row: Unpaid) {
   return `Due ${formatDay(row.due_on)}`;
 }
 
+/** A wa.me link with the reminder filled in, or null when the number cannot be used. */
+export function whatsappLink(row: Unpaid): string | null {
+  const digits = (row.phone ?? "").replace(/\D/g, "");
+  const international =
+    digits.length === 10 ? `91${digits}` : digits.length >= 11 && digits.length <= 15 ? digits : null;
+  if (!international) return null;
+  const text = `Hi ${row.student_name}, a reminder that your fee of ${formatRupees(row.outstanding_paise)} was due on ${formatDay(row.due_on)}. Thank you!`;
+  return `https://wa.me/${international}?text=${encodeURIComponent(text)}`;
+}
+
 /** Everyone who still owes for the month, oldest overdue first. */
 export function UnpaidList({
   rows,
@@ -46,6 +56,13 @@ export function UnpaidList({
             <Button variant="retroPaper" type="button" onClick={() => onRemind(row)}>
               Remind
             </Button>
+            {whatsappLink(row) && (
+              <Button asChild variant="retroPaper">
+                <a href={whatsappLink(row) ?? undefined} target="_blank" rel="noreferrer">
+                  WhatsApp
+                </a>
+              </Button>
+            )}
           </div>
         </li>
       ))}

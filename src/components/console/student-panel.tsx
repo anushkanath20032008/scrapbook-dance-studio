@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FormAlert } from "@/components/console/form-helpers";
-import { messageOf } from "@/components/console/form-utils";
+import { feeLabel, messageOf } from "@/components/console/form-utils";
 import { useRefreshStudents } from "@/components/console/console-data";
 import {
   StudentForm,
@@ -17,7 +17,7 @@ import { assignFeePlan } from "@/lib/fees.functions";
 import { formatRupees } from "@/lib/money";
 import { isoDate, todayInIndia } from "@/lib/validators";
 
-/** Everything about one student in one place: details, batches and fee plan. Each section saves on its own. */
+/** Everything about one dancer in one place: details, batches and monthly fee. Each section saves on its own. */
 export function StudentPanel({
   student,
   guardians,
@@ -40,6 +40,7 @@ export function StudentPanel({
   const [planId, setPlanId] = useState("");
   const [startsOn, setStartsOn] = useState(todayInIndia());
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   const onBatchIds = new Set(student.batches.map((batch) => batch.id));
   const available = batches.filter((batch) => !onBatchIds.has(batch.id));
@@ -49,6 +50,7 @@ export function StudentPanel({
     onSuccess: () => {
       setBatchId("");
       setError("");
+      setNotice("Added to the batch.");
       refresh();
     },
     onError: (e) => setError(messageOf(e)),
@@ -57,6 +59,7 @@ export function StudentPanel({
     mutationFn: (id: string) => removeFn({ data: { batchId: id, studentId: student.id } }),
     onSuccess: () => {
       setError("");
+      setNotice("Removed from the batch.");
       refresh();
     },
     onError: (e) => setError(messageOf(e)),
@@ -66,6 +69,7 @@ export function StudentPanel({
     onSuccess: () => {
       setPlanId("");
       setError("");
+      setNotice("Monthly fee updated.");
       refresh();
     },
     onError: (e) => setError(messageOf(e)),
@@ -102,7 +106,7 @@ export function StudentPanel({
           ))}
         </ul>
       )}
-      {available.length > 0 && (
+      {available.length > 0 ? (
         <div className="console-inline">
           <select
             className="field"
@@ -126,25 +130,31 @@ export function StudentPanel({
             Add to batch
           </Button>
         </div>
+      ) : (
+        <p className="console-hint">
+          {batches.length === 0
+            ? "No batches yet. Add one under Batches."
+            : "Already on every batch. Add another under Batches."}
+        </p>
       )}
 
-      <h3>Fee plan</h3>
+      <h3>Monthly fee</h3>
       <p className="console-hint">
         {student.plan
-          ? `${student.plan.name} · ${formatRupees(student.plan.amount_paise)} a month since ${student.plan.starts_on}`
-          : "No fee plan yet."}
+          ? `${formatRupees(student.plan.amount_paise)} a month since ${student.plan.starts_on}`
+          : "No monthly fee yet."}
       </p>
       <div className="console-inline">
-        <Field label="Assign a plan">
+        <Field label="Change to">
           <select
             className="field"
             value={planId}
             onChange={(event) => setPlanId(event.target.value)}
           >
-            <option value="">Choose a plan</option>
+            <option value="">Choose a fee</option>
             {plans.map((plan) => (
               <option key={plan.id} value={plan.id}>
-                {plan.name} · {formatRupees(plan.amount_paise)}
+                {feeLabel(plan)}
               </option>
             ))}
           </select>
@@ -163,9 +173,14 @@ export function StudentPanel({
           disabled={!planId || !isoDate.safeParse(startsOn).success || assign.isPending}
           onClick={() => assign.mutate()}
         >
-          Assign plan
+          Set fee
         </Button>
       </div>
+      {notice && !error && (
+        <p role="status" className="console-notice">
+          ✓ {notice}
+        </p>
+      )}
       <FormAlert message={error} />
       <div className="console-actions">
         <Button variant="retroPaper" type="button" onClick={onClose}>

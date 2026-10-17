@@ -14,8 +14,8 @@ function Setup() {
         <div className="window-bar chrome-font">Checklist.dialog</div>
         <div className="window-inner">
           <p>
-            Five steps take you from an empty studio to your first month of fees. Leave any time:
-            each step ticks itself from what you have added.
+            Five steps to your first month of fees. Leave any time: each step ticks itself from what
+            you have added.
           </p>
           <SetupChecklist />
         </div>

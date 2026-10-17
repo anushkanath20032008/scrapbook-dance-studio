@@ -29,7 +29,7 @@ const navItems: {
 }[] = [
   { to: "/app", label: "Overview", exact: true },
   { to: "/app/setup", label: "Setup", exact: false },
-  { to: "/app/students", label: "Students", exact: false },
+  { to: "/app/students", label: "Dancers", exact: false },
   { to: "/app/batches", label: "Batches", exact: false },
   { to: "/app/plans", label: "Fee plans", exact: false },
 ];

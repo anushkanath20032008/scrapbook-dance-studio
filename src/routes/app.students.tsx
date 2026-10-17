@@ -3,9 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ConsoleDialog } from "@/components/console/console-dialog";
+import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
-import { useRefreshStudents } from "@/components/console/console-data";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
@@ -15,11 +16,11 @@ import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
 
 export const Route = createFileRoute("/app/students")({
-  head: () => ({ meta: [{ title: "Students | Choreo Studio" }] }),
-  component: Students,
+  head: () => ({ meta: [{ title: "Dancers | Choreo Studio" }] }),
+  component: Dancers,
 });
 
-function Students() {
+function Dancers() {
   const refresh = useRefreshStudents();
   const listStudents = useServerFn(listStudentOverview);
   const listGuardiansFn = useServerFn(listGuardians);
@@ -28,6 +29,7 @@ function Students() {
   const archiveFn = useServerFn(setStudentArchived);
 
   const [showArchived, setShowArchived] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -61,25 +63,11 @@ function Students() {
 
   return (
     <section>
-      <h1 className="display console-title">Students</h1>
-      <div className="window">
-        <div className="window-bar chrome-font">New student</div>
-        <div className="window-inner">
-          {ready ? (
-            <StudentForm
-              guardians={guardians.data ?? []}
-              batches={batches.data ?? []}
-              plans={plans.data ?? []}
-              onDone={() => undefined}
-            />
-          ) : (
-            <p>Loading…</p>
-          )}
-        </div>
-      </div>
-
-      <div className="console-list-head">
-        <h2>Your students</h2>
+      <h1 className="display console-title">Dancers</h1>
+      <div className="console-toolbar">
+        <Button variant="retro" type="button" disabled={!ready} onClick={() => setAddOpen(true)}>
+          + Add dancer
+        </Button>
         <label className="console-check">
           <input
             type="checkbox"
@@ -90,9 +78,9 @@ function Students() {
         </label>
       </div>
       <FormAlert message={error} />
-      {students.isError && <p role="alert">Could not load your students. Please refresh.</p>}
+      {students.isError && <p role="alert">Could not load your dancers. Please refresh.</p>}
       {students.data?.length === 0 && (
-        <p className="console-empty">No students yet. Add your first above.</p>
+        <p className="console-empty">No dancers yet. Add your first.</p>
       )}
       <ul className="console-list">
         {students.data?.map((student) => (
@@ -105,9 +93,8 @@ function Students() {
               <div>
                 <strong>{student.name}</strong>
                 <span className="console-hint">
-                  {student.guardian
-                    ? `${student.guardian.name}${student.guardian.phone ? ` · ${student.guardian.phone}` : " · no phone"}`
-                    : "No guardian"}
+                  {student.guardian?.phone ?? "No phone"}
+                  {student.archived_at ? " · archived" : ""}
                 </span>
                 <span className="console-hint">
                   {student.batches.length > 0
@@ -115,9 +102,8 @@ function Students() {
                     : "No batch"}
                   {" · "}
                   {student.plan
-                    ? `${student.plan.name} (${formatRupees(student.plan.amount_paise)})`
-                    : "No fee plan"}
-                  {student.archived_at ? " · archived" : ""}
+                    ? `${formatRupees(student.plan.amount_paise)} a month`
+                    : "No fee yet"}
                 </span>
               </div>
               <div className="console-row-actions">
@@ -156,6 +142,17 @@ function Students() {
           </li>
         ))}
       </ul>
+
+      <ConsoleDialog open={addOpen} onOpenChange={setAddOpen} title="New dancer">
+        {ready && (
+          <StudentForm
+            guardians={guardians.data ?? []}
+            batches={batches.data ?? []}
+            plans={plans.data ?? []}
+            onDone={() => setAddOpen(false)}
+          />
+        )}
+      </ConsoleDialog>
     </section>
   );
 }

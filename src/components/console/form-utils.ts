@@ -1,3 +1,4 @@
+import { formatRupees } from "@/lib/money";
 import type { ZodError } from "zod";
 
 export type FieldErrors = Record<string, string>;
@@ -17,3 +18,11 @@ export function messageOf(error: unknown): string {
 }
 
 export const weekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+/** What a dancer pays, as the dancer would read it: the amount and classes, never the studio's plan name. */
+export const feeLabel = (plan: { amount_paise: number; classes_per_week: number | null }) =>
+  `${formatRupees(plan.amount_paise)} a month${
+    plan.classes_per_week
+      ? ` · ${plan.classes_per_week} class${plan.classes_per_week === 1 ? "" : "es"} a week`
+      : ""
+  }`;

@@ -37,31 +37,31 @@ export function buildSetupSteps(counts: SetupCounts): SetupStep[] {
     },
     {
       id: "students",
-      title: "Add students with a guardian and phone",
+      title: "Add your dancers with a phone number",
       detail:
         counts.students > 0
-          ? `${count(counts.students, "student")}, ${counts.studentsWithContact} with a guardian phone`
-          : "No students yet",
+          ? `${count(counts.students, "dancer")}, ${counts.studentsWithContact} with a phone`
+          : "No dancers yet",
       done: counts.studentsWithContact > 0,
       to: "/app/students",
     },
     {
       id: "roster",
-      title: "Put students on batches",
+      title: "Put dancers on batches",
       detail:
         counts.studentsOnBatch > 0
-          ? `${count(counts.studentsOnBatch, "student")} on a batch`
-          : "No student is on a batch yet",
+          ? `${count(counts.studentsOnBatch, "dancer")} on a batch`
+          : "No dancer is on a batch yet",
       done: counts.studentsOnBatch > 0,
       to: "/app/students",
     },
     {
       id: "assign",
-      title: "Give every student a fee plan",
+      title: "Set a monthly fee for every dancer",
       detail:
         counts.students > 0
-          ? `${counts.studentsWithPlan} of ${counts.students} students have a plan`
-          : "Add students first",
+          ? `${counts.studentsWithPlan} of ${counts.students} dancers have a fee`
+          : "Add dancers first",
       done: counts.students > 0 && counts.studentsWithPlan === counts.students,
       to: "/app/students",
     },

@@ -1,7 +1,7 @@
 import { hashToken } from "./family.server";
+import { SCREENSHOT_BUCKET } from "./schemas";
 import { friendlyError, unwrap, type Db, type StudioContext } from "./studio.server";
 
-export const SCREENSHOT_BUCKET = "claim-screenshots";
 export const RETENTION_DAYS = 30;
 const NOT_FOUND = "This link is not valid. Ask your studio for a new one.";
 const tokenShape = /^[A-Za-z0-9_-]{43}$/;
@@ -61,8 +61,12 @@ export async function submitClaim(admin: Db, input: ClaimInput) {
     const path = `${studioId}/${claim.id}.${screenshotExtensions[input.screenshotType]}`;
     const signed = await admin.storage.from(SCREENSHOT_BUCKET).createSignedUploadUrl(path);
     if (!signed.error && signed.data) {
-      await admin.from("payment_claims").update({ screenshot_path: path }).eq("id", claim.id);
-      upload = { path, token: signed.data.token };
+      const saved = await admin
+        .from("payment_claims")
+        .update({ screenshot_path: path })
+        .eq("id", claim.id);
+      // Only hand out the upload token once the path is stored, so a file never lands untracked.
+      if (!saved.error) upload = { path, token: signed.data.token };
     }
   }
   return { claimId: claim.id, upload };
@@ -81,13 +85,21 @@ export async function listMyClaims(admin: Db, token: string) {
   );
 }
 
-/** Remove a claim's screenshot from storage and clear its path. Used when a claim is decided and by the purge job. */
-export async function removeScreenshots(admin: Db, claims: { id: string; path: string }[]) {
+/**
+ * Remove claims' screenshots from storage. The purge job also clears the stored path; a decision keeps it,
+ * so the next purge run sweeps a file whose signed upload landed after the decision.
+ */
+export async function removeScreenshots(
+  admin: Db,
+  claims: { id: string; path: string }[],
+  { clearPath }: { clearPath: boolean } = { clearPath: true },
+) {
   if (claims.length === 0) return { removed: 0 };
   const result = await admin.storage
     .from(SCREENSHOT_BUCKET)
     .remove(claims.map((claim) => claim.path));
   if (result.error) throw new Error("Could not delete the screenshot files.");
+  if (!clearPath) return { removed: claims.length };
   const { error } = await admin
     .from("payment_claims")
     .update({ screenshot_path: null })
@@ -106,7 +118,9 @@ async function clearScreenshotFor(admin: Db, claimId: string) {
     .eq("id", claimId)
     .maybeSingle();
   if (data?.screenshot_path)
-    await removeScreenshots(admin, [{ id: claimId, path: data.screenshot_path }]);
+    await removeScreenshots(admin, [{ id: claimId, path: data.screenshot_path }], {
+      clearPath: false,
+    });
 }
 
 /** Pending claims beside what each dancer owes, with a flag for a reference number already seen. */

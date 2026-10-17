@@ -153,6 +153,17 @@ describe("reminder preview and queueing", () => {
     void owner;
   });
 
+  it("returns nothing from reminder_targets itself for another studio's dancers", async () => {
+    const { overdue } = await fixture();
+    const stranger = await newStudio(db);
+    const rows = await db.query(
+      { user: stranger },
+      "SELECT * FROM public.reminder_targets('2026-10-01'::date, '2026-10-10'::date, $1, false)",
+      [overdue.id],
+    );
+    expect(rows).toEqual([]);
+  });
+
   it("is not available to anonymous callers", async () => {
     expect(
       await rejection(

@@ -21,7 +21,9 @@ const claimId = "55555555-5555-4555-8555-555555555555";
 const token = "A".repeat(43);
 
 /** A service-role stand-in: the family link lookup, the claim function, and storage. */
-function adminStub(options: { revoked?: boolean; storageFails?: boolean } = {}) {
+function adminStub(
+  options: { revoked?: boolean; storageFails?: boolean; pathUpdateFails?: boolean } = {},
+) {
   const storage = {
     createSignedUploadUrl: vi.fn(async (path: string) =>
       options.storageFails
@@ -44,6 +46,12 @@ function adminStub(options: { revoked?: boolean; storageFails?: boolean } = {}) 
           { claim_id: "c2", screenshot_path: "s/c2.jpg" },
         ],
       };
+    if (
+      call.table === "payment_claims" &&
+      options.pathUpdateFails &&
+      call.steps.some(([n]) => n === "update")
+    )
+      return { error: { code: "XX000", message: "down" } };
     if (call.table === "payment_claims") return { data: { screenshot_path: "s/old.png" } };
     return {};
   });
@@ -120,6 +128,14 @@ describe("submitClaim", () => {
     expect(result.upload).toEqual({ path: `${studio}/${claimId}.jpg`, token: "upload-token" });
   });
 
+  it("hands out no upload token when the screenshot path could not be stored", async () => {
+    const { admin } = adminStub({ pathUpdateFails: true });
+    expect(await submitClaim(admin, { ...base, screenshotType: "image/png" })).toEqual({
+      claimId,
+      upload: null,
+    });
+  });
+
   it("still saves the claim when storage is unavailable", async () => {
     const { admin } = adminStub({ storageFails: true });
     expect(await submitClaim(admin, { ...base, screenshotType: "image/png" })).toEqual({
@@ -173,6 +189,23 @@ describe("owner decisions and screenshots", () => {
       reason: "No such transfer",
     });
     expect(rejectStub.storage.remove).toHaveBeenCalledWith(["s/old.png"]);
+  });
+
+  it("keeps the stored path after a decision so the purge job can sweep a late upload", async () => {
+    const owner = fakeSupabase(() => ({ data: { id: claimId } }));
+    const stub = adminStub();
+    await confirmClaim({ supabase: owner.client, userId: user }, stub.admin, {
+      claimId,
+      acknowledgeExcess: false,
+    });
+    const cleared = stub.calls.some(
+      (call) =>
+        call.table === "payment_claims" &&
+        call.steps.some(
+          ([name, args]) => name === "update" && JSON.stringify(args).includes("screenshot_path"),
+        ),
+    );
+    expect(cleared).toBe(false);
   });
 
   it("sends the adjusted amount and acknowledgment only when given", async () => {

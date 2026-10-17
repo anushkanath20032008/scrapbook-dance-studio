@@ -2,6 +2,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FamilyLinkSection } from "@/components/console/family-link-section";
 import { Field, FormAlert } from "@/components/console/form-helpers";
 import { feeLabel, messageOf } from "@/components/console/form-utils";
 import { useRefreshStudents } from "@/components/console/console-data";
@@ -176,6 +177,7 @@ export function StudentPanel({
           Set fee
         </Button>
       </div>
+      {student.guardian && <FamilyLinkSection guardianId={student.guardian.id} />}
       {notice && !error && (
         <p role="status" className="console-notice">
           ✓ {notice}

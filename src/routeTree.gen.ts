@@ -25,6 +25,9 @@ import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
+import { Route as AppVerifyRouteImport } from './routes/app.verify'
+import { Route as FamilyTokenRouteImport } from './routes/family.$token'
+import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 
@@ -108,6 +111,21 @@ const AppStudentsRoute = AppStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => AppRoute,
 } as any)
+const AppVerifyRoute = AppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AppRoute,
+} as any)
+const FamilyTokenRoute = FamilyTokenRouteImport.update({
+  id: '/family/$token',
+  path: '/family/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJobsPurgeScreenshotsRoute = ApiJobsPurgeScreenshotsRouteImport.update({
+  id: '/api/jobs/purge-screenshots',
+  path: '/api/jobs/purge-screenshots',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiJobsSendRemindersRoute = ApiJobsSendRemindersRouteImport.update({
   id: '/api/jobs/send-reminders',
   path: '/api/jobs/send-reminders',
@@ -135,7 +153,10 @@ export interface FileRoutesByFullPath {
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -154,7 +175,10 @@ export interface FileRoutesByTo {
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
   '/app': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -175,7 +199,10 @@ export interface FileRoutesById {
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
@@ -197,7 +224,10 @@ export interface FileRouteTypes {
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
     | '/app/'
+    | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   fileRoutesByTo: FileRoutesByTo
@@ -216,7 +246,10 @@ export interface FileRouteTypes {
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
     | '/app'
+    | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   id:
@@ -236,7 +269,10 @@ export interface FileRouteTypes {
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
     | '/app/'
+    | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
   fileRoutesById: FileRoutesById
@@ -249,6 +285,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OptOutRoute: typeof OptOutRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  FamilyTokenRoute: typeof FamilyTokenRoute
+  ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
 }
@@ -367,6 +405,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppStudentsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/verify': {
+      id: '/app/verify'
+      path: '/verify'
+      fullPath: '/app/verify'
+      preLoaderRoute: typeof AppVerifyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/family/$token': {
+      id: '/family/$token'
+      path: '/family/$token'
+      fullPath: '/family/$token'
+      preLoaderRoute: typeof FamilyTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/jobs/purge-screenshots': {
+      id: '/api/jobs/purge-screenshots'
+      path: '/api/jobs/purge-screenshots'
+      fullPath: '/api/jobs/purge-screenshots'
+      preLoaderRoute: typeof ApiJobsPurgeScreenshotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/jobs/send-reminders': {
       id: '/api/jobs/send-reminders'
       path: '/api/jobs/send-reminders'
@@ -393,6 +452,7 @@ interface AppRouteChildren {
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
+  AppVerifyRoute: typeof AppVerifyRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -405,6 +465,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,
+  AppVerifyRoute: AppVerifyRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -418,6 +479,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OptOutRoute: OptOutRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  FamilyTokenRoute: FamilyTokenRoute,
+  ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
 }

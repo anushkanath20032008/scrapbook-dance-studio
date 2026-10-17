@@ -32,7 +32,8 @@ const navItems: {
     | "/app/billing"
     | "/app/attendance"
     | "/app/insights"
-    | "/app/messages";
+    | "/app/messages"
+    | "/app/verify";
   label: string;
   exact: boolean;
 }[] = [
@@ -40,6 +41,7 @@ const navItems: {
   { to: "/app/setup", label: "Setup", exact: false },
   { to: "/app/students", label: "Dancers", exact: false },
   { to: "/app/billing", label: "Billing", exact: false },
+  { to: "/app/verify", label: "To verify", exact: false },
   { to: "/app/attendance", label: "Attendance", exact: false },
   { to: "/app/messages", label: "Messages", exact: false },
   { to: "/app/insights", label: "Insights", exact: false },

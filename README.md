@@ -85,9 +85,15 @@ Everything is a TanStack Start server function (`src/lib/*.functions.ts`) that l
 
 In the Dodo dashboard add a webhook pointing to `https://<your domain>/api/webhooks/dodo` with the subscription events, and copy its signing secret into `DODO_PAYMENTS_WEBHOOK_KEY`. The signature is checked on the raw body before anything is read. Each event is applied once, only if it is newer than the last one applied, and only for the studio's own subscription.
 
+### Payment claims and screenshots
+
+A dancer can report a payment from their private link (`/family/<token>`). A claim changes no balance until the owner confirms it under **To verify**; confirming runs the same amount-versus-owed gate as any payment, and the owner's own bank or UPI statement, matched by reference number, is the source of truth. A screenshot is optional: it uploads straight to the private `claim-screenshots` storage bucket (PNG, JPEG or WebP, up to 5 MB, created by migration `0013`) through a one-time signed URL, is viewed by the owner through a 60-second signed URL, and is deleted when the claim is decided.
+
+`POST /api/jobs/purge-screenshots` deletes screenshots of decided claims and of claims left pending for over 30 days. Schedule it daily with the same header as the reminder job (`Authorization: Bearer <RENDER_JOB_SECRET>`). Have a lawyer review the privacy notice on the family page before real dancers' screenshots are collected.
+
 ### Database changes
 
-The migrations in `drizzle/migrations` are additive. Apply `0003` to `0006` to the database, then run `drizzle/verify/rollout-checks.sql` against it: it must return no rows. Apply the migrations before deploying the code that uses them.
+The migrations in `drizzle/migrations` are additive. Apply `0003` onward (currently to `0013`) to the database, then run `drizzle/verify/rollout-checks.sql` against it: it must return no rows. Apply the migrations before deploying the code that uses them.
 
 ## Security
 

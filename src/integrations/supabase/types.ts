@@ -323,6 +323,60 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_claims: {
+        Row: {
+          amount_paise: number
+          confirmed_paise: number | null
+          created_at: string
+          decided_at: string | null
+          decision_reason: string | null
+          guardian_id: string
+          id: string
+          method: string
+          paid_on: string
+          payment_id: string | null
+          reference: string | null
+          screenshot_path: string | null
+          status: string
+          student_id: string
+          studio_id: string
+        }
+        Insert: {
+          amount_paise: number
+          confirmed_paise?: number | null
+          created_at?: string
+          decided_at?: string | null
+          decision_reason?: string | null
+          guardian_id: string
+          id?: string
+          method: string
+          paid_on: string
+          payment_id?: string | null
+          reference?: string | null
+          screenshot_path?: string | null
+          status?: string
+          student_id: string
+          studio_id: string
+        }
+        Update: {
+          amount_paise?: number
+          confirmed_paise?: number | null
+          created_at?: string
+          decided_at?: string | null
+          decision_reason?: string | null
+          guardian_id?: string
+          id?: string
+          method?: string
+          paid_on?: string
+          payment_id?: string | null
+          reference?: string | null
+          screenshot_path?: string | null
+          status?: string
+          student_id?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_paise: number
@@ -693,6 +747,51 @@ export type Database = {
           missing_paise: number
           period: string
         }[]
+      }
+      claim_screenshots_to_purge: {
+        Args: { p_days?: number }
+        Returns: { claim_id: string; screenshot_path: string }[]
+      }
+      confirm_payment_claim: {
+        Args: {
+          p_acknowledge_excess?: boolean
+          p_amount_paise?: number
+          p_claim: string
+        }
+        Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
+      }
+      payment_claim_queue: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          amount_paise: number
+          claim_id: string
+          created_at: string
+          excess_paise: number
+          has_screenshot: boolean
+          method: string
+          owed_paise: number
+          paid_on: string
+          possible_duplicate: boolean
+          reference: string
+          remaining_paise: number
+          student_id: string
+          student_name: string
+        }[]
+      }
+      reject_payment_claim: {
+        Args: { p_claim: string; p_reason: string }
+        Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
+      }
+      submit_payment_claim: {
+        Args: {
+          p_amount_paise: number
+          p_guardian: string
+          p_method: string
+          p_paid_on: string
+          p_reference?: string
+          p_student: string
+        }
+        Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
       }
       payment_check: {
         Args: { p_amount_paise: number; p_student: string }

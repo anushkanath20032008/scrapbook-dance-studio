@@ -92,6 +92,13 @@
       "when": 1791201200000,
       "tag": "0012_reminder_preview",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791201300000,
+      "tag": "0013_payment_claims",
+      "breakpoints": true
     }
   ]
 }

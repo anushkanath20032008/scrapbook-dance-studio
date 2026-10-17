@@ -3,7 +3,7 @@
 WITH new_tables(name) AS (
   VALUES ('guardians'), ('students'), ('batches'), ('batch_members'), ('fee_plans'),
          ('fee_plan_assignments'), ('class_sessions'), ('attendance_records'), ('charges'),
-         ('payments'), ('reminders'), ('family_links'), ('billing_events')
+         ('payments'), ('reminders'), ('family_links'), ('billing_events'), ('payment_claims')
 ),
 billing_columns(name) AS (
   VALUES ('plan'), ('billing_status'), ('dodo_customer_id'), ('dodo_subscription_id'),
@@ -43,7 +43,7 @@ SELECT 'owners can write ' || g.table_name || ' (' || g.privilege_type || ')'
 FROM information_schema.role_table_grants g
 WHERE g.table_schema = 'public'
   AND g.grantee = 'authenticated'
-  AND g.table_name IN ('reminders', 'billing_events')
+  AND g.table_name IN ('reminders', 'billing_events', 'payment_claims')
   AND g.privilege_type <> 'SELECT'
 
 UNION ALL
@@ -72,7 +72,7 @@ UNION ALL
 SELECT 'owners can run ' || p.proname
 FROM pg_proc p
 WHERE p.pronamespace = 'public'::regnamespace
-  AND p.proname IN ('claim_due_reminders', 'apply_billing_event')
+  AND p.proname IN ('claim_due_reminders', 'apply_billing_event', 'submit_payment_claim', 'claim_screenshots_to_purge')
   AND has_function_privilege('authenticated', p.oid, 'EXECUTE')
 
 UNION ALL
@@ -83,7 +83,9 @@ WHERE p.pronamespace = 'public'::regnamespace
                     'ledger_overview', 'mark_attendance', 'queue_fee_reminders', 'record_payment',
                     'student_attendance', 'student_ledger_status', 'apply_billing_event',
                     'unpaid_students', 'studio_snapshot', 'payment_check', 'student_charge_ledger', 'attendance_by_student',
-                    'attendance_by_batch', 'monthly_trend', 'preview_fee_reminders', 'reminder_targets')
+                    'attendance_by_batch', 'monthly_trend', 'preview_fee_reminders', 'reminder_targets',
+                    'submit_payment_claim', 'claim_screenshots_to_purge', 'confirm_payment_claim',
+                    'reject_payment_claim', 'payment_claim_queue')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

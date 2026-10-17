@@ -64,3 +64,25 @@ export const generateChargesInput = z
     message: "The due date cannot be before the month it bills",
     path: ["dueOn"],
   });
+
+export const screenshotMimeTypes = ["image/png", "image/jpeg", "image/webp"] as const;
+export const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
+
+/** What a dancer sends from their private link. UPI and bank payments need a reference number. */
+export const claimInput = z
+  .object({
+    token: z.string().min(1).max(200),
+    studentId: uuid,
+    amountPaise: paise,
+    method: z.enum(paymentMethods),
+    paidOn: isoDate,
+    reference: optionalText(100),
+    screenshotType: z.enum(screenshotMimeTypes).optional(),
+  })
+  .refine(
+    (claim) => !(claim.method === "upi" || claim.method === "bank") || claim.reference !== null,
+    {
+      message: "Enter the reference number for a UPI or bank payment",
+      path: ["reference"],
+    },
+  );

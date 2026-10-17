@@ -93,6 +93,6 @@ function Home() {
         ["We have several trainers. Is that covered?","Today the app is built around one studio team. Tell us how you work when you join; it shapes what we build next."],
         ["What if I want to stop?","Cancel any time. Your records are yours; ask and we'll send them as a spreadsheet."],
       ].map(([q,a],i)=><Window title={`readme_0${i+1}.txt`} key={q}><details><summary>{q}</summary><p>{a}</p></details></Window>)}</div></div></section>
-    </main><footer className="footer"><div className="wrap"><strong>Choreo Studio</strong><span>Less chasing. More dancing.</span><div><a href="#join">Join the waitlist</a> · <a href="/login">Log in</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/opt-out">Opt out</a></div><small>© 2026 Choreo Studio</small></div></footer>
+    </main><footer className="footer"><div className="wrap"><strong>Choreo Studio</strong><span>Less chasing. More dancing.</span><div><a href="#join">Join the waitlist</a> · <a href="/login">Log in</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="mailto:nath.anushka26@gmail.com">Contact</a> · <a href="/opt-out">Opt out</a></div><small>© 2026 Choreo Studio</small></div></footer>
   </>;
 }

@@ -4,6 +4,7 @@ import {
   getWhatsAppProvider,
   HttpWhatsAppProvider,
   MetaCloudWhatsAppProvider,
+  VobizWhatsAppProvider,
   renderReminder,
   toInternationalPhone,
 } from "@/lib/whatsapp.server";
@@ -193,5 +194,53 @@ describe("MetaCloudWhatsAppProvider", () => {
       WHATSAPP_PROVIDER_TOKEN: "x",
     });
     expect(provider).toBeInstanceOf(MetaCloudWhatsAppProvider);
+  });
+});
+
+describe("VobizWhatsAppProvider", () => {
+  const provider = (fetchImpl: typeof fetch) =>
+    new VobizWhatsAppProvider(
+      { authId: "id", authToken: "tok", channelId: "ch", wabaId: "123" },
+      "en",
+      fetchImpl,
+    );
+  const req = {
+    to: "+919999999999",
+    templateName: "fee_due_reminder",
+    variables: { guardian: "Meera", student: "Aarav", studio: "S", amount: "₹1", month: "M", due_date: "5 Oct" },
+    text: "hi",
+  };
+
+  it("posts the template with Vobiz's headers and ids", async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ id: "m1" }, { status: 201 }));
+    expect(await provider(fetchImpl as unknown as typeof fetch).send(req)).toEqual({
+      ok: true,
+      providerMessageId: "m1",
+    });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("https://api.vobiz.ai/api/v1/messaging/messages");
+    expect((init.headers as Record<string, string>)["X-Auth-ID"]).toBe("id");
+    const body = JSON.parse(String(init.body));
+    expect(body).toMatchObject({ channel_id: "ch", waba_id: "123", to: "+919999999999", type: "template" });
+    expect(body.template.components[0].parameters).toHaveLength(6);
+  });
+
+  it("retries a busy service but not a rejected message", async () => {
+    const reply = (status: number) =>
+      provider((async () => new Response("x", { status })) as unknown as typeof fetch).send(req);
+    expect(await reply(400)).toMatchObject({ retryable: false });
+    expect(await reply(503)).toMatchObject({ retryable: true });
+  });
+
+  it("is chosen first when all four Vobiz settings are present", () => {
+    const env = {
+      VOBIZ_AUTH_ID: "a",
+      VOBIZ_AUTH_TOKEN: "b",
+      VOBIZ_CHANNEL_ID: "c",
+      VOBIZ_WABA_ID: "d",
+      WHATSAPP_PHONE_NUMBER_ID: "1",
+      WHATSAPP_ACCESS_TOKEN: "t",
+    };
+    expect(getWhatsAppProvider(env)).toBeInstanceOf(VobizWhatsAppProvider);
   });
 });

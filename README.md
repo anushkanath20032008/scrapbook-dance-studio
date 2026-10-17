@@ -109,3 +109,5 @@ Reminders you queue in the console are sent by `POST /api/jobs/send-reminders`; 
 **WhatsApp (Meta Cloud API).** Set `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` and optionally `WHATSAPP_TEMPLATE_LANGUAGE` (default `en`). Create two approved utility templates, `fee_due_reminder` and `fee_overdue_reminder`, whose body uses these variables in order: `{{1}}` guardian name, `{{2}}` dancer, `{{3}}` studio, `{{4}}` amount, `{{5}}` month, `{{6}}` due date. Example body: "Hi {{1}}, a reminder from {{3}}: {{2}}'s fee for {{5}} ({{4}}) is due on {{6}}. Thank you!"
 
 **Owner nudge email (Resend).** Set `RESEND_API_KEY`, `NUDGE_FROM_EMAIL` (a sender Resend has verified) and `PUBLIC_APP_URL`. The owner is emailed on a due date and every Monday while any dancer is unpaid this month.
+
+**Vobiz instead of your own number.** Vobiz (a Meta-approved provider) can supply the WhatsApp number, so reminders do not come from a personal phone. Set `VOBIZ_AUTH_ID` and `VOBIZ_AUTH_TOKEN` (console.vobiz.ai), `VOBIZ_CHANNEL_ID` and `VOBIZ_WABA_ID`. It is used before the Meta settings when all four are present. Submit the same two templates through Vobiz.

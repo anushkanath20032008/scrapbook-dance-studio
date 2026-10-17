@@ -202,11 +202,79 @@ export class MetaCloudWhatsAppProvider implements WhatsAppProvider {
   }
 }
 
-/** The configured provider: Meta's Cloud API when its two settings are present, else the generic HTTP provider, else null. */
+/** Vobiz (a Meta-approved provider that can supply the WhatsApp number): sends an approved template. */
+export class VobizWhatsAppProvider implements WhatsAppProvider {
+  constructor(
+    private readonly credentials: { authId: string; authToken: string; channelId: string; wabaId: string },
+    private readonly language: string = "en",
+    private readonly fetchImpl: typeof fetch = fetch,
+  ) {}
+
+  async send(request: SendRequest): Promise<SendResult> {
+    let response: Response;
+    try {
+      response = await this.fetchImpl("https://api.vobiz.ai/api/v1/messaging/messages", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "X-Auth-ID": this.credentials.authId,
+          "X-Auth-Token": this.credentials.authToken,
+        },
+        body: JSON.stringify({
+          channel_id: this.credentials.channelId,
+          waba_id: this.credentials.wabaId,
+          to: request.to,
+          type: "template",
+          template: {
+            name: request.templateName,
+            language: { code: this.language },
+            components: [
+              {
+                type: "body",
+                parameters: TEMPLATE_VARIABLE_ORDER.map((key) => ({
+                  type: "text",
+                  text: request.variables[key] ?? "",
+                })),
+              },
+            ],
+          },
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch {
+      return { ok: false, retryable: true, error: "Could not reach Vobiz." };
+    }
+    if (!response.ok) {
+      const retryable = response.status === 429 || response.status >= 500;
+      return { ok: false, retryable, error: `Vobiz answered ${response.status}.` };
+    }
+    const body = (await response.json().catch(() => null)) as {
+      id?: unknown;
+      wamid?: unknown;
+      message_id?: unknown;
+    } | null;
+    const id = body?.wamid ?? body?.id ?? body?.message_id;
+    return { ok: true, providerMessageId: typeof id === "string" ? id : "accepted" };
+  }
+}
+
+/** The configured provider: Vobiz, else Meta's Cloud API, else the generic HTTP provider, else null. */
 export function getWhatsAppProvider(
   env: Record<string, string | undefined> = process.env,
   fetchImpl: typeof fetch = fetch,
 ): WhatsAppProvider | null {
+  const vobiz = {
+    authId: env["VOBIZ_AUTH_ID"]?.trim(),
+    authToken: env["VOBIZ_AUTH_TOKEN"]?.trim(),
+    channelId: env["VOBIZ_CHANNEL_ID"]?.trim(),
+    wabaId: env["VOBIZ_WABA_ID"]?.trim(),
+  };
+  if (vobiz.authId && vobiz.authToken && vobiz.channelId && vobiz.wabaId)
+    return new VobizWhatsAppProvider(
+      { authId: vobiz.authId, authToken: vobiz.authToken, channelId: vobiz.channelId, wabaId: vobiz.wabaId },
+      env["WHATSAPP_TEMPLATE_LANGUAGE"]?.trim() || "en",
+      fetchImpl,
+    );
   const phoneNumberId = env["WHATSAPP_PHONE_NUMBER_ID"]?.trim();
   const accessToken = env["WHATSAPP_ACCESS_TOKEN"]?.trim();
   if (phoneNumberId && accessToken)

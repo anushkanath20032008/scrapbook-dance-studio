@@ -31,7 +31,8 @@ export async function previewReminders({ supabase }: StudioContext, input: Choic
 /** Whether a WhatsApp provider is configured, so the console can say honestly that reminders are only queued. */
 export function getMessagingStatus() {
   const configured = Boolean(
-    (process.env["WHATSAPP_PHONE_NUMBER_ID"] && process.env["WHATSAPP_ACCESS_TOKEN"]) ||
+    (process.env["VOBIZ_AUTH_ID"] && process.env["VOBIZ_AUTH_TOKEN"] && process.env["VOBIZ_CHANNEL_ID"] && process.env["VOBIZ_WABA_ID"]) ||
+      (process.env["WHATSAPP_PHONE_NUMBER_ID"] && process.env["WHATSAPP_ACCESS_TOKEN"]) ||
       (process.env["WHATSAPP_PROVIDER_URL"] && process.env["WHATSAPP_PROVIDER_TOKEN"]),
   );
   return { providerConfigured: configured };

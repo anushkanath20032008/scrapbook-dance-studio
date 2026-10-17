@@ -603,6 +603,24 @@ export type Database = {
         Args: { p_plan: string; p_starts_on: string; p_student: string }
         Returns: string
       }
+      attendance_by_batch: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          batch_id: string
+          batch_name: string
+          held: number
+          weekdays: number[]
+        }[]
+      }
+      attendance_by_student: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          marked: number
+          present: number
+          student_id: string
+          student_name: string
+        }[]
+      }
       batch_day: {
         Args: { p_batch: string; p_on: string }
         Returns: {

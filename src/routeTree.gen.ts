@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
 import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
@@ -65,6 +66,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAttendanceRoute = AppAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppBatchesRoute = AppBatchesRouteImport.update({
   id: '/batches',
   path: '/batches',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/plans': typeof AppPlansRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/plans': typeof AppPlansRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
   '/app/plans': typeof AppPlansRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
     | '/app/plans'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
     | '/app/plans'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/opt-out'
     | '/reset-password'
+    | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
     | '/app/plans'
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/attendance': {
+      id: '/app/attendance'
+      path: '/attendance'
+      fullPath: '/app/attendance'
+      preLoaderRoute: typeof AppAttendanceRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/batches': {
       id: '/app/batches'
       path: '/batches'
@@ -328,6 +347,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAttendanceRoute: typeof AppAttendanceRoute
   AppBatchesRoute: typeof AppBatchesRoute
   AppBillingRoute: typeof AppBillingRoute
   AppPlansRoute: typeof AppPlansRoute
@@ -337,6 +357,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAttendanceRoute: AppAttendanceRoute,
   AppBatchesRoute: AppBatchesRoute,
   AppBillingRoute: AppBillingRoute,
   AppPlansRoute: AppPlansRoute,

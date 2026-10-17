@@ -32,3 +32,16 @@ export const getStudentAttendance = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) =>
     (await import("@/lib/attendance.server")).getStudentAttendance(context, data),
   );
+
+export const getAttendanceSummary = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    validate(
+      z
+        .object({ from: isoDate, to: isoDate })
+        .refine((range) => range.to >= range.from, "The end date cannot be before the start date"),
+    ),
+  )
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/attendance-summary.server")).getAttendanceSummary(context, data),
+  );

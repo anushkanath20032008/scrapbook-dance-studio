@@ -188,6 +188,9 @@ button { cursor:pointer; }
 .pay-result { border:2px solid var(--ink); padding:10px 12px; display:grid; gap:6px; background:var(--paper); }
 .pay-result[data-tone="good"] { background:#dcefdc; }
 .pay-result[data-tone="warn"] { background:#f6c9c5; }
+.mark-button { border:2px solid var(--ink); background:var(--paper); padding:6px 14px; font-weight:800; font-size:13px; min-width:84px; }
+.mark-button[aria-pressed="true"][data-tone="good"] { background:#bfe3c0; box-shadow:2px 2px 0 var(--ink); }
+.mark-button[aria-pressed="true"][data-tone="warn"] { background:#f6c9c5; box-shadow:2px 2px 0 var(--ink); }
 .console-form { display:grid; gap:14px; }
 .console-field { display:grid; gap:5px; margin:0; border:0; padding:0; min-width:0; }
 .console-field-error { color:#7a1812; font-weight:700; font-size:.85rem; }

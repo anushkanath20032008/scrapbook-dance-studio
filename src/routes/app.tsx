@@ -23,7 +23,14 @@ export const Route = createFileRoute("/app")({
 
 // Each screen is added to this list as it ships.
 const navItems: {
-  to: "/app" | "/app/setup" | "/app/students" | "/app/batches" | "/app/plans" | "/app/billing";
+  to:
+    | "/app"
+    | "/app/setup"
+    | "/app/students"
+    | "/app/batches"
+    | "/app/plans"
+    | "/app/billing"
+    | "/app/attendance";
   label: string;
   exact: boolean;
 }[] = [
@@ -31,6 +38,7 @@ const navItems: {
   { to: "/app/setup", label: "Setup", exact: false },
   { to: "/app/students", label: "Dancers", exact: false },
   { to: "/app/billing", label: "Billing", exact: false },
+  { to: "/app/attendance", label: "Attendance", exact: false },
   { to: "/app/batches", label: "Batches", exact: false },
   { to: "/app/plans", label: "Fee plans", exact: false },
 ];

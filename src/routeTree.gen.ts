@@ -12,8 +12,24 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
+import { Route as AppBatchesRouteImport } from './routes/app.batches'
+import { Route as AppBillingRouteImport } from './routes/app.billing'
+import { Route as AppInsightsRouteImport } from './routes/app.insights'
+import { Route as AppMessagesRouteImport } from './routes/app.messages'
+import { Route as AppPlansRouteImport } from './routes/app.plans'
+import { Route as AppSetupRouteImport } from './routes/app.setup'
+import { Route as AppStudentsRouteImport } from './routes/app.students'
+import { Route as AppVerifyRouteImport } from './routes/app.verify'
+import { Route as FamilyTokenRouteImport } from './routes/family.$token'
+import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
+import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
+import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +46,16 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OptOutRoute = OptOutRouteImport.update({
   id: '/opt-out',
   path: '/opt-out',
@@ -40,43 +66,229 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAttendanceRoute = AppAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBatchesRoute = AppBatchesRouteImport.update({
+  id: '/batches',
+  path: '/batches',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBillingRoute = AppBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInsightsRoute = AppInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMessagesRoute = AppMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlansRoute = AppPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSetupRoute = AppSetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppStudentsRoute = AppStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerifyRoute = AppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AppRoute,
+} as any)
+const FamilyTokenRoute = FamilyTokenRouteImport.update({
+  id: '/family/$token',
+  path: '/family/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJobsPurgeScreenshotsRoute = ApiJobsPurgeScreenshotsRouteImport.update({
+  id: '/api/jobs/purge-screenshots',
+  path: '/api/jobs/purge-screenshots',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJobsSendRemindersRoute = ApiJobsSendRemindersRouteImport.update({
+  id: '/api/jobs/send-reminders',
+  path: '/api/jobs/send-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksDodoRoute = ApiWebhooksDodoRouteImport.update({
+  id: '/api/webhooks/dodo',
+  path: '/api/webhooks/dodo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
+  '/app/': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
+  '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
+  '/app': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
+  '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/app/attendance': typeof AppAttendanceRoute
+  '/app/batches': typeof AppBatchesRoute
+  '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
+  '/app/messages': typeof AppMessagesRoute
+  '/app/plans': typeof AppPlansRoute
+  '/app/setup': typeof AppSetupRoute
+  '/app/students': typeof AppStudentsRoute
+  '/app/verify': typeof AppVerifyRoute
+  '/family/$token': typeof FamilyTokenRoute
+  '/app/': typeof AppIndexRoute
+  '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
+  '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
+  '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/admin' | '/opt-out' | '/reset-password'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/admin'
+    | '/app'
+    | '/login'
+    | '/opt-out'
+    | '/reset-password'
+    | '/app/attendance'
+    | '/app/batches'
+    | '/app/billing'
+    | '/app/insights'
+    | '/app/messages'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
+    | '/app/'
+    | '/api/jobs/purge-screenshots'
+    | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/admin' | '/opt-out' | '/reset-password'
-  id: '__root__' | '/' | '/account' | '/admin' | '/opt-out' | '/reset-password'
+  to:
+    | '/'
+    | '/account'
+    | '/admin'
+    | '/login'
+    | '/opt-out'
+    | '/reset-password'
+    | '/app/attendance'
+    | '/app/batches'
+    | '/app/billing'
+    | '/app/insights'
+    | '/app/messages'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
+    | '/app'
+    | '/api/jobs/purge-screenshots'
+    | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/admin'
+    | '/app'
+    | '/login'
+    | '/opt-out'
+    | '/reset-password'
+    | '/app/attendance'
+    | '/app/batches'
+    | '/app/billing'
+    | '/app/insights'
+    | '/app/messages'
+    | '/app/plans'
+    | '/app/setup'
+    | '/app/students'
+    | '/app/verify'
+    | '/family/$token'
+    | '/app/'
+    | '/api/jobs/purge-screenshots'
+    | '/api/jobs/send-reminders'
+    | '/api/webhooks/dodo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
   OptOutRoute: typeof OptOutRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  FamilyTokenRoute: typeof FamilyTokenRoute
+  ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
+  ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
+  ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -102,6 +314,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/opt-out': {
       id: '/opt-out'
       path: '/opt-out'
@@ -116,15 +342,147 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/attendance': {
+      id: '/app/attendance'
+      path: '/attendance'
+      fullPath: '/app/attendance'
+      preLoaderRoute: typeof AppAttendanceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/batches': {
+      id: '/app/batches'
+      path: '/batches'
+      fullPath: '/app/batches'
+      preLoaderRoute: typeof AppBatchesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/billing': {
+      id: '/app/billing'
+      path: '/billing'
+      fullPath: '/app/billing'
+      preLoaderRoute: typeof AppBillingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/insights': {
+      id: '/app/insights'
+      path: '/insights'
+      fullPath: '/app/insights'
+      preLoaderRoute: typeof AppInsightsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/messages': {
+      id: '/app/messages'
+      path: '/messages'
+      fullPath: '/app/messages'
+      preLoaderRoute: typeof AppMessagesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/plans': {
+      id: '/app/plans'
+      path: '/plans'
+      fullPath: '/app/plans'
+      preLoaderRoute: typeof AppPlansRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/setup': {
+      id: '/app/setup'
+      path: '/setup'
+      fullPath: '/app/setup'
+      preLoaderRoute: typeof AppSetupRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/students': {
+      id: '/app/students'
+      path: '/students'
+      fullPath: '/app/students'
+      preLoaderRoute: typeof AppStudentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/verify': {
+      id: '/app/verify'
+      path: '/verify'
+      fullPath: '/app/verify'
+      preLoaderRoute: typeof AppVerifyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/family/$token': {
+      id: '/family/$token'
+      path: '/family/$token'
+      fullPath: '/family/$token'
+      preLoaderRoute: typeof FamilyTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/jobs/purge-screenshots': {
+      id: '/api/jobs/purge-screenshots'
+      path: '/api/jobs/purge-screenshots'
+      fullPath: '/api/jobs/purge-screenshots'
+      preLoaderRoute: typeof ApiJobsPurgeScreenshotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/jobs/send-reminders': {
+      id: '/api/jobs/send-reminders'
+      path: '/api/jobs/send-reminders'
+      fullPath: '/api/jobs/send-reminders'
+      preLoaderRoute: typeof ApiJobsSendRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/dodo': {
+      id: '/api/webhooks/dodo'
+      path: '/api/webhooks/dodo'
+      fullPath: '/api/webhooks/dodo'
+      preLoaderRoute: typeof ApiWebhooksDodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AppRouteChildren {
+  AppAttendanceRoute: typeof AppAttendanceRoute
+  AppBatchesRoute: typeof AppBatchesRoute
+  AppBillingRoute: typeof AppBillingRoute
+  AppInsightsRoute: typeof AppInsightsRoute
+  AppMessagesRoute: typeof AppMessagesRoute
+  AppPlansRoute: typeof AppPlansRoute
+  AppSetupRoute: typeof AppSetupRoute
+  AppStudentsRoute: typeof AppStudentsRoute
+  AppVerifyRoute: typeof AppVerifyRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAttendanceRoute: AppAttendanceRoute,
+  AppBatchesRoute: AppBatchesRoute,
+  AppBillingRoute: AppBillingRoute,
+  AppInsightsRoute: AppInsightsRoute,
+  AppMessagesRoute: AppMessagesRoute,
+  AppPlansRoute: AppPlansRoute,
+  AppSetupRoute: AppSetupRoute,
+  AppStudentsRoute: AppStudentsRoute,
+  AppVerifyRoute: AppVerifyRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
   OptOutRoute: OptOutRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  FamilyTokenRoute: FamilyTokenRoute,
+  ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
+  ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
+  ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

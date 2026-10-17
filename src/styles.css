@@ -184,6 +184,10 @@ button { cursor:pointer; }
 .month-field { width:auto; min-width:180px; }
 .console-inline-label { display:flex; align-items:center; gap:10px; font-weight:800; font-size:14px; }
 @media (max-width: 640px) { .unpaid-row { grid-template-columns:minmax(0,1fr); } .unpaid-owed { justify-items:start; } }
+.pay-owed { margin:0; font-size:1.05rem; }
+.pay-result { border:2px solid var(--ink); padding:10px 12px; display:grid; gap:6px; background:var(--paper); }
+.pay-result[data-tone="good"] { background:#dcefdc; }
+.pay-result[data-tone="warn"] { background:#f6c9c5; }
 .console-form { display:grid; gap:14px; }
 .console-field { display:grid; gap:5px; margin:0; border:0; padding:0; min-width:0; }
 .console-field-error { color:#7a1812; font-weight:700; font-size:.85rem; }

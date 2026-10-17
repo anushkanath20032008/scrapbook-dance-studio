@@ -82,7 +82,7 @@ WHERE p.pronamespace = 'public'::regnamespace
   AND p.proname IN ('assign_fee_plan', 'batch_day', 'claim_due_reminders', 'generate_monthly_charges',
                     'ledger_overview', 'mark_attendance', 'queue_fee_reminders', 'record_payment',
                     'student_attendance', 'student_ledger_status', 'apply_billing_event',
-                    'unpaid_students', 'studio_snapshot')
+                    'unpaid_students', 'studio_snapshot', 'payment_check', 'student_charge_ledger')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

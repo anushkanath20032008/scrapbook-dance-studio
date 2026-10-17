@@ -8,6 +8,7 @@ import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthTotals } from "@/components/console/month-totals";
 import { SetupChecklist } from "@/components/console/setup-checklist";
+import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { UnpaidList } from "@/components/console/unpaid-list";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
@@ -33,6 +34,7 @@ function Overview() {
   const [dueOn, setDueOn] = useState("");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [paying, setPaying] = useState<PayingStudent | null>(null);
 
   const report = useQuery({
     queryKey: ["home-report", period],
@@ -132,9 +134,21 @@ function Overview() {
           <div className="console-list-head">
             <h2>Who hasn&apos;t paid</h2>
           </div>
-          <UnpaidList rows={report.data?.unpaid ?? []} />
+          <UnpaidList
+            rows={report.data?.unpaid ?? []}
+            onRecord={(row) => setPaying({ id: row.student_id, name: row.student_name })}
+          />
         </>
       )}
+
+      <RecordPaymentDialog
+        student={paying}
+        onClose={() => setPaying(null)}
+        onSaved={(message) => {
+          setError("");
+          setNotice(message);
+        }}
+      />
 
       {!setupDone && (
         <div className="window setup-card">

@@ -13,8 +13,14 @@ function dueText(row: Unpaid) {
   return `Due ${shortDate(row.due_on)}`;
 }
 
-/** Everyone who still owes for the month, oldest overdue first. Actions arrive with the screens they belong to. */
-export function UnpaidList({ rows }: { rows: Unpaid[] }) {
+/** Everyone who still owes for the month, oldest overdue first. Reminders arrive with the messages screen. */
+export function UnpaidList({
+  rows,
+  onRecord,
+}: {
+  rows: Unpaid[];
+  onRecord: (row: Unpaid) => void;
+}) {
   if (rows.length === 0)
     return <p className="console-empty">Nobody owes anything for this month.</p>;
   return (
@@ -34,7 +40,7 @@ export function UnpaidList({ rows }: { rows: Unpaid[] }) {
             </span>
           </div>
           <div className="console-row-actions">
-            <Button variant="retroPaper" type="button" disabled title="Arrives with payments">
+            <Button variant="retro" type="button" onClick={() => onRecord(row)}>
               Record payment
             </Button>
             <Button variant="retroPaper" type="button" disabled title="Arrives with reminders">

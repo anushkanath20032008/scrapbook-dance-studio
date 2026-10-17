@@ -1,0 +1,221 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
+import { VoidDialog, type VoidTarget } from "@/components/console/void-dialog";
+import { getStudentCharges, getStudentLedger } from "@/lib/ledger.functions";
+import { formatRupees } from "@/lib/money";
+import { listStudentOverview } from "@/lib/setup.functions";
+
+export const Route = createFileRoute("/app/billing")({
+  head: () => ({ meta: [{ title: "Billing | Choreo Studio" }] }),
+  component: Billing,
+});
+
+const monthLabel = (period: string) =>
+  new Date(`${period}T00:00:00`).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+const dayLabel = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+const methodLabel: Record<string, string> = {
+  cash: "cash",
+  upi: "UPI",
+  bank: "bank transfer",
+  other: "other",
+};
+
+function Billing() {
+  const listStudents = useServerFn(listStudentOverview);
+  const loadCharges = useServerFn(getStudentCharges);
+  const loadLedger = useServerFn(getStudentLedger);
+
+  const [studentId, setStudentId] = useState("");
+  const [paying, setPaying] = useState<PayingStudent | null>(null);
+  const [voiding, setVoiding] = useState<VoidTarget | null>(null);
+  const [notice, setNotice] = useState("");
+
+  const students = useQuery({
+    queryKey: ["students-overview", false],
+    queryFn: () => listStudents({ data: {} }),
+  });
+  const charges = useQuery({
+    queryKey: ["student-charges", studentId],
+    queryFn: () => loadCharges({ data: { studentId } }),
+    enabled: studentId !== "",
+  });
+  const ledger = useQuery({
+    queryKey: ["student-payments", studentId],
+    queryFn: () => loadLedger({ data: { studentId } }),
+    enabled: studentId !== "",
+  });
+
+  const student = students.data?.find((row) => row.id === studentId);
+  const balance = ledger.data?.balance_paise;
+
+  return (
+    <section>
+      <h1 className="display console-title">Billing</h1>
+      <div className="console-toolbar">
+        <label className="console-inline-label">
+          Dancer
+          <select
+            className="field month-field"
+            value={studentId}
+            onChange={(event) => {
+              setStudentId(event.target.value);
+              setNotice("");
+            }}
+          >
+            <option value="">Choose a dancer</option>
+            {students.data?.map((row) => (
+              <option key={row.id} value={row.id}>
+                {row.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {notice && (
+        <p role="status" className="console-notice">
+          ✓ {notice}
+        </p>
+      )}
+      {students.isError && <p role="alert">Could not load your dancers. Please refresh.</p>}
+      {!studentId && (
+        <p className="console-empty">Choose a dancer to see their charges and payments.</p>
+      )}
+
+      {studentId && student && (
+        <>
+          <div className="totals">
+            <div
+              className="totals-headline"
+              data-tone={balance === undefined ? "idle" : balance > 0 ? "warn" : "good"}
+            >
+              <span className="totals-label">
+                {balance !== undefined && balance < 0 ? "Credit" : "Owes"}
+              </span>
+              <strong>{balance === undefined ? "…" : formatRupees(Math.abs(balance))}</strong>
+              <span className="console-hint">{student.name}</span>
+            </div>
+            <div className="console-actions">
+              <Button
+                variant="retro"
+                type="button"
+                onClick={() => setPaying({ id: student.id, name: student.name })}
+              >
+                Record payment
+              </Button>
+            </div>
+          </div>
+
+          <div className="console-list-head">
+            <h2>Charges</h2>
+          </div>
+          {charges.data?.length === 0 && <p className="console-empty">No charges yet.</p>}
+          <ul className="console-list">
+            {charges.data?.map((charge) => (
+              <li
+                key={charge.charge_id}
+                className="console-row"
+                data-archived={charge.status === "voided"}
+              >
+                <div>
+                  <strong>{monthLabel(charge.period)}</strong>
+                  <span className="console-hint">
+                    {formatRupees(charge.amount_paise)} · due {dayLabel(charge.due_on)}
+                    {charge.status === "voided"
+                      ? ` · voided: ${charge.void_reason ?? ""}`
+                      : charge.settled_on
+                        ? ` · settled ${dayLabel(charge.settled_on)} by ${methodLabel[charge.settled_method ?? "other"] ?? charge.settled_method}`
+                        : charge.allocated_paise > 0
+                          ? ` · ${formatRupees(charge.allocated_paise)} paid, ${formatRupees(charge.outstanding_paise)} left`
+                          : ""}
+                  </span>
+                </div>
+                <div className="console-row-actions">
+                  <span
+                    className="status-pill"
+                    data-tone={
+                      charge.status === "paid"
+                        ? "good"
+                        : charge.status === "overdue"
+                          ? "warn"
+                          : "idle"
+                    }
+                  >
+                    {charge.status}
+                  </span>
+                  {charge.status !== "voided" && (
+                    <Button
+                      variant="retroPaper"
+                      type="button"
+                      onClick={() =>
+                        setVoiding({
+                          kind: "charge",
+                          id: charge.charge_id,
+                          label: `the ${monthLabel(charge.period)} charge`,
+                        })
+                      }
+                    >
+                      Void
+                    </Button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="console-list-head">
+            <h2>Payments</h2>
+          </div>
+          {ledger.data?.payments.length === 0 && <p className="console-empty">No payments yet.</p>}
+          <ul className="console-list">
+            {ledger.data?.payments.map((payment) => (
+              <li
+                key={payment.id}
+                className="console-row"
+                data-archived={payment.voided_at !== null}
+              >
+                <div>
+                  <strong>{formatRupees(payment.amount_paise)}</strong>
+                  <span className="console-hint">
+                    {dayLabel(payment.paid_on)} · {methodLabel[payment.method] ?? payment.method}
+                    {payment.reference ? ` · ref ${payment.reference}` : ""}
+                    {payment.note ? ` · ${payment.note}` : ""}
+                    {payment.voided_at ? ` · voided: ${payment.void_reason ?? ""}` : ""}
+                  </span>
+                </div>
+                {!payment.voided_at && (
+                  <div className="console-row-actions">
+                    <Button
+                      variant="retroPaper"
+                      type="button"
+                      onClick={() =>
+                        setVoiding({
+                          kind: "payment",
+                          id: payment.id,
+                          label: `the ${formatRupees(payment.amount_paise)} payment`,
+                        })
+                      }
+                    >
+                      Void
+                    </Button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <RecordPaymentDialog student={paying} onClose={() => setPaying(null)} onSaved={setNotice} />
+      <VoidDialog target={voiding} onClose={() => setVoiding(null)} onDone={setNotice} />
+    </section>
+  );
+}

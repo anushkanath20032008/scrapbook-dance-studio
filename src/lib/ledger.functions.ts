@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateChargesInput, paymentInput } from "@/lib/schemas";
-import { isoDate, uuid, validate, voidReason } from "@/lib/validators";
+import { isoDate, paise, uuid, validate, voidReason } from "@/lib/validators";
 
 const voidInput = z.object({ id: uuid, reason: voidReason });
 const periodInput = z.object({ period: isoDate });
@@ -54,4 +54,18 @@ export const getStudentLedger = createServerFn({ method: "GET" })
   .inputValidator(validate(z.object({ studentId: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/ledger.server")).getStudentLedger(context, data),
+  );
+
+export const checkPayment = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ studentId: uuid, amountPaise: paise })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/ledger.server")).checkPayment(context, data),
+  );
+
+export const getStudentCharges = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ studentId: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/ledger.server")).getStudentCharges(context, data),
   );

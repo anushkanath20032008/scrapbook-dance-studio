@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  checkPayment,
   generateCharges,
   getOverview,
   getStudentLedger,
@@ -76,6 +77,8 @@ describe("ledger server functions", () => {
         p_paid_on: "2026-10-06",
         p_note: null,
         p_idempotency_key: "payment-0001",
+        p_reference: null,
+        p_acknowledge_excess: false,
       },
     ]);
   });
@@ -146,5 +149,33 @@ describe("ledger server functions", () => {
     expect(ledger.balance_paise).toBe(1400000);
     expect(ledger.charges).toHaveLength(3);
     expect(ledger.payments).toHaveLength(2);
+  });
+});
+
+describe("payment gate server functions", () => {
+  it("passes the reference and the excess acknowledgment to the database", async () => {
+    const { client, calls } = fakeSupabase(() => ({ data: { id: "p1" } }));
+    await recordPayment(
+      { supabase: client, userId: user },
+      { ...base, note: null, reference: "UTR123", acknowledgeExcess: true },
+    );
+    expect(calls[0].args?.[0]).toMatchObject({
+      p_reference: "UTR123",
+      p_acknowledge_excess: true,
+    });
+  });
+
+  it("accepts a reference and defaults the acknowledgment to false", () => {
+    const parsed = paymentInput.parse({ ...base, reference: "  UTR1  " });
+    expect(parsed.reference).toBe("UTR1");
+    expect(parsed.acknowledgeExcess).toBe(false);
+    expect(paymentInput.safeParse({ ...base, reference: "x".repeat(101) }).success).toBe(false);
+  });
+
+  it("returns zeros when the check finds nothing", async () => {
+    const { client } = fakeSupabase(() => ({ data: [] }));
+    expect(
+      await checkPayment({ supabase: client, userId: user }, { studentId, amountPaise: 100 }),
+    ).toEqual({ owed_paise: 0, remaining_paise: 0, excess_paise: 0 });
   });
 });

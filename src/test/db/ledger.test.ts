@@ -346,7 +346,8 @@ describe("ledger: charges, payments and derived status", () => {
     const record = (owner: string, student: string, amount: number, paidOn: string, key: string) =>
       db.query<{ id: string; amount_paise: string }>(
         { user: owner },
-        "SELECT id, amount_paise::text FROM public.record_payment($1, $2, 'upi', $3::date, 'note', $4)",
+        // These dancers have no charges yet, so any payment is an excess; the payment gate has its own tests.
+        "SELECT id, amount_paise::text FROM public.record_payment($1, $2, 'upi', $3::date, 'note', $4, NULL, true)",
         [student, amount, paidOn, key],
       );
 

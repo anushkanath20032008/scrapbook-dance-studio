@@ -11,3 +11,12 @@ export function useRefreshStudents() {
     void queryClient.invalidateQueries({ queryKey: setupCountsKey });
   };
 }
+
+/** Everything a payment or void can change: Home's totals, the unpaid list and one dancer's billing. */
+export function useRefreshMoney() {
+  const queryClient = useQueryClient();
+  return () => {
+    for (const key of ["home-report", "student-charges", "student-payments", "payment-check"])
+      void queryClient.invalidateQueries({ queryKey: [key] });
+  };
+}

@@ -332,6 +332,7 @@ export type Database = {
           method: string
           note: string | null
           paid_on: string
+          reference: string | null
           student_id: string
           studio_id: string
           void_reason: string | null
@@ -345,6 +346,7 @@ export type Database = {
           method: string
           note?: string | null
           paid_on: string
+          reference?: string | null
           student_id: string
           studio_id: string
           void_reason?: string | null
@@ -358,6 +360,7 @@ export type Database = {
           method?: string
           note?: string | null
           paid_on?: string
+          reference?: string | null
           student_id?: string
           studio_id?: string
           void_reason?: string | null
@@ -642,13 +645,23 @@ export type Database = {
         Args: { p_period: string; p_today?: string }
         Returns: number
       }
+      payment_check: {
+        Args: { p_amount_paise: number; p_student: string }
+        Returns: {
+          excess_paise: number
+          owed_paise: number
+          remaining_paise: number
+        }[]
+      }
       record_payment: {
         Args: {
+          p_acknowledge_excess?: boolean
           p_amount_paise: number
           p_idempotency_key: string
           p_method: string
           p_note: string | null
           p_paid_on: string
+          p_reference?: string | null
           p_student: string
         }
         Returns: Database["public"]["Tables"]["payments"]["Row"]
@@ -660,6 +673,23 @@ export type Database = {
           batch_name: string
           present: boolean
           session_on: string
+        }[]
+      }
+      student_charge_ledger: {
+        Args: { p_student: string; p_today?: string }
+        Returns: {
+          allocated_paise: number
+          amount_paise: number
+          charge_id: string
+          due_on: string
+          fee_plan_name: string
+          outstanding_paise: number
+          period: string
+          settled_method: string
+          settled_on: string
+          status: string
+          void_reason: string
+          voided_at: string
         }[]
       }
       student_ledger_status: {

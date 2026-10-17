@@ -53,6 +53,8 @@ export const paymentInput = z.object({
   method: z.enum(paymentMethods),
   paidOn: isoDate,
   note: optionalText(500),
+  reference: optionalText(100),
+  acknowledgeExcess: z.boolean().default(false),
   idempotencyKey,
 });
 

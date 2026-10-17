@@ -23,6 +23,8 @@ export async function recordPayment(
     method: string;
     paidOn: string;
     note: string | null;
+    reference?: string | null | undefined;
+    acknowledgeExcess?: boolean | undefined;
     idempotencyKey: string;
   },
 ) {
@@ -34,6 +36,8 @@ export async function recordPayment(
       p_paid_on: input.paidOn,
       p_note: input.note,
       p_idempotency_key: input.idempotencyKey,
+      p_reference: input.reference ?? null,
+      p_acknowledge_excess: input.acknowledgeExcess ?? false,
     }),
   );
 }
@@ -95,7 +99,7 @@ export async function getStudentLedger({ supabase }: StudioContext, input: { stu
   const payments = unwrap(
     await supabase
       .from("payments")
-      .select("id, amount_paise, method, paid_on, note, voided_at, void_reason")
+      .select("id, amount_paise, method, paid_on, note, reference, voided_at, void_reason")
       .eq("student_id", input.studentId)
       .order("paid_on", { ascending: false })
       .limit(500),
@@ -105,4 +109,23 @@ export async function getStudentLedger({ supabase }: StudioContext, input: { stu
       .filter((row) => row.voided_at === null)
       .reduce((total, row) => total + row.amount_paise, 0);
   return { charges, payments, balance_paise: live(charges) - live(payments) };
+}
+
+/** Compare an amount with what a dancer owes: how much is owed, what would remain, and any excess. */
+export async function checkPayment(
+  { supabase }: StudioContext,
+  input: { studentId: string; amountPaise: number },
+) {
+  const [check] = unwrap(
+    await supabase.rpc("payment_check", {
+      p_student: input.studentId,
+      p_amount_paise: input.amountPaise,
+    }),
+  );
+  return check ?? { owed_paise: 0, remaining_paise: 0, excess_paise: 0 };
+}
+
+/** One dancer's charges with what is settled and the date and method of the payment that completed each. */
+export async function getStudentCharges({ supabase }: StudioContext, input: { studentId: string }) {
+  return unwrap(await supabase.rpc("student_charge_ledger", { p_student: input.studentId }));
 }

@@ -69,21 +69,32 @@ export const screenshotMimeTypes = ["image/png", "image/jpeg", "image/webp"] as 
 export const SCREENSHOT_BUCKET = "claim-screenshots";
 export const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
 
-/** What a dancer sends from their private link. UPI and bank payments need a reference number. */
+const claimShape = {
+  studentId: uuid,
+  amountPaise: paise,
+  method: z.enum(paymentMethods),
+  paidOn: isoDate,
+  reference: optionalText(100),
+  screenshotType: z.enum(screenshotMimeTypes).optional(),
+};
+
+/** UPI and bank payments need a reference number. */
+const hasReference = (claim: { method: string; reference: string | null }) =>
+  !(claim.method === "upi" || claim.method === "bank") || claim.reference !== null;
+const referenceIssue = {
+  message: "Enter the reference number for a UPI or bank payment",
+  path: ["reference"],
+};
+
+/** What a dancer sends from their private link. */
 export const claimInput = z
-  .object({
-    token: z.string().min(1).max(200),
-    studentId: uuid,
-    amountPaise: paise,
-    method: z.enum(paymentMethods),
-    paidOn: isoDate,
-    reference: optionalText(100),
-    screenshotType: z.enum(screenshotMimeTypes).optional(),
-  })
-  .refine(
-    (claim) => !(claim.method === "upi" || claim.method === "bank") || claim.reference !== null,
-    {
-      message: "Enter the reference number for a UPI or bank payment",
-      path: ["reference"],
-    },
-  );
+  .object({ token: z.string().min(1).max(200), ...claimShape })
+  .refine(hasReference, referenceIssue);
+
+/** What a signed-in dancer sends from their own account: the studio, never a guardian or a token. */
+export const memberClaimInput = z
+  .object({ studioId: uuid, ...claimShape })
+  .refine(hasReference, referenceIssue);
+
+/** A short code or a whole link, as typed by a dancer. */
+export const joinInput = z.object({ secret: z.string().trim().min(1).max(200) });

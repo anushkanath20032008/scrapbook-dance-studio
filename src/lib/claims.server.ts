@@ -28,6 +28,24 @@ export async function resolveLink(admin: Db, token: string) {
   return { studioId: data.studio_id, guardianId: data.guardian_id };
 }
 
+/**
+ * A one-time signed upload URL for a claim's screenshot, or null when none was wanted or it could not be set up.
+ * The path is stored on the claim first, so a file never lands untracked.
+ */
+export async function prepareScreenshotUpload(
+  admin: Db,
+  studioId: string,
+  claimId: string,
+  type: ScreenshotType | undefined,
+) {
+  if (!type) return null;
+  const path = `${studioId}/${claimId}.${screenshotExtensions[type]}`;
+  const signed = await admin.storage.from(SCREENSHOT_BUCKET).createSignedUploadUrl(path);
+  if (signed.error || !signed.data) return null;
+  const saved = await admin.from("payment_claims").update({ screenshot_path: path }).eq("id", claimId);
+  return saved.error ? null : { path, token: signed.data.token };
+}
+
 export type ClaimInput = {
   token: string;
   studentId: string;
@@ -56,19 +74,7 @@ export async function submitClaim(admin: Db, input: ClaimInput) {
     }),
   );
 
-  let upload: { path: string; token: string } | null = null;
-  if (input.screenshotType) {
-    const path = `${studioId}/${claim.id}.${screenshotExtensions[input.screenshotType]}`;
-    const signed = await admin.storage.from(SCREENSHOT_BUCKET).createSignedUploadUrl(path);
-    if (!signed.error && signed.data) {
-      const saved = await admin
-        .from("payment_claims")
-        .update({ screenshot_path: path })
-        .eq("id", claim.id);
-      // Only hand out the upload token once the path is stored, so a file never lands untracked.
-      if (!saved.error) upload = { path, token: signed.data.token };
-    }
-  }
+  const upload = await prepareScreenshotUpload(admin, studioId, claim.id, input.screenshotType);
   return { claimId: claim.id, upload };
 }
 

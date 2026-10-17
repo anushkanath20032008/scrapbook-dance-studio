@@ -69,7 +69,12 @@ function ConsoleLayout() {
     if (session.status === "signed-out") void navigate({ to: "/login" });
   }, [session.status, navigate]);
 
-  if (session.status !== "signed-in") {
+  // A dancer who opened the console by mistake goes to their own area; no studio is created for them.
+  useEffect(() => {
+    if (context.data?.memberOnly) void navigate({ to: "/me" });
+  }, [context.data?.memberOnly, navigate]);
+
+  if (session.status !== "signed-in" || context.data?.memberOnly) {
     return (
       <main className="console-loading">
         <p>Loading your studio…</p>

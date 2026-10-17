@@ -323,6 +323,93 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_attempts: {
+        Row: {
+          attempted_at: string
+          id: number
+          source_hash: string | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: never
+          source_hash?: string | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: never
+          source_hash?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      member_invites: {
+        Row: {
+          code_hash: string
+          created_at: string
+          expires_at: string
+          guardian_id: string
+          id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          revoked_at: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          guardian_id: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          guardian_id?: string
+          id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          revoked_at?: string | null
+          studio_id?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      member_links: {
+        Row: {
+          created_at: string
+          guardian_id: string
+          id: string
+          revoked_at: string | null
+          studio_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          guardian_id: string
+          id?: string
+          revoked_at?: string | null
+          studio_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          guardian_id?: string
+          id?: string
+          revoked_at?: string | null
+          studio_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_claims: {
         Row: {
           amount_paise: number
@@ -340,6 +427,7 @@ export type Database = {
           status: string
           student_id: string
           studio_id: string
+          submitted_via: string
         }
         Insert: {
           amount_paise: number
@@ -357,6 +445,7 @@ export type Database = {
           status?: string
           student_id: string
           studio_id: string
+          submitted_via?: string
         }
         Update: {
           amount_paise?: number
@@ -374,6 +463,7 @@ export type Database = {
           status?: string
           student_id?: string
           studio_id?: string
+          submitted_via?: string
         }
         Relationships: []
       }
@@ -790,6 +880,46 @@ export type Database = {
       }
       reject_payment_claim: {
         Args: { p_claim: string; p_reason: string }
+        Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
+      }
+      create_member_invite: {
+        Args: { p_code_hash: string; p_days: number; p_guardian: string; p_token_hash: string }
+        Returns: { expires_at: string; id: string }[]
+      }
+      redeem_member_invite: {
+        Args: { p_secret: string; p_source?: string }
+        Returns: string | null
+      }
+      member_studios: {
+        Args: Record<PropertyKey, never>
+        Returns: { joined_at: string; studio_id: string; studio_name: string }[]
+      }
+      member_view: {
+        Args: { p_studio: string }
+        Returns: Json | null
+      }
+      member_claims: {
+        Args: { p_studio: string }
+        Returns: {
+          amount_paise: number
+          created_at: string
+          decision_reason: string | null
+          id: string
+          method: string
+          paid_on: string
+          status: string
+          student_id: string
+        }[]
+      }
+      submit_payment_claim_member: {
+        Args: {
+          p_amount_paise: number
+          p_method: string
+          p_paid_on: string
+          p_reference?: string
+          p_student: string
+          p_studio: string
+        }
         Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
       }
       submit_payment_claim: {

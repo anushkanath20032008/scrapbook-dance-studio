@@ -15,7 +15,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
 import { Route as AppBatchesRouteImport } from './routes/app.batches'
@@ -61,9 +63,19 @@ const OptOutRoute = OptOutRouteImport.update({
   path: '/opt-out',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -144,7 +156,9 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
@@ -166,7 +180,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
@@ -190,7 +206,9 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
@@ -215,7 +233,9 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/opt-out'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
@@ -237,7 +257,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/opt-out'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
@@ -260,7 +282,9 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/opt-out'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
@@ -284,7 +308,9 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   OptOutRoute: typeof OptOutRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
   FamilyTokenRoute: typeof FamilyTokenRoute
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
@@ -335,11 +361,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OptOutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -478,7 +518,9 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   OptOutRoute: OptOutRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
   FamilyTokenRoute: FamilyTokenRoute,
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,

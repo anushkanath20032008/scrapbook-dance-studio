@@ -134,11 +134,88 @@ export class HttpWhatsAppProvider implements WhatsAppProvider {
   }
 }
 
-/** The configured provider, or null when WHATSAPP_PROVIDER_URL or WHATSAPP_PROVIDER_TOKEN is missing or the URL is unusable. */
+const GRAPH_VERSION = "v21.0";
+// The approved template bodies must use these variables in this order: {{1}} guardian, {{2}} student,
+// {{3}} studio, {{4}} amount, {{5}} month, {{6}} due date.
+const TEMPLATE_VARIABLE_ORDER = ["guardian", "student", "studio", "amount", "month", "due_date"] as const;
+
+/** Meta's WhatsApp Cloud API: sends an approved template to one number. */
+export class MetaCloudWhatsAppProvider implements WhatsAppProvider {
+  constructor(
+    private readonly phoneNumberId: string,
+    private readonly accessToken: string,
+    private readonly language: string = "en",
+    private readonly fetchImpl: typeof fetch = fetch,
+  ) {}
+
+  async send(request: SendRequest): Promise<SendResult> {
+    let response: Response;
+    try {
+      response = await this.fetchImpl(
+        `https://graph.facebook.com/${GRAPH_VERSION}/${encodeURIComponent(this.phoneNumberId)}/messages`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${this.accessToken}`,
+          },
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            to: request.to.replace(/^\+/, ""),
+            type: "template",
+            template: {
+              name: request.templateName,
+              language: { code: this.language },
+              components: [
+                {
+                  type: "body",
+                  parameters: TEMPLATE_VARIABLE_ORDER.map((key) => ({
+                    type: "text",
+                    text: request.variables[key] ?? "",
+                  })),
+                },
+              ],
+            },
+          }),
+          signal: AbortSignal.timeout(10_000),
+        },
+      );
+    } catch {
+      return { ok: false, retryable: true, error: "Could not reach WhatsApp." };
+    }
+    if (!response.ok) {
+      const retryable = response.status === 429 || response.status >= 500;
+      const body = (await response.json().catch(() => null)) as {
+        error?: { message?: unknown };
+      } | null;
+      const reason =
+        typeof body?.error?.message === "string" ? ` ${body.error.message.slice(0, 200)}` : "";
+      return {
+        ok: false,
+        retryable,
+        error: `WhatsApp answered ${response.status}.${reason}`,
+      };
+    }
+    const body = (await response.json().catch(() => null)) as { messages?: { id?: unknown }[] } | null;
+    const id = body?.messages?.[0]?.id;
+    return { ok: true, providerMessageId: typeof id === "string" ? id : "accepted" };
+  }
+}
+
+/** The configured provider: Meta's Cloud API when its two settings are present, else the generic HTTP provider, else null. */
 export function getWhatsAppProvider(
   env: Record<string, string | undefined> = process.env,
   fetchImpl: typeof fetch = fetch,
 ): WhatsAppProvider | null {
+  const phoneNumberId = env["WHATSAPP_PHONE_NUMBER_ID"]?.trim();
+  const accessToken = env["WHATSAPP_ACCESS_TOKEN"]?.trim();
+  if (phoneNumberId && accessToken)
+    return new MetaCloudWhatsAppProvider(
+      phoneNumberId,
+      accessToken,
+      env["WHATSAPP_TEMPLATE_LANGUAGE"]?.trim() || "en",
+      fetchImpl,
+    );
   const url = env["WHATSAPP_PROVIDER_URL"]?.trim();
   const token = env["WHATSAPP_PROVIDER_TOKEN"]?.trim();
   if (!url || !token) return null;

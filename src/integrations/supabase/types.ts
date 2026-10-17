@@ -709,6 +709,16 @@ export type Database = {
           total_students: number
         }[]
       }
+      owner_nudge_summary: {
+        Args: { p_today?: string }
+        Returns: {
+          due_today_count: number
+          outstanding_paise: number
+          overdue_count: number
+          studio_id: string
+          unpaid_count: number
+        }[]
+      }
       mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number

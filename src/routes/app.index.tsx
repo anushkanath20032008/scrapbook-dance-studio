@@ -1,3 +1,4 @@
+import { formatRupees } from "@/lib/money";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -58,6 +59,8 @@ function Overview() {
   });
 
   const snapshot = report.data?.snapshot;
+  const unpaidRows = report.data?.unpaid ?? [];
+  const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   const defaultDue = `${month}-05`;
 
@@ -85,6 +88,20 @@ function Overview() {
 
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
       {snapshot && <MonthTotals snapshot={snapshot} />}
+
+      {unpaidRows.length > 0 && (
+        <div className="console-banner" role="status">
+          <span>
+            <strong>
+              {unpaidRows.length} unpaid
+            </strong>{" "}
+            · {formatRupees(unpaidTotal)} owed this month
+          </span>
+          <Button variant="retro" type="button" onClick={() => setReminding({ period, allUnpaid: true })}>
+            Remind all unpaid
+          </Button>
+        </div>
+      )}
 
       {needsCharges && (
         <div className="window generate-card">

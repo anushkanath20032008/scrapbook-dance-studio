@@ -168,6 +168,7 @@ button { cursor:pointer; }
 /* Studio console */
 /* Console forms and lists */
 .console-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:16px; margin:0 0 16px; }
+.console-banner { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:0 0 16px; padding:12px 14px; border:2px solid var(--ink); background:#fde9b8; font-size:.95rem; }
 .console-notice { margin:0 0 12px; padding:8px 12px; border:2px solid var(--ink); background:#dcefdc; font-weight:800; font-size:.9rem; }
 .console-dialog > button[class*="absolute"] { color:var(--paper); top:9px; right:12px; opacity:1; }
 .console-dialog { max-width:min(560px, calc(100vw - 24px)); }

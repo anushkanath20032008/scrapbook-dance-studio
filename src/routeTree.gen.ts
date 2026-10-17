@@ -29,6 +29,7 @@ import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
 import { Route as AppVerifyRouteImport } from './routes/app.verify'
 import { Route as FamilyTokenRouteImport } from './routes/family.$token'
+import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-nudge'
 import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
@@ -133,6 +134,11 @@ const FamilyTokenRoute = FamilyTokenRouteImport.update({
   path: '/family/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiJobsOwnerNudgeRoute = ApiJobsOwnerNudgeRouteImport.update({
+  id: '/api/jobs/owner-nudge',
+  path: '/api/jobs/owner-nudge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiJobsPurgeScreenshotsRoute = ApiJobsPurgeScreenshotsRouteImport.update({
   id: '/api/jobs/purge-screenshots',
   path: '/api/jobs/purge-screenshots',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app': typeof AppIndexRoute
+  '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/family/$token'
     | '/app/'
+    | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/family/$token'
     | '/app'
+    | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/app/verify'
     | '/family/$token'
     | '/app/'
+    | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   FamilyTokenRoute: typeof FamilyTokenRoute
+  ApiJobsOwnerNudgeRoute: typeof ApiJobsOwnerNudgeRoute
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
@@ -459,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FamilyTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/jobs/owner-nudge': {
+      id: '/api/jobs/owner-nudge'
+      path: '/api/jobs/owner-nudge'
+      fullPath: '/api/jobs/owner-nudge'
+      preLoaderRoute: typeof ApiJobsOwnerNudgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/jobs/purge-screenshots': {
       id: '/api/jobs/purge-screenshots'
       path: '/api/jobs/purge-screenshots'
@@ -522,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   FamilyTokenRoute: FamilyTokenRoute,
+  ApiJobsOwnerNudgeRoute: ApiJobsOwnerNudgeRoute,
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,

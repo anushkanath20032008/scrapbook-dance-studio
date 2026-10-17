@@ -3,6 +3,7 @@ import { authenticateJobRequest } from "@/lib/job-auth.server";
 import {
   getWhatsAppProvider,
   HttpWhatsAppProvider,
+  MetaCloudWhatsAppProvider,
   renderReminder,
   toInternationalPhone,
 } from "@/lib/whatsapp.server";
@@ -134,5 +135,63 @@ describe("authenticateJobRequest", () => {
 
   it("fails closed when the secret is not configured", () => {
     expect(authenticateJobRequest(withAuth("Bearer x"), {})?.status).toBe(500);
+  });
+});
+
+describe("MetaCloudWhatsAppProvider", () => {
+  const variables = {
+    guardian: "Meera",
+    student: "Aarav",
+    studio: "Rhythm House",
+    amount: "₹900",
+    month: "October 2026",
+    due_date: "5 Oct",
+  };
+  const send = (fetchImpl: typeof fetch) =>
+    new MetaCloudWhatsAppProvider("123", "tok", "en", fetchImpl).send({
+      to: "+919999999999",
+      templateName: "fee_due_reminder",
+      variables,
+      text: "hi",
+    });
+
+  it("posts the template with variables in the approved order", async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ messages: [{ id: "wamid.1" }] }));
+    expect(await send(fetchImpl as unknown as typeof fetch)).toEqual({
+      ok: true,
+      providerMessageId: "wamid.1",
+    });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain("/123/messages");
+    const body = JSON.parse(String(init.body));
+    expect(body.to).toBe("919999999999");
+    expect(body.template.name).toBe("fee_due_reminder");
+    expect(body.template.components[0].parameters.map((p: { text: string }) => p.text)).toEqual([
+      "Meera",
+      "Aarav",
+      "Rhythm House",
+      "₹900",
+      "October 2026",
+      "5 Oct",
+    ]);
+  });
+
+  it("does not retry a rejected message but retries a busy or failing service", async () => {
+    const reply = (status: number) =>
+      send((async () =>
+        Response.json({ error: { message: "bad" } }, { status })) as unknown as typeof fetch);
+    expect(await reply(400)).toMatchObject({ ok: false, retryable: false });
+    expect(await reply(429)).toMatchObject({ ok: false, retryable: true });
+    expect(await reply(503)).toMatchObject({ ok: false, retryable: true });
+  });
+
+  it("is chosen by its own settings and wins over the generic provider", () => {
+    const provider = getWhatsAppProvider({
+      WHATSAPP_PHONE_NUMBER_ID: "1",
+      WHATSAPP_ACCESS_TOKEN: "t",
+      WHATSAPP_PROVIDER_URL: "https://example.com",
+      WHATSAPP_PROVIDER_TOKEN: "x",
+    });
+    expect(provider).toBeInstanceOf(MetaCloudWhatsAppProvider);
   });
 });

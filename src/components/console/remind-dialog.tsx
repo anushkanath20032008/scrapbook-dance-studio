@@ -8,8 +8,13 @@ import { messageOf } from "@/components/console/form-utils";
 import { formatRupees } from "@/lib/money";
 import { previewReminders, queueReminders } from "@/lib/reminders.functions";
 
-/** Who to remind: one dancer, or everyone overdue for the month. */
-export type RemindTarget = { period: string; studentId?: string; name?: string };
+/** Who to remind: one dancer, everyone overdue (the default), or everyone unpaid for the month. */
+export type RemindTarget = {
+  period: string;
+  studentId?: string;
+  name?: string;
+  allUnpaid?: boolean;
+};
 
 export function RemindDialog({
   target,
@@ -26,7 +31,13 @@ export function RemindDialog({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
-      title={target?.studentId ? `Remind ${target.name ?? "dancer"}` : "Remind everyone overdue"}
+      title={
+        target?.studentId
+          ? `Remind ${target.name ?? "dancer"}`
+          : target?.allUnpaid
+            ? "Remind everyone unpaid"
+            : "Remind everyone overdue"
+      }
     >
       {target && <RemindForm target={target} onClose={onClose} onQueued={onQueued} />}
     </ConsoleDialog>
@@ -49,10 +60,18 @@ function RemindForm({
 
   const choice = {
     period: target.period,
-    ...(target.studentId ? { studentId: target.studentId } : { onlyOverdue: true }),
+    ...(target.studentId
+      ? { studentId: target.studentId }
+      : target.allUnpaid
+        ? {}
+        : { onlyOverdue: true }),
   };
   const recipients = useQuery({
-    queryKey: ["reminder-preview", target.period, target.studentId ?? "all-overdue"],
+    queryKey: [
+      "reminder-preview",
+      target.period,
+      target.studentId ?? (target.allUnpaid ? "all-unpaid" : "all-overdue"),
+    ],
     queryFn: () => preview({ data: choice }),
     staleTime: 0,
     gcTime: 0,

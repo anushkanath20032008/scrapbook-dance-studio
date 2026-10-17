@@ -101,3 +101,11 @@ The migrations in `drizzle/migrations` are additive. Apply `0003` onward (curren
 - Never prefix a secret with `VITE_`; Vite exposes those to the browser.
 - This repository is public. If a secret has ever been committed to it, treat it as leaked: rotate it in the provider's dashboard (Supabase, Dodo Payments, WhatsApp provider) and update Vercel, even after deleting it from the code. Git history keeps the old value.
 - The repository is connected to Lovable: don't force-push or rewrite published history.
+
+## WhatsApp reminders and owner nudges
+
+Reminders you queue in the console are sent by `POST /api/jobs/send-reminders`; the owner email nudge is `POST /api/jobs/owner-nudge`. Call both from your scheduler (the reminder job every few minutes, the nudge once a day) with `Authorization: Bearer <RENDER_JOB_SECRET>`. With nothing configured the console falls back to tap-to-send chats and the jobs send nothing.
+
+**WhatsApp (Meta Cloud API).** Set `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` and optionally `WHATSAPP_TEMPLATE_LANGUAGE` (default `en`). Create two approved utility templates, `fee_due_reminder` and `fee_overdue_reminder`, whose body uses these variables in order: `{{1}}` guardian name, `{{2}}` dancer, `{{3}}` studio, `{{4}}` amount, `{{5}}` month, `{{6}}` due date. Example body: "Hi {{1}}, a reminder from {{3}}: {{2}}'s fee for {{5}} ({{4}}) is due on {{6}}. Thank you!"
+
+**Owner nudge email (Resend).** Set `RESEND_API_KEY`, `NUDGE_FROM_EMAIL` (a sender Resend has verified) and `PUBLIC_APP_URL`. The owner is emailed on a due date and every Monday while any dancer is unpaid this month.

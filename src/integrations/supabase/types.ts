@@ -663,6 +663,15 @@ export type Database = {
         Args: { p_period: string; p_today?: string }
         Returns: number
       }
+      monthly_trend: {
+        Args: { p_months?: number; p_today?: string }
+        Returns: {
+          billed_paise: number
+          collected_paise: number
+          missing_paise: number
+          period: string
+        }[]
+      }
       payment_check: {
         Args: { p_amount_paise: number; p_student: string }
         Returns: {

@@ -78,6 +78,13 @@
       "when": 1791200700000,
       "tag": "0010_attendance_summary",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791200800000,
+      "tag": "0011_monthly_trend",
+      "breakpoints": true
     }
   ]
 }

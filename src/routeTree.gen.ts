@@ -20,6 +20,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
 import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
+import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
@@ -81,6 +82,11 @@ const AppBillingRoute = AppBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInsightsRoute = AppInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/insights'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/insights'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/insights'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -308,6 +320,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBillingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/insights': {
+      id: '/app/insights'
+      path: '/insights'
+      fullPath: '/app/insights'
+      preLoaderRoute: typeof AppInsightsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -350,6 +369,7 @@ interface AppRouteChildren {
   AppAttendanceRoute: typeof AppAttendanceRoute
   AppBatchesRoute: typeof AppBatchesRoute
   AppBillingRoute: typeof AppBillingRoute
+  AppInsightsRoute: typeof AppInsightsRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
@@ -360,6 +380,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAttendanceRoute: AppAttendanceRoute,
   AppBatchesRoute: AppBatchesRoute,
   AppBillingRoute: AppBillingRoute,
+  AppInsightsRoute: AppInsightsRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getHomeReport } from "@/lib/reports.server";
+import { getHomeReport, getMonthlyTrend } from "@/lib/reports.server";
 import { fakeSupabase } from "./fake-supabase";
 
 const user = "11111111-1111-4111-8111-111111111111";
@@ -42,5 +42,15 @@ describe("getHomeReport", () => {
     await expect(
       getHomeReport({ supabase: client, userId: user }, { period: "2026-10-01" }),
     ).rejects.toThrow("Something went wrong. Please try again.");
+  });
+});
+
+describe("getMonthlyTrend", () => {
+  it("asks the database for six months", async () => {
+    const rows = [{ period: "2026-10-01", billed_paise: 1, collected_paise: 1, missing_paise: 0 }];
+    const { client, calls } = fakeSupabase(() => ({ data: rows }));
+    expect(await getMonthlyTrend({ supabase: client, userId: user })).toEqual(rows);
+    expect(calls[0]?.fn).toBe("monthly_trend");
+    expect(calls[0]?.args).toEqual([{ p_months: 6 }]);
   });
 });

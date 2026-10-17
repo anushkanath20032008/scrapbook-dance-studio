@@ -20,3 +20,8 @@ export async function getHomeReport({ supabase }: StudioContext, input: { period
   const unpaid = unwrap(await supabase.rpc("unpaid_students", { p_period: period }));
   return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid };
 }
+
+/** Billed, collected and missing for each of the last six months, oldest first, from the database. */
+export async function getMonthlyTrend({ supabase }: StudioContext) {
+  return unwrap(await supabase.rpc("monthly_trend", { p_months: 6 }));
+}

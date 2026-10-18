@@ -44,6 +44,7 @@ function Login() {
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("role") === "dancer") setRole("dancer");
+    if (new URLSearchParams(window.location.search).get("mode") === "register") setMode("register");
   }, []);
 
   useEffect(() => {

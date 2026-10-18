@@ -15,7 +15,7 @@ button { cursor:pointer; }
 .display { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; line-height:.96; letter-spacing:0; text-transform:uppercase; }
 .chrome-font { font-family:VT323,monospace; font-size:24px; line-height:1; }
 .wrap { width:min(100% - 48px,1200px); margin-inline:auto; }
-.window { border:2px solid var(--ink); background:var(--paper); color:var(--ink); box-shadow:5px 5px 0 var(--status-overdue); }
+.window { border:2px solid var(--ink); background:var(--paper); color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
 .window-bar { min-height:37px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 10px 4px 14px; background:var(--blue); color:var(--paper); border-bottom:2px solid var(--ink); }
 .window-controls { display:flex; gap:5px; flex:none; }
 .window-controls i { width:15px; height:15px; display:block; border:2px solid var(--ink); background:var(--grey); }

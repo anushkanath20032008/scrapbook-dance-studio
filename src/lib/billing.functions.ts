@@ -1,0 +1,19 @@
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const planSchema = z.enum(["starter", "growth", "studio"]);
+
+// The Dodo SDK and its secrets live in billing.server.ts, loaded only inside the server handler.
+export const createSubscriptionCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ plan: planSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { startSubscriptionCheckout } = await import("@/lib/billing.server");
+    return startSubscriptionCheckout(data.plan, {
+      supabase: context.supabase,
+      userId: context.userId,
+      requestOrigin: new URL(getRequest().url).origin,
+    });
+  });

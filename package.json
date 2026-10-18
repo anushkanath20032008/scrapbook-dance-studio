@@ -55,6 +55,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dodopayments": "^2.54.2",
     "embla-carousel-react": "^8.6.0",
     "gsap": "^3.15.0",
     "input-otp": "^1.4.2",
@@ -74,6 +75,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "2.25.3",
     "@testing-library/jest-dom": "^6.6.0",

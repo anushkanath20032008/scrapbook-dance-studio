@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" font-family="'Space Grotesk',Arial,sans-serif">
+  <rect width="900" height="260" fill="#f6e7da"/>
+  <g transform="translate(40,40)">
+    <rect x="8" y="8" width="150" height="150" rx="34" fill="#14110f"/>
+    <rect width="150" height="150" rx="34" fill="#2a3da8"/>
+    <path d="M108 52 C60 36 34 70 48 102 C60 128 98 128 112 108" fill="none" stroke="#f6e7da" stroke-width="22" stroke-linecap="round"/>
+    <path d="M118 14 L125 34 L146 40 L125 46 L118 66 L111 46 L90 40 L111 34 Z" fill="#f2c14a" stroke="#14110f" stroke-width="3" stroke-linejoin="round"/>
+    <text x="0" y="205" font-size="30" font-weight="800" fill="#14110f" letter-spacing="2">CHOREO STUDIO</text>
+    <text x="0" y="240" font-size="13" font-weight="700" fill="#2a3da8" letter-spacing="3">A</text>
+  </g>
+  <g transform="translate(380,40) rotate(-4 200 80)">
+    <rect x="8" y="8" width="440" height="150" fill="#14110f"/>
+    <rect width="440" height="150" fill="#f2c14a" stroke="#14110f" stroke-width="6"/>
+    <rect x="14" y="14" width="412" height="122" fill="none" stroke="#14110f" stroke-width="3"/>
+    <text x="220" y="88" text-anchor="middle" font-size="66" font-weight="800" fill="#14110f" letter-spacing="3">CHOREO</text>
+    <text x="220" y="124" text-anchor="middle" font-size="30" font-weight="800" fill="#2a3da8" letter-spacing="14">STUDIO ✓</text>
+  </g>
+  <text x="100" y="250" font-size="16" fill="#14110f" font-weight="700">A</text>
+  <text x="560" y="250" font-size="16" fill="#14110f" font-weight="700">B</text>
+</svg>

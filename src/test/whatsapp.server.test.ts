@@ -1,0 +1,246 @@
+import { describe, expect, it, vi } from "vitest";
+import { authenticateJobRequest } from "@/lib/job-auth.server";
+import {
+  getWhatsAppProvider,
+  HttpWhatsAppProvider,
+  MetaCloudWhatsAppProvider,
+  VobizWhatsAppProvider,
+  renderReminder,
+  toInternationalPhone,
+} from "@/lib/whatsapp.server";
+
+const payload = {
+  studio_name: "Rhythm House",
+  guardian_name: "Meera",
+  student_name: "Aarav",
+  amount_paise: 90000,
+  due_on: "2026-10-05",
+  period: "2026-10-01",
+};
+const request = {
+  to: "+919999999999",
+  templateName: "fee_due_reminder",
+  variables: {},
+  text: "hi",
+};
+
+describe("phone numbers", () => {
+  it("normalizes Indian numbers and refuses unusable ones", () => {
+    expect(toInternationalPhone("98765 43210")).toBe("+919876543210");
+    expect(toInternationalPhone("09876543210")).toBe("+919876543210");
+    expect(toInternationalPhone("919876543210")).toBe("+919876543210");
+    expect(toInternationalPhone("+44 20 7946 0958")).toBe("+442079460958");
+    expect(toInternationalPhone("12345")).toBeNull();
+    expect(toInternationalPhone("")).toBeNull();
+    expect(toInternationalPhone(null)).toBeNull();
+  });
+});
+
+describe("renderReminder", () => {
+  it("writes a due and an overdue message from the stored payload", () => {
+    const due = renderReminder("fee_due", payload);
+    expect(due?.templateName).toBe("fee_due_reminder");
+    expect(due?.text).toContain("₹900");
+    expect(due?.text).toContain("5 Oct");
+    expect(due?.text).toContain("October 2026");
+    expect(renderReminder("fee_overdue", payload)?.templateName).toBe("fee_overdue_reminder");
+  });
+
+  it("returns null for an unknown kind or a payload missing details", () => {
+    expect(renderReminder("other", payload)).toBeNull();
+    expect(renderReminder("fee_due", { ...payload, amount_paise: 0 })).toBeNull();
+    expect(renderReminder("fee_due", null)).toBeNull();
+  });
+});
+
+describe("HttpWhatsAppProvider", () => {
+  const provider = (impl: () => Promise<Response>) =>
+    new HttpWhatsAppProvider(
+      "https://wa.example/send",
+      "tok",
+      vi.fn(impl) as unknown as typeof fetch,
+    );
+
+  it("returns the provider message id and sends the bearer token", async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ id: "wamid.1" }));
+    const result = await new HttpWhatsAppProvider(
+      "https://wa.example/send",
+      "tok",
+      fetchImpl as unknown as typeof fetch,
+    ).send(request);
+    expect(result).toEqual({ ok: true, providerMessageId: "wamid.1" });
+    const init = (fetchImpl.mock.calls[0] as unknown as [string, RequestInit])[1];
+    expect((init.headers as Record<string, string>)["authorization"]).toBe("Bearer tok");
+  });
+
+  it("treats 429, 5xx and network errors as retryable and other 4xx as final", async () => {
+    expect(
+      await provider(async () => new Response("", { status: 429 })).send(request),
+    ).toMatchObject({
+      ok: false,
+      retryable: true,
+    });
+    expect(
+      await provider(async () => new Response("", { status: 503 })).send(request),
+    ).toMatchObject({
+      ok: false,
+      retryable: true,
+    });
+    expect(
+      await provider(async () => new Response("", { status: 400 })).send(request),
+    ).toMatchObject({
+      ok: false,
+      retryable: false,
+    });
+    expect(
+      await provider(async () => {
+        throw new Error("down");
+      }).send(request),
+    ).toMatchObject({ ok: false, retryable: true });
+  });
+});
+
+describe("getWhatsAppProvider", () => {
+  it("is null without both settings or with an insecure remote URL", () => {
+    expect(getWhatsAppProvider({})).toBeNull();
+    expect(getWhatsAppProvider({ WHATSAPP_PROVIDER_URL: "https://x.test" })).toBeNull();
+    expect(
+      getWhatsAppProvider({ WHATSAPP_PROVIDER_URL: "http://x.test", WHATSAPP_PROVIDER_TOKEN: "t" }),
+    ).toBeNull();
+    expect(
+      getWhatsAppProvider({ WHATSAPP_PROVIDER_URL: "nonsense", WHATSAPP_PROVIDER_TOKEN: "t" }),
+    ).toBeNull();
+    expect(
+      getWhatsAppProvider({
+        WHATSAPP_PROVIDER_URL: "https://x.test",
+        WHATSAPP_PROVIDER_TOKEN: "t",
+      }),
+    ).not.toBeNull();
+  });
+});
+
+describe("authenticateJobRequest", () => {
+  const env = { RENDER_JOB_SECRET: "s3cret" };
+  const withAuth = (value?: string) =>
+    new Request("https://x.test/api/jobs/send-reminders", {
+      method: "POST",
+      ...(value ? { headers: { authorization: value } } : {}),
+    });
+
+  it("allows the right secret only", () => {
+    expect(authenticateJobRequest(withAuth("Bearer s3cret"), env)).toBeNull();
+    expect(authenticateJobRequest(withAuth("Bearer wrong"), env)?.status).toBe(401);
+    expect(authenticateJobRequest(withAuth(), env)?.status).toBe(401);
+    expect(authenticateJobRequest(withAuth("Basic s3cret"), env)?.status).toBe(401);
+  });
+
+  it("fails closed when the secret is not configured", () => {
+    expect(authenticateJobRequest(withAuth("Bearer x"), {})?.status).toBe(500);
+  });
+});
+
+describe("MetaCloudWhatsAppProvider", () => {
+  const variables = {
+    guardian: "Meera",
+    student: "Aarav",
+    studio: "Rhythm House",
+    amount: "₹900",
+    month: "October 2026",
+    due_date: "5 Oct",
+  };
+  const send = (fetchImpl: typeof fetch) =>
+    new MetaCloudWhatsAppProvider("123", "tok", "en", fetchImpl).send({
+      to: "+919999999999",
+      templateName: "fee_due_reminder",
+      variables,
+      text: "hi",
+    });
+
+  it("posts the template with variables in the approved order", async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ messages: [{ id: "wamid.1" }] }));
+    expect(await send(fetchImpl as unknown as typeof fetch)).toEqual({
+      ok: true,
+      providerMessageId: "wamid.1",
+    });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain("/123/messages");
+    const body = JSON.parse(String(init.body));
+    expect(body.to).toBe("919999999999");
+    expect(body.template.name).toBe("fee_due_reminder");
+    expect(body.template.components[0].parameters.map((p: { text: string }) => p.text)).toEqual([
+      "Meera",
+      "Aarav",
+      "Rhythm House",
+      "₹900",
+      "October 2026",
+      "5 Oct",
+    ]);
+  });
+
+  it("does not retry a rejected message but retries a busy or failing service", async () => {
+    const reply = (status: number) =>
+      send((async () =>
+        Response.json({ error: { message: "bad" } }, { status })) as unknown as typeof fetch);
+    expect(await reply(400)).toMatchObject({ ok: false, retryable: false });
+    expect(await reply(429)).toMatchObject({ ok: false, retryable: true });
+    expect(await reply(503)).toMatchObject({ ok: false, retryable: true });
+  });
+
+  it("is chosen by its own settings and wins over the generic provider", () => {
+    const provider = getWhatsAppProvider({
+      WHATSAPP_PHONE_NUMBER_ID: "1",
+      WHATSAPP_ACCESS_TOKEN: "t",
+      WHATSAPP_PROVIDER_URL: "https://example.com",
+      WHATSAPP_PROVIDER_TOKEN: "x",
+    });
+    expect(provider).toBeInstanceOf(MetaCloudWhatsAppProvider);
+  });
+});
+
+describe("VobizWhatsAppProvider", () => {
+  const provider = (fetchImpl: typeof fetch) =>
+    new VobizWhatsAppProvider(
+      { authId: "id", authToken: "tok", channelId: "ch", wabaId: "123" },
+      "en",
+      fetchImpl,
+    );
+  const req = {
+    to: "+919999999999",
+    templateName: "fee_due_reminder",
+    variables: { guardian: "Meera", student: "Aarav", studio: "S", amount: "₹1", month: "M", due_date: "5 Oct" },
+    text: "hi",
+  };
+
+  it("posts the template with Vobiz's headers and ids", async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ id: "m1" }, { status: 201 }));
+    expect(await provider(fetchImpl as unknown as typeof fetch).send(req)).toEqual({
+      ok: true,
+      providerMessageId: "m1",
+    });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("https://api.vobiz.ai/api/v1/messaging/messages");
+    expect((init.headers as Record<string, string>)["X-Auth-ID"]).toBe("id");
+    const body = JSON.parse(String(init.body));
+    expect(body).toMatchObject({ channel_id: "ch", waba_id: "123", to: "+919999999999", type: "template" });
+    expect(body.template.components[0].parameters).toHaveLength(6);
+  });
+
+  it("retries a busy service but not a rejected message", async () => {
+    const reply = (status: number) =>
+      provider((async () => new Response("x", { status })) as unknown as typeof fetch).send(req);
+    expect(await reply(400)).toMatchObject({ retryable: false });
+    expect(await reply(503)).toMatchObject({ retryable: true });
+  });
+
+  it("is chosen first when all four Vobiz settings are present", () => {
+    const env = {
+      VOBIZ_AUTH_ID: "a",
+      VOBIZ_AUTH_TOKEN: "b",
+      VOBIZ_CHANNEL_ID: "c",
+      VOBIZ_WABA_ID: "d",
+      WHATSAPP_PHONE_NUMBER_ID: "1",
+      WHATSAPP_ACCESS_TOKEN: "t",
+    };
+    expect(getWhatsAppProvider(env)).toBeInstanceOf(VobizWhatsAppProvider);
+  });
+});

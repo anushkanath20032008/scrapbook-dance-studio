@@ -22,6 +22,104 @@
       "when": 1791114579424,
       "tag": "0002_secure_waitlist_owner_role",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791200000000,
+      "tag": "0003_studio_directory",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791200100000,
+      "tag": "0004_ledger_and_attendance",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791200200000,
+      "tag": "0005_messaging_family_billing",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791200300000,
+      "tag": "0006_apply_billing_event",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791200400000,
+      "tag": "0007_revoke_original_table_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791200500000,
+      "tag": "0008_console_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791200600000,
+      "tag": "0009_payment_gate",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791200700000,
+      "tag": "0010_attendance_summary",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791200800000,
+      "tag": "0011_monthly_trend",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791201200000,
+      "tag": "0012_reminder_preview",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791201300000,
+      "tag": "0013_payment_claims",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791201400000,
+      "tag": "0014_harden_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1791201500000,
+      "tag": "0015_owner_nudge",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791201600000,
+      "tag": "0016_member_access",
+      "breakpoints": true
     }
   ]
 }

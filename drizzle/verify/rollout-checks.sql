@@ -1,9 +1,10 @@
--- Read-only checks to run after applying migrations 0003 to 0008. It returns one row per problem and no rows
+-- Read-only checks to run after applying migrations 0003 to 0016. It returns one row per problem and no rows
 -- when everything is as designed. Run it with a role that can read the catalogs (the database owner).
 WITH new_tables(name) AS (
   VALUES ('guardians'), ('students'), ('batches'), ('batch_members'), ('fee_plans'),
          ('fee_plan_assignments'), ('class_sessions'), ('attendance_records'), ('charges'),
-         ('payments'), ('reminders'), ('family_links'), ('billing_events'), ('payment_claims')
+         ('payments'), ('reminders'), ('family_links'), ('billing_events'), ('payment_claims'),
+         ('member_invites'), ('member_links'), ('invite_attempts')
 ),
 billing_columns(name) AS (
   VALUES ('plan'), ('billing_status'), ('dodo_customer_id'), ('dodo_subscription_id'),
@@ -23,7 +24,7 @@ UNION ALL
 SELECT 'no policy: ' || n.name
 FROM new_tables n
 WHERE to_regclass('public.' || n.name) IS NOT NULL
-  AND n.name <> 'billing_events' -- service role only, by design
+  AND n.name NOT IN ('billing_events', 'invite_attempts') -- service role only, by design
   AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname = 'public' AND p.tablename = n.name)
 
 UNION ALL
@@ -45,6 +46,36 @@ WHERE g.table_schema = 'public'
   AND g.grantee = 'authenticated'
   AND g.table_name IN ('reminders', 'billing_events', 'payment_claims')
   AND g.privilege_type <> 'SELECT'
+
+UNION ALL
+SELECT 'owners can reach invite_attempts'
+FROM information_schema.role_table_grants g
+WHERE g.table_schema = 'public' AND g.grantee IN ('authenticated', 'anon', 'PUBLIC') AND g.table_name = 'invite_attempts'
+
+UNION ALL
+SELECT 'owners or members can write ' || g.table_name || '.' || g.column_name || ' (' || g.privilege_type || ')'
+FROM information_schema.column_privileges g
+WHERE g.table_schema = 'public'
+  AND g.grantee IN ('authenticated', 'anon', 'PUBLIC')
+  AND g.table_name IN ('member_invites', 'member_links')
+  AND g.privilege_type IN ('INSERT', 'UPDATE')
+  AND g.column_name <> 'revoked_at'
+
+UNION ALL
+SELECT 'owners can read ' || g.table_name || '.' || g.column_name
+FROM information_schema.column_privileges g
+WHERE g.table_schema = 'public'
+  AND g.grantee IN ('authenticated', 'anon', 'PUBLIC')
+  AND g.privilege_type = 'SELECT'
+  AND ((g.table_name = 'member_invites' AND g.column_name IN ('token_hash', 'code_hash', 'redeemed_by'))
+    OR (g.table_name = 'member_links' AND g.column_name = 'user_id'))
+
+UNION ALL
+SELECT 'a policy lets members in on ' || p.tablename || ': ' || p.policyname
+FROM pg_policies p
+WHERE p.schemaname = 'public'
+  AND (p.qual ILIKE '%member_links%' OR p.with_check ILIKE '%member_links%'
+       OR p.qual ILIKE '%is_member%' OR p.with_check ILIKE '%is_member%')
 
 UNION ALL
 SELECT 'owners can reach billing_events'
@@ -85,7 +116,9 @@ WHERE p.pronamespace = 'public'::regnamespace
                     'unpaid_students', 'studio_snapshot', 'payment_check', 'student_charge_ledger', 'attendance_by_student',
                     'attendance_by_batch', 'monthly_trend', 'preview_fee_reminders', 'reminder_targets',
                     'submit_payment_claim', 'claim_screenshots_to_purge', 'confirm_payment_claim',
-                    'reject_payment_claim', 'payment_claim_queue', 'has_role')
+                    'reject_payment_claim', 'payment_claim_queue', 'has_role', 'create_member_invite',
+                    'redeem_member_invite', 'member_studios', 'member_view', 'member_claims',
+                    'submit_payment_claim_member')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

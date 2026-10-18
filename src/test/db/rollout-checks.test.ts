@@ -26,6 +26,27 @@ describe("rollout checks", () => {
     expect(await problems()).toEqual([]);
   });
 
+  it("reports member tables left open and member functions callable without signing in", async () => {
+    const db2 = await createDb();
+    try {
+      await db2.admin("GRANT SELECT (token_hash) ON public.member_invites TO authenticated");
+      await db2.admin("GRANT UPDATE (guardian_id) ON public.member_links TO authenticated");
+      await db2.admin("GRANT SELECT ON public.invite_attempts TO authenticated");
+      await db2.admin("GRANT EXECUTE ON FUNCTION public.member_view(uuid) TO anon");
+      const found = (await db2.pg.query<{ problem: string }>(checks.trim().replace(/;$/, ""))).rows.map((row) => row.problem);
+      expect(found).toEqual(
+        expect.arrayContaining([
+          "owners can read member_invites.token_hash",
+          "owners or members can write member_links.guardian_id (UPDATE)",
+          "owners can reach invite_attempts",
+          "anon can run member_view",
+        ]),
+      );
+    } finally {
+      await db2.close();
+    }
+  }, 60_000);
+
   it("reports a table left open, a missing policy and a billing column an owner could write", async () => {
     await db.admin("GRANT DELETE ON public.charges TO authenticated");
     await db.admin("GRANT UPDATE (plan) ON public.studio_profiles TO authenticated");

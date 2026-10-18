@@ -38,7 +38,8 @@ function Login() {
 
   // Someone who is already signed in goes straight to the console.
   useEffect(() => {
-    if (session.status === "signed-in") void navigate({ to: "/app" });
+    if (session.status === "signed-in")
+      void navigate({ to: new URLSearchParams(window.location.search).get("role") === "dancer" ? "/me" : "/app" });
   }, [session.status, navigate]);
 
   useEffect(() => {
@@ -129,7 +130,17 @@ function Login() {
           <div className="window">
             <div className="window-bar chrome-font">Dancer.dialog</div>
             <div className="window-inner">
-              <p>Your studio shares a code or link with you. Enter it to see your fees and tell your studio when you've paid.</p>
+              <p>Sign in to see your own classes, attendance and fees at your studio, and to tell them when you've paid.</p>
+              <div className="login-actions">
+                <Button variant="retro" type="button" onClick={() => void navigate({ to: "/me" })}>
+                  Sign in as a dancer
+                </Button>
+                <Button variant="retroPaper" type="button" onClick={() => void navigate({ to: "/join" })}>
+                  I have an invite code
+                </Button>
+              </div>
+              <h2 className="console-subhead">Or use a private link</h2>
+              <p>Your studio can also share a private link or code that shows your fees without signing in. Enter it here.</p>
               <form onSubmit={openDancerPage}>
                 <label className="form-label">
                   Code or link from your studio

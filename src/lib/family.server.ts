@@ -62,7 +62,7 @@ export async function revokeFamilyLink({ supabase }: StudioContext, input: { id:
   return { revoked: true };
 }
 
-type FamilyStudent = {
+export type FamilyStudent = {
   id: string;
   name: string;
   balance_paise: number;
@@ -77,6 +77,14 @@ type FamilyStudent = {
   attendance: { date: string | null; present: boolean }[];
   charges: { period: string; due_on: string; amount_paise: number; plan: string; status: string }[];
   payments: { amount_paise: number; method: string; paid_on: string }[];
+};
+
+/** The fixed shape behind the family link and the member portal. */
+export type FamilyView = {
+  studio_name: string | null;
+  guardian_name: string | null;
+  students: FamilyStudent[];
+  balance_paise: number;
 };
 
 type Status = {

@@ -313,3 +313,4 @@ button { cursor:pointer; }
 .final-cta .text-link { color:var(--paper); }
 .site-nav .brand, .nav-links a { white-space:nowrap; }
 @media(max-width:1000px){ .nav-links { gap:14px; } .nav-links a.nav-hide:nth-child(-n+2) { display:none; } }
+.trial-note { margin:10px 0 0; font-size:13px; font-weight:700; }

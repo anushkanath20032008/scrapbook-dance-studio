@@ -130,10 +130,7 @@ function FamilyPage() {
           </section>
         ))}
 
-        <p className="console-hint">
-          This is a private link. To sign in with your own account, ask your studio for a login
-          invite.
-        </p>
+        <p className="console-hint">This is a private link from your studio. Don't share it.</p>
 
         {claims.data && claims.data.length > 0 && (
           <>

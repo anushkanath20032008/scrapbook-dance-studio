@@ -7,7 +7,6 @@ import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
-import { AccessBadge, useMemberAccess } from "@/components/console/member-access-section";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
@@ -33,7 +32,6 @@ function Dancers() {
   const [addOpen, setAddOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const accessOf = useMemberAccess();
 
   const students = useQuery({
     queryKey: ["students-overview", showArchived],
@@ -93,7 +91,7 @@ function Dancers() {
           >
             <div className="console-row">
               <div>
-                <strong>{student.name}</strong> <AccessBadge state={accessOf(student.guardian?.id)} />
+                <strong>{student.name}</strong>
                 <span className="console-hint">
                   {student.guardian?.phone ?? "No phone"}
                   {student.archived_at ? " · archived" : ""}

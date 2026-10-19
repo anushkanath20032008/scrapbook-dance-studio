@@ -1,32 +1,9 @@
 import { ensureStudio, friendlyError, type StudioContext } from "./studio.server";
 
-const noStudio = {
-  ownerName: "",
-  studioName: "",
-  plan: "waitlist",
-  billingStatus: "not_started",
-  isPlatformOwner: false,
-};
-
 /** What the console shell needs after sign-in: the studio's identity, plan and billing state, and platform role. */
 export async function getConsoleContext(context: StudioContext) {
-  const { supabase, userId } = context;
-
-  // A dancer who signed in with their own account has memberships but no studio. They belong in the member
-  // area, and opening the console must not create a studio profile for them.
-  const existing = await supabase
-    .from("studio_profiles")
-    .select("user_id")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (existing.error) throw friendlyError(existing.error, "Could not load your studio.");
-  if (!existing.data) {
-    const memberships = await supabase.rpc("member_studios");
-    if (!memberships.error && (memberships.data?.length ?? 0) > 0) {
-      return { ...noStudio, memberOnly: true };
-    }
-  }
   await ensureStudio(context);
+  const { supabase, userId } = context;
 
   const { data: profile, error } = await supabase
     .from("studio_profiles")
@@ -43,7 +20,6 @@ export async function getConsoleContext(context: StudioContext) {
   if (roleError) throw friendlyError(roleError, "Could not load your studio.");
 
   return {
-    memberOnly: false,
     ownerName: profile?.name ?? "",
     studioName: profile?.studio_name ?? "",
     plan: profile?.plan ?? "waitlist",

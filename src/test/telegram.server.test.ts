@@ -6,6 +6,7 @@ import {
   createTelegramClient,
   createTelegramInvite,
   handleTelegramUpdate,
+  parsePaidMessage,
   listTelegramRecipients,
   sendTelegramReminders,
   telegramConfig,
@@ -436,5 +437,109 @@ describe("owner sends reminders", () => {
     );
     expect(pauses).toHaveLength(2);
     expect(pauses.every((ms) => ms >= 34)).toBe(true);
+  });
+});
+
+describe("typed paid replies", () => {
+  it("understands the common ways to say it, with an optional amount and note", () => {
+    expect(parsePaidMessage("paid")).toEqual({ amountPaise: null, note: "" });
+    expect(parsePaidMessage("Paid!")).toEqual({ amountPaise: null, note: "" });
+    expect(parsePaidMessage("I've paid 4500")).toEqual({ amountPaise: 450000, note: "" });
+    expect(parsePaidMessage("paid ₹4,500 ref 123456")).toEqual({ amountPaise: 450000, note: "123456" });
+    expect(parsePaidMessage("Payment done Rs. 2500.50 UTR: ABC123")).toEqual({
+      amountPaise: 250050,
+      note: "ABC123",
+    });
+    expect(parsePaidMessage("done")).toEqual({ amountPaise: null, note: "" });
+  });
+
+  it("ignores everything else", () => {
+    for (const text of ["hello", "when is class", "unpaid", "I will pay tomorrow", "/help"])
+      expect(parsePaidMessage(text)).toBeNull();
+  });
+
+  it("ignores an absurd amount and keeps the rest as the note", () => {
+    expect(parsePaidMessage("paid 99999999")?.amountPaise).toBeNull();
+    expect(parsePaidMessage("paid 0")?.amountPaise).toBeNull();
+  });
+
+  type Options = {
+    linked?: boolean;
+    dancers?: number;
+    balance?: number;
+    pending?: boolean;
+    claimError?: boolean;
+    noCharges?: boolean;
+  };
+  const admin = (o: Options = {}) =>
+    fakeSupabase((call) => {
+      if (call.table === "telegram_links")
+        return { data: o.linked === false ? [] : [{ studio_id: owner, guardian_id: guardian }] };
+      if (call.table === "students")
+        return {
+          data: Array.from({ length: o.dancers ?? 1 }, () => ({
+            id: student,
+            studio_id: owner,
+            guardian_id: guardian,
+          })),
+        };
+      if (call.table === "charges") return { data: o.noCharges ? null : { period: "2026-10-01" } };
+      if (call.fn === "student_ledger_status")
+        return { data: [{ charge_id: charge, outstanding_paise: 1, balance_paise: o.balance ?? 150000 }] };
+      if (call.table === "payment_claims") return { data: o.pending ? [{ id: "c0" }] : [] };
+      if (call.fn === "submit_payment_claim")
+        return o.claimError ? { error: { code: "P0001", message: "five" } } : { data: { id: "claim1" } };
+      return undefined;
+    });
+
+  it("makes a pending claim for the whole balance when no amount is typed", async () => {
+    const { client, calls } = admin();
+    const bot = botStub();
+    await handleTelegramUpdate(client, bot.client, start("paid"));
+    const claim = calls.find((c) => c.fn === "submit_payment_claim");
+    expect(claim?.args?.[0]).toMatchObject({
+      p_guardian: guardian,
+      p_student: student,
+      p_amount_paise: 150000,
+      p_method: "other",
+      p_reference: "Telegram: I've paid",
+    });
+    expect(bot.sendMessage.mock.calls[0]?.[1]).toContain("₹1,500");
+    expect(bot.sendMessage.mock.calls[0]?.[1]).toContain("check it");
+  });
+
+  it("uses the typed amount and keeps the reference the dancer gave", async () => {
+    const { client, calls } = admin();
+    await handleTelegramUpdate(client, botStub().client, start("paid 1000 ref 998877"));
+    const claim = calls.find((c) => c.fn === "submit_payment_claim");
+    expect(claim?.args?.[0]).toMatchObject({ p_amount_paise: 100000, p_reference: "Telegram: 998877" });
+  });
+
+  it("does not claim for a chat that has not joined, a settled balance, or a second dancer", async () => {
+    for (const [options, text] of [
+      [{ linked: false }, "don't know you yet"],
+      [{ balance: 0 }, "Nothing is owed"],
+      [{ noCharges: true }, "Nothing is owed"],
+      [{ pending: true }, "already has your payment note"],
+      [{ dancers: 2 }, "more than one dancer"],
+    ] as const) {
+      const { client, calls } = admin(options);
+      const bot = botStub();
+      await handleTelegramUpdate(client, bot.client, start("paid"));
+      expect(calls.some((c) => c.fn === "submit_payment_claim")).toBe(false);
+      expect(bot.sendMessage.mock.calls[0]?.[1]).toContain(text);
+    }
+  });
+
+  it("ignores chatter without touching the database, and apologises when saving fails", async () => {
+    const quiet = admin();
+    const bot = botStub();
+    await handleTelegramUpdate(quiet.client, bot.client, start("hello there"));
+    expect(quiet.calls).toHaveLength(0);
+    expect(bot.sendMessage).not.toHaveBeenCalled();
+
+    const failing = botStub();
+    await handleTelegramUpdate(admin({ claimError: true }).client, failing.client, start("paid"));
+    expect(failing.sendMessage.mock.calls[0]?.[1]).toContain("could not send that");
   });
 });

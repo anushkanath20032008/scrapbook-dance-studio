@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { hashToken, newToken } from "./family.server";
+import { formatRupees } from "./money";
 import { reminderText } from "./manual-reminders";
 import { friendlyError, unwrap, type Db, type StudioContext } from "./studio.server";
 import { todayInIndia } from "./validators";
@@ -341,7 +342,11 @@ export async function handleTelegramUpdate(admin: Db, client: TelegramClient, up
     const chatId = message?.chat?.id;
     const text = message?.text?.trim();
     if (typeof chatId !== "number" || message?.chat?.type !== "private" || !text) return;
-    if (!/^\/start(@\w+)?(\s|$)/.test(text)) return;
+    if (!/^\/start(@\w+)?(\s|$)/.test(text)) {
+      const paid = parsePaidMessage(text);
+      if (paid) await client.sendMessage(chatId, await handlePaidText(admin, chatId, paid));
+      return;
+    }
 
     const payload = text.split(/\s+/)[1];
     if (!payload) {
@@ -375,7 +380,102 @@ async function handleJoin(admin: Db, chatId: number, token: string) {
   const name = studio.data?.studio_name?.trim() || "Your studio";
   return row.outcome === "already"
     ? `You are already set up. ${name} will send fee reminders here.`
-    : `You are set up ✓ ${name} will send fee reminders here. When you have paid, tap "I've paid" under a reminder and the studio will check it.`;
+    : `You are set up ✓ ${name} will send fee reminders here. When you have paid, tap "I've paid" under a reminder, or just reply "paid" (or "paid 2000" if it was less). The studio will check it.`;
+}
+
+export type PaidMessage = { amountPaise: number | null; note: string };
+
+/**
+ * Reads a typed reply like "paid", "I've paid 4500" or "paid ₹4,500 ref 123456". Anything else is not a payment
+ * note and is ignored. The amount is optional; the note is whatever is left, kept short.
+ */
+export function parsePaidMessage(text: string): PaidMessage | null {
+  const match = /^\s*(?:i\s*(?:'ve|’ve|have)\s+)?(?:paid|done|payment\s+(?:done|made))\b[\s:.,-]*(.*)$/i.exec(text);
+  if (!match) return null;
+  let rest = (match[1] ?? "").trim();
+  let amountPaise: number | null = null;
+  const amount = /(?:₹|rs\.?|inr)?\s*(\d[\d,]*(?:\.\d{1,2})?)/i.exec(rest);
+  if (amount) {
+    const rupees = Number((amount[1] ?? "").replace(/,/g, ""));
+    if (rupees >= 1 && rupees <= 1_000_000) {
+      amountPaise = Math.round(rupees * 100);
+      rest = (rest.slice(0, amount.index) + " " + rest.slice(amount.index + amount[0].length)).trim();
+    }
+  }
+  const note = rest.replace(/^(?:ref(?:erence)?\.?|utr)\s*[:#-]?\s*/i, "").replace(/\s+/g, " ").slice(0, 80);
+  return { amountPaise, note: /[a-z0-9]/i.test(note) ? note : "" };
+}
+
+/**
+ * A typed "paid" from a joined chat: a pending claim for the amount given, or for the whole balance when none is
+ * given. It never changes a balance; the owner checks it against the bank in To verify.
+ */
+async function handlePaidText(admin: Db, chatId: number, paid: PaidMessage) {
+  const trouble = "Something went wrong. Please try again in a minute.";
+  const links = await admin
+    .from("telegram_links")
+    .select("studio_id, guardian_id")
+    .eq("chat_id", chatId)
+    .is("revoked_at", null);
+  if (links.error) return trouble;
+  const guardianIds = (links.data ?? []).map((link) => link.guardian_id);
+  if (guardianIds.length === 0)
+    return "I don't know you yet. Your studio sends you a personal link to join. Ask them for yours.";
+
+  const students = await admin
+    .from("students")
+    .select("id, studio_id, guardian_id")
+    .in("guardian_id", guardianIds)
+    .is("archived_at", null);
+  if (students.error) return trouble;
+  const dancers = students.data ?? [];
+  if (dancers.length !== 1)
+    return dancers.length === 0
+      ? "Sorry, I could not find your fee. Please ask your studio."
+      : "I found more than one dancer on this chat. Please tap \"I've paid\" under the reminder for the right one.";
+  const dancer = dancers[0] as { id: string; studio_id: string; guardian_id: string };
+
+  const latest = await admin
+    .from("charges")
+    .select("period")
+    .eq("student_id", dancer.id)
+    .eq("studio_id", dancer.studio_id)
+    .is("voided_at", null)
+    .order("period", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (latest.error) return trouble;
+  if (!latest.data) return "Nothing is owed right now. Thank you!";
+  const statuses = await admin.rpc("student_ledger_status", {
+    p_period: latest.data.period,
+    p_student_ids: [dancer.id],
+  });
+  if (statuses.error) return trouble;
+  const balance = Number(statuses.data?.[0]?.balance_paise ?? 0);
+  if (balance <= 0) return "Nothing is owed right now. Thank you!";
+
+  const waiting = await admin
+    .from("payment_claims")
+    .select("id")
+    .eq("student_id", dancer.id)
+    .eq("status", "pending")
+    .like("reference", "Telegram:%")
+    .limit(1);
+  if (waiting.error) return trouble;
+  if ((waiting.data ?? []).length > 0)
+    return "Your studio already has your payment note and will check it soon.";
+
+  const amountPaise = paid.amountPaise ?? balance;
+  const claim = await admin.rpc("submit_payment_claim", {
+    p_guardian: dancer.guardian_id,
+    p_student: dancer.id,
+    p_amount_paise: amountPaise,
+    p_method: "other",
+    p_paid_on: todayInIndia(),
+    p_reference: paid.note ? `Telegram: ${paid.note}` : CLAIM_REFERENCE,
+  });
+  if (claim.error) return "Sorry, I could not send that to your studio. Please tell them directly.";
+  return `Thanks! I told your studio you paid ${formatRupees(amountPaise)}. They will check it against their records and confirm.`;
 }
 
 /** "I've paid": a pending claim for what the ledger still shows owed. The owner confirms it in To verify. */
@@ -423,7 +523,7 @@ async function handlePaidTap(admin: Db, chatId: number, chargeId: string) {
     .select("id")
     .eq("student_id", studentId)
     .eq("status", "pending")
-    .eq("reference", CLAIM_REFERENCE)
+    .like("reference", "Telegram:%")
     .limit(1);
   if (waiting.error) return "Something went wrong. Please try again in a minute.";
   if ((waiting.data ?? []).length > 0)

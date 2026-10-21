@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { studioPlans, subscriptionNote } from "@/lib/plans";
 import { joinWaitlist } from "@/lib/waitlist.functions";
+import { useScrollReveal } from "@/lib/scroll-reveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -36,6 +37,7 @@ function Home() {
   const problem = useRef<HTMLElement>(null);
   const solution = useRef<HTMLElement>(null);
   const estimate = Math.round(students * fee * late / 100);
+  useScrollReveal(".section h2, .section-intro, .problem-grid > div, .calc-window, .sequence > .window, .video-window, .desktop-icon, .offer-banner, .pricing-card, .pricing-footnote, .faq-list > .window, .final-cta .hero-actions, .signup-dialog");
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let ctx: { revert: () => void } | undefined;

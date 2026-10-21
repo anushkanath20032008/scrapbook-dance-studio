@@ -12,6 +12,9 @@ describe("getConsoleContext", () => {
     });
     const result = await getConsoleContext({ supabase: client, userId: user });
     expect(result).toEqual({
+      studentLimit: null,
+      studentCount: 0,
+      trialEndsAt: null,
       ownerName: "",
       studioName: "",
       plan: "waitlist",
@@ -62,5 +65,30 @@ describe("getConsoleContext", () => {
     await expect(getConsoleContext({ supabase: client, userId: user })).rejects.toThrow(
       "Could not load your studio.",
     );
+  });
+});
+
+describe("getConsoleContext capacity", () => {
+  it("reports the plan's dancer limit and count, and hides them when the lookup fails", async () => {
+    const ok = fakeSupabase((call) => {
+      if (call.fn === "has_role") return { data: false };
+      if (call.fn === "studio_capacity")
+        return { data: [{ student_limit: 50, student_count: 12, trial_ends_at: "2026-11-20T00:00:00Z" }] };
+      return { data: null };
+    });
+    expect(await getConsoleContext({ supabase: ok.client, userId: user })).toMatchObject({
+      studentLimit: 50,
+      studentCount: 12,
+      trialEndsAt: "2026-11-20T00:00:00Z",
+    });
+    const broken = fakeSupabase((call) => {
+      if (call.fn === "has_role") return { data: false };
+      if (call.fn === "studio_capacity") return { error: { code: "42883", message: "missing" } };
+      return { data: null };
+    });
+    expect(await getConsoleContext({ supabase: broken.client, userId: user })).toMatchObject({
+      studentLimit: null,
+      studentCount: 0,
+    });
   });
 });

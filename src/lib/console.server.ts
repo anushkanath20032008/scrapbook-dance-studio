@@ -19,7 +19,14 @@ export async function getConsoleContext(context: StudioContext) {
   });
   if (roleError) throw friendlyError(roleError, "Could not load your studio.");
 
+  // How many dancers the studio has and the plan's limit (null means no limit). A failure here just hides the count.
+  const capacity = await supabase.rpc("studio_capacity");
+  const cap = capacity.error ? undefined : capacity.data?.[0];
+
   return {
+    studentLimit: (cap?.student_limit as number | null | undefined) ?? null,
+    studentCount: cap?.student_count ?? 0,
+    trialEndsAt: cap?.trial_ends_at ?? null,
     ownerName: profile?.name ?? "",
     studioName: profile?.studio_name ?? "",
     plan: profile?.plan ?? "waitlist",

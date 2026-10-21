@@ -866,6 +866,14 @@ export type Database = {
           unpaid_count: number
         }[]
       }
+      studio_capacity: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          student_count: number
+          student_limit: number
+          trial_ends_at: string
+        }[]
+      }
       mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number

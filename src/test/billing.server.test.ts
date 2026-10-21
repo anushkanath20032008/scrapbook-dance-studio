@@ -92,7 +92,7 @@ describe("startSubscriptionCheckout", () => {
     vi.stubEnv("DODO_PAYMENTS_API_KEY", "");
 
     await expect(checkout("starter")).rejects.toThrow(
-      "The Starter plan isn't available for checkout yet",
+      "The Regular plan isn't available for checkout yet",
     );
     expect(dodo.create).not.toHaveBeenCalled();
   });

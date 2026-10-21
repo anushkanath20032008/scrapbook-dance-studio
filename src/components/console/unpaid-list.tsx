@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
+import { whatsappLink } from "@/lib/manual-reminders";
 import type { getHomeReport } from "@/lib/reports.functions";
 
 type Unpaid = Awaited<ReturnType<typeof getHomeReport>>["unpaid"][number];
@@ -11,25 +12,23 @@ function dueText(row: Unpaid) {
   return `Due ${formatDay(row.due_on)}`;
 }
 
-/** A wa.me link with the reminder filled in, or null when the number cannot be used. */
-export function whatsappLink(row: Unpaid): string | null {
-  const digits = (row.phone ?? "").replace(/\D/g, "");
-  const international =
-    digits.length === 10 ? `91${digits}` : digits.length >= 11 && digits.length <= 15 ? digits : null;
-  if (!international) return null;
-  const text = `Hi ${row.student_name}, a reminder that your fee of ${formatRupees(row.outstanding_paise)} was due on ${formatDay(row.due_on)}. Thank you!`;
-  return `https://wa.me/${international}?text=${encodeURIComponent(text)}`;
-}
-
 /** Everyone who still owes for the month, oldest overdue first. */
 export function UnpaidList({
   rows,
   onRecord,
   onRemind,
+  studioName,
+  reminded,
+  onOpened,
+  showQueue,
 }: {
   rows: Unpaid[];
   onRecord: (row: Unpaid) => void;
   onRemind: (row: Unpaid) => void;
+  studioName: string;
+  reminded: Set<string>;
+  onOpened: (chargeId: string) => void;
+  showQueue: boolean;
 }) {
   if (rows.length === 0)
     return <p className="console-empty">Nobody owes anything for this month.</p>;
@@ -48,18 +47,30 @@ export function UnpaidList({
             <span className="status-pill" data-tone={row.status === "overdue" ? "warn" : "idle"}>
               {dueText(row)}
             </span>
+            {reminded.has(row.charge_id) && (
+              <span className="status-pill" data-tone="good">
+                Reminded today
+              </span>
+            )}
           </div>
           <div className="console-row-actions">
             <Button variant="retro" type="button" onClick={() => onRecord(row)}>
               Record payment
             </Button>
-            <Button variant="retroPaper" type="button" onClick={() => onRemind(row)}>
-              Remind
-            </Button>
-            {whatsappLink(row) && (
+            {showQueue && (
+              <Button variant="retroPaper" type="button" onClick={() => onRemind(row)}>
+                Remind
+              </Button>
+            )}
+            {whatsappLink(row, studioName) && (
               <Button asChild variant="retroPaper">
-                <a href={whatsappLink(row) ?? undefined} target="_blank" rel="noreferrer">
-                  WhatsApp
+                <a
+                  href={whatsappLink(row, studioName) ?? undefined}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => onOpened(row.charge_id)}
+                >
+                  {reminded.has(row.charge_id) ? "WhatsApp again" : "WhatsApp"}
                 </a>
               </Button>
             )}

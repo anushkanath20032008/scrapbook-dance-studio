@@ -2,7 +2,7 @@ import { formatRupees } from "@/lib/money";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
@@ -12,6 +12,12 @@ import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { UnpaidList } from "@/components/console/unpaid-list";
+import { TelegramBatchDialog } from "@/components/console/telegram-batch";
+import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
+import { getConsoleContext } from "@/lib/console.functions";
+import { markReminded, remindedToday } from "@/lib/manual-reminders";
+import { getMessagingStatus } from "@/lib/reminders.functions";
+import { getTelegramStatus } from "@/lib/telegram.functions";
 import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
@@ -36,6 +42,21 @@ function Overview() {
   const [error, setError] = useState("");
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [reminding, setReminding] = useState<RemindTarget | null>(null);
+  const [batchOpen, setBatchOpen] = useState(false);
+  const [telegramOpen, setTelegramOpen] = useState(false);
+  const [reminded, setReminded] = useState<Set<string>>(new Set());
+  const today = todayInIndia();
+  useEffect(() => setReminded(remindedToday(today)), [today]);
+  const loadContext = useServerFn(getConsoleContext);
+  const context = useQuery({ queryKey: ["console-context"], queryFn: () => loadContext() });
+  const studioName = context.data?.studioName ?? "";
+  const loadMessaging = useServerFn(getMessagingStatus);
+  const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => loadMessaging() });
+  const providerConfigured = messaging.data?.providerConfigured === true;
+  const loadTelegram = useServerFn(getTelegramStatus);
+  const telegram = useQuery({ queryKey: ["telegram-status"], queryFn: () => loadTelegram() });
+  const telegramConfigured = telegram.data?.configured === true;
+  const markOpened = (chargeId: string) => setReminded(new Set(markReminded(chargeId, today)));
 
   const report = useQuery({
     queryKey: ["home-report", period],
@@ -97,9 +118,18 @@ function Overview() {
             </strong>{" "}
             · {formatRupees(unpaidTotal)} owed this month
           </span>
-          <Button variant="retro" type="button" onClick={() => setReminding({ period, allUnpaid: true })}>
-            Remind all unpaid
+          <Button
+            variant="retro"
+            type="button"
+            onClick={() => (providerConfigured ? setReminding({ period, allUnpaid: true }) : setBatchOpen(true))}
+          >
+            {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
           </Button>
+          {telegramConfigured && (
+            <Button variant="retroPaper" type="button" onClick={() => setTelegramOpen(true)}>
+              Remind on Telegram
+            </Button>
+          )}
         </div>
       )}
 
@@ -150,14 +180,16 @@ function Overview() {
         <>
           <div className="console-list-head">
             <h2>Who hasn&apos;t paid</h2>
-            <Button
-              variant="retroPaper"
-              type="button"
-              onClick={() => setReminding({ period })}
-              disabled={snapshot.overdue_paise === 0}
-            >
-              Remind everyone overdue
-            </Button>
+            {providerConfigured && (
+              <Button
+                variant="retroPaper"
+                type="button"
+                onClick={() => setReminding({ period })}
+                disabled={snapshot.overdue_paise === 0}
+              >
+                Remind everyone overdue
+              </Button>
+            )}
           </div>
           <UnpaidList
             rows={report.data?.unpaid ?? []}
@@ -165,10 +197,27 @@ function Overview() {
             onRemind={(row) =>
               setReminding({ period, studentId: row.student_id, name: row.student_name })
             }
+            studioName={studioName}
+            reminded={reminded}
+            onOpened={markOpened}
+            showQueue={providerConfigured}
           />
         </>
       )}
 
+      <WhatsAppBatchDialog
+        open={batchOpen}
+        onClose={() => setBatchOpen(false)}
+        rows={unpaidRows}
+        studioName={studioName}
+        reminded={reminded}
+        onOpened={markOpened}
+      />
+      <TelegramBatchDialog
+        open={telegramOpen}
+        onClose={() => setTelegramOpen(false)}
+        period={period}
+      />
       <RemindDialog
         target={reminding}
         onClose={() => setReminding(null)}

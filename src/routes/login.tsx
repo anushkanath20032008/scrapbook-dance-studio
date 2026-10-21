@@ -33,17 +33,14 @@ function Login() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [role, setRole] = useState<"studio" | "dancer">("studio");
-  const [code, setCode] = useState("");
 
   // Someone who is already signed in goes straight to the console.
   useEffect(() => {
-    if (session.status === "signed-in")
-      void navigate({ to: new URLSearchParams(window.location.search).get("role") === "dancer" ? "/me" : "/app" });
+    if (session.status === "signed-in") void navigate({ to: "/app" });
   }, [session.status, navigate]);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("role") === "dancer") setRole("dancer");
+    if (new URLSearchParams(window.location.search).get("mode") === "register") setMode("register");
   }, []);
 
   useEffect(() => {
@@ -86,17 +83,6 @@ function Login() {
     }
   }
 
-  function openDancerPage(event: FormEvent) {
-    event.preventDefault();
-    // Accept the bare code or the whole link the studio shared.
-    const token = code.trim().split("/family/").pop()?.split(/[?#/]/)[0] ?? "";
-    if (token.length < 8) {
-      setError("Enter the code or link your studio shared with you.");
-      return;
-    }
-    window.location.assign(`/family/${encodeURIComponent(token)}`);
-  }
-
   async function continueWithGoogle() {
     setBusy(true);
     setMessage("");
@@ -118,42 +104,6 @@ function Login() {
       <div className="wrap login-wrap">
         <a href="/">← Choreo Studio</a>
         <h1 className="display login-title">{headings[mode]}</h1>
-        <div className="login-tabs" role="tablist" aria-label="Who are you?" style={{ marginBottom: 16 }}>
-          <Button type="button" role="tab" aria-selected={role === "studio"} variant={role === "studio" ? "retro" : "retroPaper"} onClick={() => { setRole("studio"); setError(""); }}>
-            I run a studio
-          </Button>
-          <Button type="button" role="tab" aria-selected={role === "dancer"} variant={role === "dancer" ? "retro" : "retroPaper"} onClick={() => { setRole("dancer"); setError(""); }}>
-            I'm a dancer
-          </Button>
-        </div>
-        {role === "dancer" ? (
-          <div className="window">
-            <div className="window-bar chrome-font">Dancer.dialog</div>
-            <div className="window-inner">
-              <p>Sign in to see your own classes, attendance and fees at your studio, and to tell them when you've paid.</p>
-              <div className="login-actions">
-                <Button variant="retro" type="button" onClick={() => void navigate({ to: "/me" })}>
-                  Sign in as a dancer
-                </Button>
-                <Button variant="retroPaper" type="button" onClick={() => void navigate({ to: "/join" })}>
-                  I have an invite code
-                </Button>
-              </div>
-              <h2 className="console-subhead">Or use a private link</h2>
-              <p>Your studio can also share a private link or code that shows your fees without signing in. Enter it here.</p>
-              <form onSubmit={openDancerPage}>
-                <label className="form-label">
-                  Code or link from your studio
-                  <input className="field" value={code} onChange={(event) => { setCode(event.target.value); setError(""); }} aria-invalid={error !== ""} autoComplete="off" />
-                </label>
-                {error !== "" && <p role="alert" className="login-error">{error}</p>}
-                <div className="login-actions">
-                  <Button variant="retro" type="submit">Open my page</Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        ) : (
         <div className="window">
           <div className="window-bar chrome-font">
             {mode === "register" ? "Register.dialog" : "Sign-in.dialog"}
@@ -285,7 +235,6 @@ function Login() {
             </p>
           </div>
         </div>
-        )}
       </div>
     </main>
   );

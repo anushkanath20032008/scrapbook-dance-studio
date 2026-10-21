@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,10 @@ import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
-import { AccessBadge, useMemberAccess } from "@/components/console/member-access-section";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
+import { getConsoleContext } from "@/lib/console.functions";
 import { listGuardians, setStudentArchived } from "@/lib/directory.functions";
 import { listFeePlans } from "@/lib/fees.functions";
 import { formatRupees } from "@/lib/money";
@@ -29,11 +30,16 @@ function Dancers() {
   const listPlansFn = useServerFn(listFeePlans);
   const archiveFn = useServerFn(setStudentArchived);
 
+  const loadContext = useServerFn(getConsoleContext);
+  const capacity = useQuery({ queryKey: ["console-context"], queryFn: () => loadContext() });
+  const limit = capacity.data?.studentLimit ?? null;
+  const count = capacity.data?.studentCount ?? 0;
+  const atLimit = limit !== null && count >= limit;
+
   const [showArchived, setShowArchived] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const accessOf = useMemberAccess();
 
   const students = useQuery({
     queryKey: ["students-overview", showArchived],
@@ -67,7 +73,7 @@ function Dancers() {
     <section>
       <h1 className="display console-title">Dancers</h1>
       <div className="console-toolbar">
-        <Button variant="retro" type="button" disabled={!ready} onClick={() => setAddOpen(true)}>
+        <Button variant="retro" type="button" disabled={!ready || atLimit} onClick={() => setAddOpen(true)}>
           + Add dancer
         </Button>
         <label className="console-check">
@@ -79,6 +85,18 @@ function Dancers() {
           Show archived
         </label>
       </div>
+      {limit !== null && (
+        <p className="console-hint" role="status">
+          {count} of {limit} dancers on your plan.
+          {atLimit && (
+            <>
+              {" "}
+              You have reached the limit.{" "}
+              <Link to="/account">Upgrade to Studio+ to add more</Link>.
+            </>
+          )}
+        </p>
+      )}
       <FormAlert message={error} />
       {students.isError && <p role="alert">Could not load your dancers. Please refresh.</p>}
       {students.data?.length === 0 && (
@@ -93,7 +111,7 @@ function Dancers() {
           >
             <div className="console-row">
               <div>
-                <strong>{student.name}</strong> <AccessBadge state={accessOf(student.guardian?.id)} />
+                <strong>{student.name}</strong>
                 <span className="console-hint">
                   {student.guardian?.phone ?? "No phone"}
                   {student.archived_at ? " · archived" : ""}

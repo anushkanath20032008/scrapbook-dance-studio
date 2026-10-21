@@ -6,7 +6,7 @@ export const setupCountsKey = ["setup-counts"] as const;
 export function useRefreshStudents() {
   const queryClient = useQueryClient();
   return () => {
-    for (const key of ["students-overview", "guardians", "batches", "fee-plans"])
+    for (const key of ["students-overview", "guardians", "batches", "fee-plans", "console-context"])
       void queryClient.invalidateQueries({ queryKey: [key] });
     void queryClient.invalidateQueries({ queryKey: setupCountsKey });
   };

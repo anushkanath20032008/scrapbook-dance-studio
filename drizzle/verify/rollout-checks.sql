@@ -118,7 +118,7 @@ WHERE p.pronamespace = 'public'::regnamespace
                     'submit_payment_claim', 'claim_screenshots_to_purge', 'confirm_payment_claim',
                     'reject_payment_claim', 'payment_claim_queue', 'has_role', 'create_member_invite',
                     'redeem_member_invite', 'member_studios', 'member_view', 'member_claims',
-                    'submit_payment_claim_member')
+                    'submit_payment_claim_member', 'owner_nudge_summary', 'student_limit', 'studio_capacity')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

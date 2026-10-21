@@ -12,7 +12,9 @@ describe("getConsoleContext", () => {
     });
     const result = await getConsoleContext({ supabase: client, userId: user });
     expect(result).toEqual({
-      memberOnly: false,
+      studentLimit: null,
+      studentCount: 0,
+      trialEndsAt: null,
       ownerName: "",
       studioName: "",
       plan: "waitlist",
@@ -21,28 +23,6 @@ describe("getConsoleContext", () => {
     });
     // The profile is created through an insert-or-ignore, never an overwrite.
     expect(calls.some((call) => call.steps.some(([name]) => name === "upsert"))).toBe(true);
-  });
-
-  it("sends a dancer with memberships and no studio to the member area without creating a studio", async () => {
-    const { client, calls } = fakeSupabase((call) =>
-      call.fn === "member_studios"
-        ? { data: [{ studio_id: user, studio_name: "Rhythm House", joined_at: "2026-10-01" }] }
-        : {},
-    );
-    const result = await getConsoleContext({ supabase: client, userId: user });
-    expect(result).toMatchObject({ memberOnly: true, isPlatformOwner: false });
-    expect(calls.some((call) => call.steps.some(([name]) => name === "upsert"))).toBe(false);
-  });
-
-  it("keeps an owner who is also a dancer in the console", async () => {
-    const { client } = fakeSupabase((call) => {
-      if (call.fn === "has_role") return { data: false };
-      if (call.table === "studio_profiles") return { data: { user_id: user, studio_name: "Mine" } };
-      return {};
-    });
-    expect(await getConsoleContext({ supabase: client, userId: user })).toMatchObject({
-      memberOnly: false,
-    });
   });
 
   it("returns the saved studio details and plan", async () => {
@@ -85,5 +65,30 @@ describe("getConsoleContext", () => {
     await expect(getConsoleContext({ supabase: client, userId: user })).rejects.toThrow(
       "Could not load your studio.",
     );
+  });
+});
+
+describe("getConsoleContext capacity", () => {
+  it("reports the plan's dancer limit and count, and hides them when the lookup fails", async () => {
+    const ok = fakeSupabase((call) => {
+      if (call.fn === "has_role") return { data: false };
+      if (call.fn === "studio_capacity")
+        return { data: [{ student_limit: 50, student_count: 12, trial_ends_at: "2026-11-20T00:00:00Z" }] };
+      return { data: null };
+    });
+    expect(await getConsoleContext({ supabase: ok.client, userId: user })).toMatchObject({
+      studentLimit: 50,
+      studentCount: 12,
+      trialEndsAt: "2026-11-20T00:00:00Z",
+    });
+    const broken = fakeSupabase((call) => {
+      if (call.fn === "has_role") return { data: false };
+      if (call.fn === "studio_capacity") return { error: { code: "42883", message: "missing" } };
+      return { data: null };
+    });
+    expect(await getConsoleContext({ supabase: broken.client, userId: user })).toMatchObject({
+      studentLimit: null,
+      studentCount: 0,
+    });
   });
 });

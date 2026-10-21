@@ -217,7 +217,7 @@ function Account() {
                             ))}
                           </ul>
                           <Button
-                            variant={plan.id === "growth" ? "retro" : "retroPaper"}
+                            variant={plan.id === "studio" ? "retro" : "retroPaper"}
                             disabled={busy || checkoutPlan !== null}
                             onClick={() => choosePlan(plan.id)}
                           >

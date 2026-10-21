@@ -644,6 +644,63 @@ export type Database = {
         }
         Relationships: []
       }
+      telegram_links: {
+        Row: {
+          chat_id: number | null
+          created_at: string
+          guardian_id: string
+          id: string
+          joined_at: string | null
+          revoked_at: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Insert: {
+          chat_id?: number | null
+          created_at?: string
+          guardian_id: string
+          id?: string
+          joined_at?: string | null
+          revoked_at?: string | null
+          studio_id: string
+          token_hash: string
+        }
+        Update: {
+          chat_id?: number | null
+          created_at?: string
+          guardian_id?: string
+          id?: string
+          joined_at?: string | null
+          revoked_at?: string | null
+          studio_id?: string
+          token_hash?: string
+        }
+        Relationships: []
+      }
+      telegram_reminder_log: {
+        Row: {
+          charge_id: string
+          created_at: string
+          id: string
+          sent_on: string
+          studio_id: string
+        }
+        Insert: {
+          charge_id: string
+          created_at?: string
+          id?: string
+          sent_on: string
+          studio_id: string
+        }
+        Update: {
+          charge_id?: string
+          created_at?: string
+          id?: string
+          sent_on?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -809,6 +866,14 @@ export type Database = {
           unpaid_count: number
         }[]
       }
+      studio_capacity: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          student_count: number
+          student_limit: number
+          trial_ends_at: string
+        }[]
+      }
       mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number
@@ -885,6 +950,10 @@ export type Database = {
       create_member_invite: {
         Args: { p_code_hash: string; p_days: number; p_guardian: string; p_token_hash: string }
         Returns: { expires_at: string; id: string }[]
+      }
+      redeem_telegram_link: {
+        Args: { p_chat_id: number; p_token_hash: string }
+        Returns: { guardian_id: string; outcome: string; studio_id: string }[]
       }
       redeem_member_invite: {
         Args: { p_secret: string; p_source?: string }

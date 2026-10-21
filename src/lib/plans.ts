@@ -1,21 +1,40 @@
-// Choreo Studio's own subscription tiers. Ids match the plans accepted by createSubscriptionCheckout.
-export const studioPlans = [
-  { id: "starter", name: "Starter", price: "₹999", features: ["One studio", "Up to 50 students"] },
+// Choreo Studio's own subscription tiers. Ids match the plans accepted by createSubscriptionCheckout. "growth" is
+// an older tier that is no longer sold; it stays in the type so existing subscriptions and webhooks keep working.
+export type StudioPlanId = "starter" | "growth" | "studio";
+
+export const FREE_TRIAL = "Free for your first month";
+
+/** The plans on sale: Regular (id "starter") and Studio+ (id "studio"). */
+export const studioPlans: readonly {
+  id: StudioPlanId;
+  name: string;
+  price: string;
+  features: readonly string[];
+}[] = [
   {
-    id: "growth",
-    name: "Growth",
-    price: "₹1,999",
-    features: ["Up to 150 students", "WhatsApp reminders"],
+    id: "starter",
+    name: "Regular",
+    price: "₹249",
+    features: [
+      "Up to 50 students",
+      "Fees, attendance and batches",
+      "WhatsApp reminders, one tap each",
+      "Dancer payment claims",
+      "Monthly trend reports",
+    ],
   },
   {
     id: "studio",
     name: "Studio+",
-    price: "₹3,999",
-    features: ["Advanced reports", "Priority support"],
+    price: "₹479",
+    features: [
+      "More than 50 students",
+      "Everything in Regular",
+      "Automated WhatsApp messages from your own WhatsApp Business account (coming soon)",
+      "Priority support",
+    ],
   },
-] as const;
-
-export type StudioPlanId = (typeof studioPlans)[number]["id"];
+];
 
 export const subscriptionNote =
   "This subscription is for the studio using ChoreoStudio. Student payments are ledger-only and are not processed by ChoreoStudio.";

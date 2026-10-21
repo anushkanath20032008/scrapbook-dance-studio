@@ -9,6 +9,15 @@ export type ReminderRow = {
   due_on: string;
 };
 
+/** The reminder wording shared by WhatsApp tap-to-send and the Telegram bot. */
+export function reminderText(
+  row: Pick<ReminderRow, "student_name" | "outstanding_paise" | "due_on">,
+  studioName = "",
+): string {
+  const from = studioName.trim() ? ` from ${studioName.trim()}` : "";
+  return `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} was due on ${formatDay(row.due_on)}. Thank you!`;
+}
+
 /** A wa.me link with the reminder filled in, or null when the number cannot be used. */
 export function whatsappLink(row: ReminderRow, studioName = ""): string | null {
   const digits = (row.phone ?? "").replace(/\D/g, "");
@@ -21,9 +30,7 @@ export function whatsappLink(row: ReminderRow, studioName = ""): string | null {
           ? digits
           : null;
   if (!international) return null;
-  const from = studioName.trim() ? ` from ${studioName.trim()}` : "";
-  const text = `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} was due on ${formatDay(row.due_on)}. Thank you!`;
-  return `https://wa.me/${international}?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/${international}?text=${encodeURIComponent(reminderText(row, studioName))}`;
 }
 
 const KEY = "choreo-manual-reminders";

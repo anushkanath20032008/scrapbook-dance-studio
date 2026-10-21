@@ -33,6 +33,7 @@ import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-n
 import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
+import { Route as ApiWebhooksTelegramRouteImport } from './routes/api/webhooks/telegram'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -154,6 +155,11 @@ const ApiWebhooksDodoRoute = ApiWebhooksDodoRouteImport.update({
   path: '/api/webhooks/dodo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksTelegramRoute = ApiWebhooksTelegramRouteImport.update({
+  id: '/api/webhooks/telegram',
+  path: '/api/webhooks/telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
+  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
+  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
+  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
+    | '/api/webhooks/telegram'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
+    | '/api/webhooks/telegram'
   id:
     | '__root__'
     | '/'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
+    | '/api/webhooks/telegram'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
+  ApiWebhooksTelegramRoute: typeof ApiWebhooksTelegramRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksDodoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/telegram': {
+      id: '/api/webhooks/telegram'
+      path: '/api/webhooks/telegram'
+      fullPath: '/api/webhooks/telegram'
+      preLoaderRoute: typeof ApiWebhooksTelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -546,6 +566,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
+  ApiWebhooksTelegramRoute: ApiWebhooksTelegramRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

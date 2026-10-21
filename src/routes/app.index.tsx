@@ -12,10 +12,12 @@ import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { UnpaidList } from "@/components/console/unpaid-list";
+import { TelegramBatchDialog } from "@/components/console/telegram-batch";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
+import { getTelegramStatus } from "@/lib/telegram.functions";
 import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
@@ -41,6 +43,7 @@ function Overview() {
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [reminding, setReminding] = useState<RemindTarget | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
+  const [telegramOpen, setTelegramOpen] = useState(false);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
@@ -50,6 +53,9 @@ function Overview() {
   const loadMessaging = useServerFn(getMessagingStatus);
   const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => loadMessaging() });
   const providerConfigured = messaging.data?.providerConfigured === true;
+  const loadTelegram = useServerFn(getTelegramStatus);
+  const telegram = useQuery({ queryKey: ["telegram-status"], queryFn: () => loadTelegram() });
+  const telegramConfigured = telegram.data?.configured === true;
   const markOpened = (chargeId: string) => setReminded(new Set(markReminded(chargeId, today)));
 
   const report = useQuery({
@@ -119,6 +125,11 @@ function Overview() {
           >
             {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
           </Button>
+          {telegramConfigured && (
+            <Button variant="retroPaper" type="button" onClick={() => setTelegramOpen(true)}>
+              Remind on Telegram
+            </Button>
+          )}
         </div>
       )}
 
@@ -201,6 +212,11 @@ function Overview() {
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}
+      />
+      <TelegramBatchDialog
+        open={telegramOpen}
+        onClose={() => setTelegramOpen(false)}
+        period={period}
       />
       <RemindDialog
         target={reminding}

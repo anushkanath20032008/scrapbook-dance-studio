@@ -12,7 +12,7 @@ Choreo Studio is a scrapbook-style operations app for independent dance studios 
 
 There are two separate kinds of money in Choreo Studio:
 
-- **Studio subscription (Dodo Payments).** The studio pays Choreo Studio for the software: Starter ₹999/month, Growth ₹1,999/month, Studio+ ₹3,999/month. Checkout is created by the server function `createSubscriptionCheckout` in `src/lib/billing.functions.ts`. The Dodo API key and product IDs never reach the browser, and a studio cannot edit its own plan or billing status.
+- **Studio subscription (Dodo Payments).** The studio pays Choreo Studio for the software: Regular ₹249/month (the `starter` plan id) and Studio+ ₹479/month (`studio`), after a free first month that needs no card. The older Growth plan is no longer sold but still works for existing subscribers. Checkout is created by the server function `createSubscriptionCheckout` in `src/lib/billing.functions.ts`. The Dodo API key and product IDs never reach the browser, and a studio cannot edit its own plan or billing status.
 - **Student fees (ledger-only).** Choreo Studio records what each student owes and what the studio says it received by cash, UPI or bank transfer. It does not process those payments.
 
 Fee plans are separate from batches. A batch says where a student dances; a fee-plan assignment says what that student owes. Two students in the same batch can pay different amounts, and past ledger charges keep the plan and amount that created them.

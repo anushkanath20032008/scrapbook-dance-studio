@@ -23,6 +23,7 @@ function Privacy() {
             <p>Studio accounts: owners store their dancers' names, phone numbers, fees, payments and attendance. Each studio can see only its own records.</p>
             <p>Payments: Choreo Studio keeps a record only. It does not process or hold dancers' money.</p>
             <p>Payment screenshots sent with a claim are optional and are deleted once the owner decides, or after 30 days.</p>
+            <p>Website analytics: on the public pages (home, sign-in, privacy and terms) we use Microsoft Clarity to see how visitors use the site, for example where they click. It is not loaded inside the studio console or on dancers' private links, so it never records dancers' names, numbers or payments.</p>
             <p>We do not sell your data.</p>
           </div>
         </div>

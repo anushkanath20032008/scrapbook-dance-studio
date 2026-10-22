@@ -10,7 +10,7 @@ import { getConsoleContext } from "@/lib/console.functions";
 export const Route = createFileRoute("/app")({
   head: () => ({
     meta: [
-      { title: "Console | Choreo Studio" },
+      { title: "Console | ChoreoStudio" },
       {
         name: "description",
         content: "Run your dance studio: fees, batches, students and attendance.",
@@ -89,7 +89,7 @@ function ConsoleLayout() {
         >
           ☰
         </button>
-        <span className="brand">Choreo Studio</span>
+        <span className="brand"><img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24"/>ChoreoStudio</span>
         <span className="console-studio">{context.data?.studioName || session.email}</span>
       </header>
       <div className="console-body">

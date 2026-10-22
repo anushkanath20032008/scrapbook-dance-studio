@@ -314,3 +314,6 @@ button { cursor:pointer; }
 .site-nav .brand, .nav-links a { white-space:nowrap; }
 @media(max-width:1000px){ .nav-links { gap:14px; } .nav-links a.nav-hide:nth-child(-n+2) { display:none; } }
 .trial-note { margin:10px 0 0; font-size:13px; font-weight:700; }
+.brand-mark { display:inline-block; vertical-align:middle; margin-right:8px; margin-top:-3px; }
+.brand-line { display:inline-flex; align-items:center; }
+.brand-line .brand-mark { margin:0 8px 0 0; }

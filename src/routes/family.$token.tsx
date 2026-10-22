@@ -15,7 +15,7 @@ import { claimInput } from "@/lib/schemas";
 export const Route = createFileRoute("/family/$token")({
   head: () => ({
     meta: [
-      { title: "Your classes and fees | Choreo Studio" },
+      { title: "Your classes and fees | ChoreoStudio" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

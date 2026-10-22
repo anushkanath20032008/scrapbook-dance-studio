@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 
 export const Route = createFileRoute("/app/setup")({
-  head: () => ({ meta: [{ title: "Set up your studio | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Set up your studio | ChoreoStudio" }] }),
   component: Setup,
 });
 

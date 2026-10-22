@@ -7,8 +7,8 @@ import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/pass
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset password | Choreo Studio" },
-      { name: "description", content: "Choose a new password for your Choreo Studio account." },
+      { title: "Reset password | ChoreoStudio" },
+      { name: "description", content: "Choose a new password for your ChoreoStudio account." },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

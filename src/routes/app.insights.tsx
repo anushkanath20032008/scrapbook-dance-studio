@@ -21,7 +21,7 @@ import { getMonthlyTrend } from "@/lib/reports.functions";
 import { todayInIndia } from "@/lib/validators";
 
 export const Route = createFileRoute("/app/insights")({
-  head: () => ({ meta: [{ title: "Insights | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Insights | ChoreoStudio" }] }),
   component: Insights,
 });
 

@@ -6,7 +6,7 @@ import { getMessagingStatus, listReminders } from "@/lib/reminders.functions";
 import { formatRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/messages")({
-  head: () => ({ meta: [{ title: "Messages | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Messages | ChoreoStudio" }] }),
   component: Messages,
 });
 

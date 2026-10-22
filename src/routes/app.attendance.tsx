@@ -11,7 +11,7 @@ import { listBatches } from "@/lib/batches.functions";
 import { todayInIndia } from "@/lib/validators";
 
 export const Route = createFileRoute("/app/attendance")({
-  head: () => ({ meta: [{ title: "Attendance | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Attendance | ChoreoStudio" }] }),
   component: Attendance,
 });
 

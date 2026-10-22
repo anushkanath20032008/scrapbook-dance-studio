@@ -11,7 +11,7 @@ import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
 
 export const Route = createFileRoute("/app/billing")({
-  head: () => ({ meta: [{ title: "Billing | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Billing | ChoreoStudio" }] }),
   component: Billing,
 });
 

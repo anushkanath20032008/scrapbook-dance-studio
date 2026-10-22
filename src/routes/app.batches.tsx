@@ -16,7 +16,7 @@ import { listBatches, saveBatch, setBatchArchived } from "@/lib/batches.function
 import { batchInput } from "@/lib/schemas";
 
 export const Route = createFileRoute("/app/batches")({
-  head: () => ({ meta: [{ title: "Batches | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Batches | ChoreoStudio" }] }),
   component: Batches,
 });
 

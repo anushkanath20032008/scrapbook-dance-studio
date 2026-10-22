@@ -12,7 +12,7 @@ import { formatRupees, parseRupees } from "@/lib/money";
 import { feePlanInput } from "@/lib/schemas";
 
 export const Route = createFileRoute("/app/plans")({
-  head: () => ({ meta: [{ title: "Fee plans | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Fee plans | ChoreoStudio" }] }),
   component: FeePlans,
 });
 

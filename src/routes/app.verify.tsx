@@ -17,7 +17,7 @@ import { formatDay, paymentMethodLabel } from "@/lib/format";
 import { formatRupees, parseRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/verify")({
-  head: () => ({ meta: [{ title: "To verify | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "To verify | ChoreoStudio" }] }),
   component: Verify,
 });
 

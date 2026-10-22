@@ -8,8 +8,8 @@ import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/pass
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in | Choreo Studio" },
-      { name: "description", content: "Sign in or create your Choreo Studio account." },
+      { title: "Sign in | ChoreoStudio" },
+      { name: "description", content: "Sign in or create your ChoreoStudio account." },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -102,7 +102,7 @@ function Login() {
   return (
     <main className="section login-page">
       <div className="wrap login-wrap">
-        <a href="/">← Choreo Studio</a>
+        <a href="/">← ChoreoStudio</a>
         <h1 className="display login-title">{headings[mode]}</h1>
         <div className="window">
           <div className="window-bar chrome-font">

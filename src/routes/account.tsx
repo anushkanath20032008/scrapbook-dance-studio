@@ -10,15 +10,15 @@ import { useServerFn } from "@tanstack/react-start";
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
-      { title: "Studio account | Choreo Studio" },
+      { title: "Studio account | ChoreoStudio" },
       {
         name: "description",
-        content: "Sign in or create a Choreo Studio account for your dance studio.",
+        content: "Sign in or create a ChoreoStudio account for your dance studio.",
       },
-      { property: "og:title", content: "Studio account | Choreo Studio" },
+      { property: "og:title", content: "Studio account | ChoreoStudio" },
       {
         property: "og:description",
-        content: "Manage your Choreo Studio account and studio details.",
+        content: "Manage your ChoreoStudio account and studio details.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -147,11 +147,11 @@ function Account() {
   return (
     <main className="section account-page">
       <div className="wrap account-wrap">
-        <a href="/">← Choreo Studio</a>
+        <a href="/">← ChoreoStudio</a>
         <h1 className="display">Studio account.</h1>
         <div className="window">
           <div className="window-bar">
-            <span className="chrome-font">Choreo Studio / account</span>
+            <span className="chrome-font">ChoreoStudio / account</span>
             <span className="window-controls">
               <i />
               <i />

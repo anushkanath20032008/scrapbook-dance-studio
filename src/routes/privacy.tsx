@@ -19,7 +19,7 @@ function Privacy() {
         <div className="window">
           <div className="window-bar chrome-font">Privacy.txt</div>
           <div className="window-inner">
-            <p>Waitlist: we keep your studio name, WhatsApp number and the answers you give, only to contact you about the demo and founding offer. <a href="/opt-out">Opt out</a> any time.</p>
+            <p>Walkthrough requests: we keep your studio name, WhatsApp number and the answers you give, only to contact you about your walkthrough. <a href="/opt-out">Opt out</a> any time.</p>
             <p>Studio accounts: owners store their dancers' names, phone numbers, fees, payments and attendance. Each studio can see only its own records.</p>
             <p>Payments: Choreo Studio keeps a record only. It does not process or hold dancers' money.</p>
             <p>Payment screenshots sent with a claim are optional and are deleted once the owner decides, or after 30 days.</p>

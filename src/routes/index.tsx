@@ -22,7 +22,8 @@ function Window({ title, children, className = "", count }: { title:string; chil
 }
 function Student({ name, batch, amount, status }: { name:string; batch:string; amount:string; status:"PAID"|"DUE"|"OVERDUE" }) {
   const color = status === "PAID" ? "var(--status-paid)" : status === "DUE" ? "var(--status-due)" : "var(--status-overdue)";
-  const ink = status === "DUE" ? "var(--ink)" : "var(--paper)";
+  // Ink text on every status colour: paper text on red or green is only about 2.7:1, ink is above 5:1.
+  const ink = "var(--ink)";
   return <div className="screen-row" style={{ "--status": color, "--status-ink": ink } as React.CSSProperties}><span><strong>{name}</strong><small>{batch} · {amount}</small></span><b>{status}</b></div>;
 }
 function Home() {

@@ -12,6 +12,14 @@ import { formatDayWithYear } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { claimInput } from "@/lib/schemas";
 
+const methodLabels: Record<string, string> = {
+  upi: "UPI",
+  bank: "Bank transfer",
+  cash: "Cash",
+  other: "Other",
+};
+const methodLabel = (method: string) => methodLabels[method] ?? method;
+
 export const Route = createFileRoute("/family/$token")({
   head: () => ({
     meta: [
@@ -49,7 +57,7 @@ function FamilyPage() {
     return (
       <main className="section login-page">
         <div className="wrap login-wrap">
-          <p>Loading…</p>
+          <p role="status">Opening your page…</p>
         </div>
       </main>
     );
@@ -61,39 +69,69 @@ function FamilyPage() {
           <p className="login-error" role="alert">
             {messageOf(view.error)}
           </p>
+          <p>Message your studio and ask for a fresh link. Nothing is wrong with your phone.</p>
         </div>
       </main>
     );
 
   const data = view.data;
   const students = data.students;
+  const owed = Object.fromEntries(students.map((s) => [s.id, s.balance_paise]));
+  const pendingTotal = (claims.data ?? [])
+    .filter((claim) => claim.status === "pending")
+    .reduce((sum, claim) => sum + claim.amount_paise, 0);
+  // The oldest fee not yet paid, so the dancer sees what the amount is for.
+  const unpaid = students
+    .flatMap((student) => student.charges)
+    .filter((charge) => charge.status !== "paid")
+    .sort((x, y) => x.due_on.localeCompare(y.due_on))[0];
+  const dueLine = unpaid ? `Due ${formatDayWithYear(unpaid.due_on)}.` : "";
 
   return (
     <main className="section login-page">
       <div className="wrap login-wrap">
-        <p className="console-hint">{data.studio_name ?? "Your studio"}</p>
+        <p className="console-hint">{data.studio_name || "Your studio"}</p>
         <h1 className="display login-title">
           Hello{data.guardian_name ? `, ${data.guardian_name}` : ""}.
         </h1>
 
-        <div className="totals">
-          <div className="totals-headline" data-tone={data.balance_paise > 0 ? "warn" : "good"}>
-            <span className="totals-label">{data.balance_paise < 0 ? "Credit" : "You owe"}</span>
+        <div className="family-owe" data-tone={data.balance_paise > 0 ? "warn" : "good"}>
+          <span className="totals-label">
+            {data.balance_paise > 0
+              ? "You owe"
+              : data.balance_paise < 0
+                ? "Credit with your studio"
+                : "You are all paid up"}
+          </span>
+          {data.balance_paise !== 0 && (
             <strong>{formatRupees(Math.abs(data.balance_paise))}</strong>
-          </div>
-          <div className="console-actions">
-            <Button
-              variant="retro"
-              type="button"
-              onClick={() => setOpen(true)}
-              disabled={students.length === 0}
-            >
-              I&apos;ve paid
-            </Button>
-          </div>
+          )}
+          {data.balance_paise > 0 && (
+            <span className="console-hint">
+              Pay your studio the way you usually do, then tell them here.
+              {dueLine ? ` ${dueLine}` : ""}
+            </span>
+          )}
+          {pendingTotal > 0 && (
+            <span className="family-pending" role="status">
+              You told your studio about {formatRupees(pendingTotal)}. They have not confirmed it
+              yet.
+            </span>
+          )}
         </div>
+        <Button
+          variant="retro"
+          type="button"
+          className="family-pay"
+          onClick={() => setOpen(true)}
+          disabled={students.length === 0}
+        >
+          {data.balance_paise > 0
+            ? `I’ve paid ${formatRupees(data.balance_paise)}`
+            : "I’ve paid something"}
+        </Button>
         {notice && (
-          <p role="status" className="console-notice">
+          <p role="status" className="family-success">
             ✓ {notice}
           </p>
         )}
@@ -120,7 +158,7 @@ function FamilyPage() {
                     <p key={index} className="family-line">
                       <strong>{formatRupees(payment.amount_paise)}</strong>
                       <span className="console-hint">
-                        {formatDayWithYear(payment.paid_on)} · {payment.method}
+                        {formatDayWithYear(payment.paid_on)} · {methodLabel(payment.method)}
                       </span>
                     </p>
                   ))}
@@ -130,7 +168,9 @@ function FamilyPage() {
           </section>
         ))}
 
-        <p className="console-hint">This is a private link from your studio. Don't share it.</p>
+        <p className="console-hint">
+          This is your own private link from your studio. Keep it to yourself.
+        </p>
 
         {claims.data && claims.data.length > 0 && (
           <>
@@ -141,7 +181,7 @@ function FamilyPage() {
                   <div>
                     <strong>{formatRupees(claim.amount_paise)}</strong>
                     <span className="console-hint">
-                      {formatDayWithYear(claim.paid_on)} · {claim.method}
+                      {formatDayWithYear(claim.paid_on)} · {methodLabel(claim.method)}
                       {claim.status === "rejected" && claim.decision_reason
                         ? ` · ${claim.decision_reason}`
                         : ""}
@@ -157,7 +197,11 @@ function FamilyPage() {
                           : "idle"
                     }
                   >
-                    {claim.status === "pending" ? "waiting for the studio" : claim.status}
+                    {claim.status === "pending"
+                      ? "Waiting for the studio"
+                      : claim.status === "confirmed"
+                        ? "Confirmed"
+                        : "Not accepted"}
                   </span>
                 </li>
               ))}
@@ -170,12 +214,14 @@ function FamilyPage() {
         {open && (
           <ClaimForm
             students={students.map((s) => ({ id: s.id, name: s.name }))}
+            owed={owed}
             parse={(fields) => claimInput.safeParse({ token, ...fields })}
             send={(data) => submit({ data })}
             onSent={() => void queryClient.invalidateQueries({ queryKey: ["my-claims", token] })}
             onDone={(message) => {
               setOpen(false);
               setNotice(message);
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             onCancel={() => setOpen(false)}
           />

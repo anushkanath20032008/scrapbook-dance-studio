@@ -35,6 +35,7 @@ type NavTo =
   | "/app/plans"
   | "/app/billing"
   | "/app/attendance"
+  | "/app/month-end"
   | "/app/insights"
   | "/app/messages"
   | "/app/verify";
@@ -45,6 +46,7 @@ const dailyItems: { to: NavTo; label: string; exact: boolean }[] = [
   { to: "/app/students", label: "Dancers", exact: false },
   { to: "/app/billing", label: "Billing", exact: false },
   { to: "/app/verify", label: "To verify", exact: false },
+  { to: "/app/month-end", label: "Month end", exact: false },
   { to: "/app/attendance", label: "Attendance", exact: false },
   { to: "/app/insights", label: "Insights", exact: false },
 ];

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { formatRupees } from "@/lib/money";
-import { whatsappLink, type ReminderRow } from "@/lib/manual-reminders";
+import { reminderText, whatsappLink, type ReminderRow } from "@/lib/manual-reminders";
 
 type Row = ReminderRow & { days_overdue?: number | null; status?: string };
 
@@ -34,13 +34,15 @@ export function WhatsAppBatchDialog({
   }, [rows, studioName]);
   const remaining = usable.filter((item) => !reminded.has(item.row.charge_id));
   const next = remaining[0];
+  const position = usable.length - remaining.length + 1;
 
   return (
     <ConsoleDialog open={open} onOpenChange={(value) => !value && onClose()} title="Remind on WhatsApp">
       {next ? (
         <>
           <p className="console-hint">
-            {remaining.length} left. Open each chat, press Send in WhatsApp, then come back for the next.
+            {position} of {usable.length}. This opens your own WhatsApp with the message ready. Press Send
+            there, then come back here for the next one.
           </p>
           <div className="console-row">
             <div>
@@ -50,12 +52,14 @@ export function WhatsAppBatchDialog({
               </span>
             </div>
           </div>
+          <blockquote className="reminder-preview">{reminderText(next.row, studioName)}</blockquote>
           <div className="console-form-actions">
             <Button asChild variant="retro">
               <a
                 href={next.link}
                 target="_blank"
                 rel="noreferrer"
+                autoFocus
                 onClick={() => onOpened(next.row.charge_id)}
               >
                 Open WhatsApp for {next.row.student_name}
@@ -81,7 +85,7 @@ export function WhatsAppBatchDialog({
       )}
       <div className="console-form-actions">
         <Button variant="retroPaper" type="button" onClick={onClose}>
-          Close
+          {next ? "Stop here" : "Close"}
         </Button>
       </div>
     </ConsoleDialog>

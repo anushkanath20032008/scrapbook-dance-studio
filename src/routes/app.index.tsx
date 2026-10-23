@@ -3,6 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
@@ -69,11 +70,11 @@ function Overview() {
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
     onSuccess: ({ created }) => {
       setError("");
-      setNotice(
-        created === 0
-          ? "No charges created. Dancers need a monthly fee that covers this month."
-          : `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
-      );
+      if (created === 0) setNotice("No charges created. Dancers need a monthly fee that covers this month.");
+      else
+        toast.success(
+          `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
+        );
       void queryClient.invalidateQueries({ queryKey: ["home-report"] });
     },
     onError: (e) => setError(messageOf(e)),
@@ -83,6 +84,8 @@ function Overview() {
   const unpaidRows = report.data?.unpaid ?? [];
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
+  // A studio with nothing charged yet starts with the checklist; later it moves to the bottom.
+  const showSetupFirst = !setupDone && counts.data !== undefined && (snapshot?.charged_students ?? 0) === 0;
   const defaultDue = `${month}-05`;
 
   return (
@@ -107,6 +110,15 @@ function Overview() {
         </label>
       </div>
 
+      {showSetupFirst && (
+        <div className="window setup-card">
+          <div className="window-bar chrome-font">Setup.dialog</div>
+          <div className="window-inner">
+            <SetupChecklist />
+          </div>
+        </div>
+      )}
+      {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
       {snapshot && <MonthTotals snapshot={snapshot} />}
 
@@ -229,13 +241,10 @@ function Overview() {
       <RecordPaymentDialog
         student={paying}
         onClose={() => setPaying(null)}
-        onSaved={(message) => {
-          setError("");
-          setNotice(message);
-        }}
+        onSaved={() => setError("")}
       />
 
-      {!setupDone && (
+      {!setupDone && !showSetupFirst && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Setup.dialog</div>
           <div className="window-inner">

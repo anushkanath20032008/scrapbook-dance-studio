@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
@@ -31,15 +32,17 @@ export function UnpaidList({
   showQueue: boolean;
 }) {
   if (rows.length === 0)
-    return <p className="console-empty">Nobody owes anything for this month.</p>;
+    return <p className="console-empty">✓ Everyone has paid for this month. Nothing to chase.</p>;
   return (
     <ul className="console-list">
       {rows.map((row) => (
         <li key={row.charge_id} className="console-row unpaid-row">
           <div>
-            <strong>{row.student_name}</strong>
+            <Link to="/app/billing" search={{ student: row.student_id }} className="row-link">
+              <strong>{row.student_name}</strong>
+            </Link>
             <span className="console-hint">
-              {row.phone ?? "No phone"} · due {formatDay(row.due_on)}
+              {row.phone ?? "No phone number yet"}
             </span>
           </div>
           <div className="unpaid-owed">

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useRefreshMoney } from "@/components/console/console-data";
@@ -29,7 +30,6 @@ function Verify() {
   const loadQueue = useServerFn(listClaimQueue);
   const screenshotFn = useServerFn(getClaimScreenshotUrl);
   const [deciding, setDeciding] = useState<{ claim: Claim; mode: Mode } | null>(null);
-  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
   const queue = useQuery({ queryKey: ["claim-queue"], queryFn: () => loadQueue() });
@@ -52,15 +52,14 @@ function Verify() {
         A dancer says they paid. Nothing changes until you confirm it. Check the reference number
         against your own bank or UPI statement.
       </p>
-      {notice && (
-        <p role="status" className="console-notice">
-          ✓ {notice}
-        </p>
-      )}
       <FormAlert message={error} />
+      {queue.isPending && <p className="console-empty">Loading…</p>}
       {queue.isError && <p role="alert">Could not load the claims. Please refresh.</p>}
       {queue.data && rows.length === 0 && (
-        <p className="console-empty">Nothing is waiting to be checked.</p>
+        <p className="console-empty">
+          ✓ Nothing is waiting. When a dancer says they paid from their link, it shows up here for you
+          to confirm.
+        </p>
       )}
       <ul className="console-list">
         {rows.map((claim) => (
@@ -153,7 +152,7 @@ function Verify() {
             onClose={() => setDeciding(null)}
             onDone={(message) => {
               setError("");
-              setNotice(message);
+              toast.success(message);
               void queryClient.invalidateQueries({ queryKey: ["claim-queue"] });
             }}
           />
@@ -299,6 +298,7 @@ function Decision({
         <Button
           variant="retro"
           type="button"
+          autoFocus={mode === "confirm"}
           disabled={
             confirm.isPending ||
             reject.isPending ||

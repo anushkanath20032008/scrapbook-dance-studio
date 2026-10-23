@@ -1,6 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useRefreshMoney } from "@/components/console/console-data";
@@ -68,19 +69,32 @@ function PaymentForm({
 
   const paise = parseRupees(amount);
   const typed = paise !== null && paise > 0;
+  // One lookup per dancer: what they owe. The excess and the balance left are worked out here as the owner types,
+  // so typing never waits on the server (the server still checks it all again when the payment is saved).
   const comparison = useQuery({
-    queryKey: ["payment-check", student.id, paise ?? 1],
-    queryFn: () => check({ data: { studentId: student.id, amountPaise: paise ?? 1 } }),
+    queryKey: ["payment-check", student.id],
+    queryFn: () => check({ data: { studentId: student.id, amountPaise: 1 } }),
   });
   const owed = comparison.data?.owed_paise;
-  const excess = typed ? (comparison.data?.excess_paise ?? 0) : 0;
-  const remaining = typed ? (comparison.data?.remaining_paise ?? 0) : 0;
+  const excess = typed && paise !== null && owed !== undefined ? Math.max(0, paise - owed) : 0;
+  const remaining = typed && paise !== null && owed !== undefined ? Math.max(0, owed - paise) : 0;
+
+  // Most payments settle what is owed, so start with that amount selected: Enter records it, typing replaces it.
+  const amountInput = useRef<HTMLInputElement>(null);
+  const edited = useRef(false);
+  useEffect(() => {
+    if (owed === undefined || owed <= 0 || edited.current) return;
+    setAmount(String(owed / 100));
+    requestAnimationFrame(() => amountInput.current?.select());
+  }, [owed]);
 
   const mutation = useMutation({
     mutationFn: (data: Parameters<typeof record>[0]["data"]) => record({ data }),
     onSuccess: (_row, variables) => {
       refresh();
-      onSaved(`Payment of ${formatRupees(variables.amountPaise)} recorded for ${student.name}.`);
+      const message = `Recorded ${formatRupees(variables.amountPaise)} from ${student.name}.`;
+      toast.success(message);
+      onSaved(message);
       onClose();
     },
     onError: (error) => setFormError(messageOf(error)),
@@ -113,16 +127,20 @@ function PaymentForm({
     <form className="console-form" onSubmit={submit} noValidate>
       <p className="pay-owed">
         Owed now <strong>{owed === undefined ? "…" : formatRupees(owed)}</strong>
+        {owed === 0 && <span className="console-hint">Nothing is due. A payment now is kept as credit.</span>}
       </p>
       <Field label="Amount received (₹)" error={errors["amountPaise"]}>
         <input
           className="field"
           inputMode="decimal"
           value={amount}
+          ref={amountInput}
           onChange={(event) => {
+            edited.current = true;
             setAmount(event.target.value);
             setAcknowledged(false);
           }}
+          onFocus={(event) => event.target.select()}
           placeholder="1,500"
           autoFocus
         />
@@ -205,7 +223,7 @@ function PaymentForm({
           type="submit"
           disabled={mutation.isPending || !typed || (excess > 0 && !acknowledged)}
         >
-          Record payment
+          {typed && paise !== null ? `Record ${formatRupees(paise)}` : "Record payment"}
         </Button>
         <Button variant="retroPaper" type="button" onClick={onClose}>
           Cancel

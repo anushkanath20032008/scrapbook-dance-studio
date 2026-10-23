@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf, weekdayNames } from "@/components/console/form-utils";
@@ -17,6 +18,15 @@ export const Route = createFileRoute("/app/attendance")({
 
 type Marks = Record<string, boolean | null>;
 
+const LAST_BATCH = "choreo-last-attendance-batch";
+const lastBatch = () => {
+  try {
+    return window.localStorage.getItem(LAST_BATCH) ?? "";
+  } catch {
+    return "";
+  }
+};
+
 function Attendance() {
   const queryClient = useQueryClient();
   const listBatchesFn = useServerFn(listBatches);
@@ -31,6 +41,7 @@ function Attendance() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [range, setRange] = useState<RangeKind>("month");
+  const [startedAllPresent, setStartedAllPresent] = useState(false);
 
   const batches = useQuery({
     queryKey: ["batches", false],
@@ -47,10 +58,29 @@ function Attendance() {
     queryFn: () => summaryFn({ data: { from, to } }),
   });
 
-  // Start from what is already saved for that class, so a mark can be changed.
+  // Pick the batch for the owner: the last one used, the only one, or the one that meets today.
+  useEffect(() => {
+    if (batchId !== "" || !batches.data || batches.data.length === 0) return;
+    const list = batches.data;
+    const weekday = new Date(`${today}T00:00:00`).getDay();
+    const pick =
+      list.find((batch) => batch.id === lastBatch()) ??
+      (list.length === 1 ? list[0] : undefined) ??
+      list.find((batch) => batch.weekdays.includes(weekday));
+    if (pick) setBatchId(pick.id);
+  }, [batches.data, batchId, today]);
+
+  // Start from what is already saved for that class, so a mark can be changed. A class with nothing saved starts with
+  // everyone present, because that is the usual day: the owner only taps the ones who missed.
   useEffect(() => {
     if (!roster.data) return;
-    setMarks(Object.fromEntries(roster.data.map((row) => [row.student_id, row.present])));
+    const saved = roster.data.some((row) => row.present !== null);
+    setStartedAllPresent(!saved && roster.data.length > 0);
+    setMarks(
+      Object.fromEntries(
+        roster.data.map((row) => [row.student_id, saved ? row.present : true]),
+      ),
+    );
   }, [roster.data]);
 
   const save = useMutation({
@@ -68,7 +98,17 @@ function Attendance() {
     },
     onSuccess: ({ marked }) => {
       setError("");
-      setNotice(`Saved ${marked} mark${marked === 1 ? "" : "s"}.`);
+      setNotice("");
+      setStartedAllPresent(false);
+      try {
+        window.localStorage.setItem(LAST_BATCH, batchId);
+      } catch {
+        // Remembering the batch is a convenience only.
+      }
+      const absent = Object.values(marks).filter((value) => value === false).length;
+      toast.success(
+        `Attendance saved: ${marked - absent} present${absent > 0 ? `, ${absent} absent` : ""}.`,
+      );
       void queryClient.invalidateQueries({ queryKey: ["batch-day"] });
       void queryClient.invalidateQueries({ queryKey: ["attendance-summary"] });
     },
@@ -80,6 +120,8 @@ function Attendance() {
 
   const rows = roster.data ?? [];
   const anyMarked = Object.values(marks).some((value) => value !== null && value !== undefined);
+  const presentCount = Object.values(marks).filter((value) => value === true).length;
+  const absentCount = Object.values(marks).filter((value) => value === false).length;
   const setAll = (present: boolean) =>
     setMarks(Object.fromEntries(rows.map((row) => [row.student_id, present])));
 
@@ -125,15 +167,30 @@ function Attendance() {
             </label>
           </div>
 
+          {batches.data?.length === 0 && (
+            <p className="console-empty">
+              Add a batch first, then mark who came to class.{" "}
+              <Link to="/app/batches" className="setup-go">
+                Add a batch
+              </Link>
+            </p>
+          )}
           {batchId && roster.isPending && <p>Loading the roster…</p>}
           {batchId && roster.isError && (
             <p role="alert">Could not load this class. Please refresh.</p>
           )}
           {batchId && roster.data && rows.length === 0 && (
-            <p className="console-empty">No dancers are on this batch for that date.</p>
+            <p className="console-empty">
+              No dancers are on this batch for that date. Add dancers to it on the Dancers page.
+            </p>
           )}
           {rows.length > 0 && (
             <>
+              {startedAllPresent && (
+                <p className="console-hint">
+                  Everyone starts as present. Tap Absent for anyone who missed class, then save.
+                </p>
+              )}
               <ul className="console-list">
                 {rows.map((row) => {
                   const mark = marks[row.student_id] ?? null;
@@ -168,7 +225,7 @@ function Attendance() {
                   );
                 })}
               </ul>
-              <div className="console-actions">
+              <div className="attend-bar">
                 <Button
                   variant="retro"
                   type="button"
@@ -178,8 +235,11 @@ function Attendance() {
                   Save attendance
                 </Button>
                 <Button variant="retroPaper" type="button" onClick={() => setAll(true)}>
-                  Mark all present
+                  All present
                 </Button>
+                <span className="attend-count">
+                  {presentCount} present · {absentCount} absent
+                </span>
               </div>
             </>
           )}
@@ -227,7 +287,7 @@ function Attendance() {
           </li>
         ))}
       </ul>
-      {summary.data?.batches.length === 0 && <p className="console-empty">No batches yet.</p>}
+      {summary.data?.batches.length === 0 && <p className="console-empty">No batches yet. Add one on the Batches page.</p>}
 
       <div className="console-list-head">
         <h2>Dancers</h2>

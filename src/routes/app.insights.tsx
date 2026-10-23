@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -46,6 +46,7 @@ function Insights() {
     Billed: row.billed_paise / 100,
     Collected: row.collected_paise / 100,
   }));
+  const hasMoney = (trend.data ?? []).some((row) => row.billed_paise > 0);
   const memberCount = new Map(batches.data?.map((batch) => [batch.id, batch.member_count]));
 
   return (
@@ -56,7 +57,14 @@ function Insights() {
         <div className="window-bar chrome-font">Billed vs collected, last 6 months</div>
         <div className="window-inner">
           {trend.isError && <p role="alert">Could not load the trend. Please refresh.</p>}
-          {trend.data && (
+          {trend.isPending && <p className="console-hint">Loading…</p>}
+          {trend.data && !hasMoney && (
+            <p className="console-empty">
+              Nothing billed yet, so there is nothing to chart. Generate this month&apos;s charges on{" "}
+              <Link to="/app">Overview</Link>.
+            </p>
+          )}
+          {trend.data && hasMoney && (
             <div
               className="trend-chart"
               role="img"
@@ -78,7 +86,7 @@ function Insights() {
               </ResponsiveContainer>
             </div>
           )}
-          {trend.data && (
+          {trend.data && hasMoney && (
             <table className="trend-table">
               <caption className="sr-only">Billed, collected and missing per month</caption>
               <thead>
@@ -107,7 +115,9 @@ function Insights() {
       <div className="console-list-head">
         <h2>Batches this month</h2>
       </div>
-      {summary.data?.batches.length === 0 && <p className="console-empty">No batches yet.</p>}
+      {summary.data?.batches.length === 0 && <p className="console-empty">
+          No batches yet. <Link to="/app/batches">Add one</Link> to see classes held.
+        </p>}
       <ul className="batch-cards">
         {summary.data?.batches.map((batch) => (
           <li key={batch.id} className="batch-card">

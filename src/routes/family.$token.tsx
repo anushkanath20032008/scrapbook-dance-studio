@@ -80,6 +80,7 @@ function FamilyPage() {
   const pendingTotal = (claims.data ?? [])
     .filter((claim) => claim.status === "pending")
     .reduce((sum, claim) => sum + claim.amount_paise, 0);
+  const allReported = data.balance_paise > 0 && pendingTotal >= data.balance_paise;
   // The oldest fee not yet paid, so the dancer sees what the amount is for.
   const unpaid = students
     .flatMap((student) => student.charges)
@@ -119,16 +120,19 @@ function FamilyPage() {
             </span>
           )}
         </div>
+        {/* Once the whole balance is already reported, the big yellow button steps back so it does not invite a duplicate. */}
         <Button
-          variant="retro"
+          variant={allReported ? "retroPaper" : "retro"}
           type="button"
           className="family-pay"
           onClick={() => setOpen(true)}
           disabled={students.length === 0}
         >
-          {data.balance_paise > 0
-            ? `I’ve paid ${formatRupees(data.balance_paise)}`
-            : "I’ve paid something"}
+          {allReported
+            ? "I paid a different amount"
+            : data.balance_paise > 0
+              ? `I’ve paid ${formatRupees(data.balance_paise)}`
+              : "I’ve paid something"}
         </Button>
         {notice && (
           <p role="status" className="family-success">

@@ -1,5 +1,6 @@
 import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
+import { todayInIndia } from "@/lib/validators";
 
 export type ReminderRow = {
   charge_id: string;
@@ -13,9 +14,12 @@ export type ReminderRow = {
 export function reminderText(
   row: Pick<ReminderRow, "student_name" | "outstanding_paise" | "due_on">,
   studioName = "",
+  today: string = todayInIndia(),
 ): string {
   const from = studioName.trim() ? ` from ${studioName.trim()}` : "";
-  return `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} was due on ${formatDay(row.due_on)}. Thank you!`;
+  // A fee that is not late yet "is due"; one past its date "was due".
+  const verb = row.due_on < today ? "was due on" : "is due on";
+  return `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} ${verb} ${formatDay(row.due_on)}. Thank you!`;
 }
 
 /** A wa.me link with the reminder filled in, or null when the number cannot be used. */

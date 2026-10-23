@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FormAlert } from "@/components/console/form-helpers";
 import { fieldErrors, messageOf, type FieldErrors } from "@/components/console/form-utils";
 import { supabase } from "@/integrations/supabase/client";
-import { parseRupees } from "@/lib/money";
+import { formatRupees, parseRupees } from "@/lib/money";
 import { MAX_SCREENSHOT_BYTES, SCREENSHOT_BUCKET, screenshotMimeTypes } from "@/lib/schemas";
 import { todayInIndia } from "@/lib/validators";
 
@@ -35,6 +35,7 @@ type Parsed<T> = { success: true; data: T } | { success: false; error: ZodError 
  */
 export function ClaimForm<T>({
   students,
+  owed,
   parse,
   send,
   onSent,
@@ -42,6 +43,8 @@ export function ClaimForm<T>({
   onCancel,
 }: {
   students: { id: string; name: string }[];
+  /** What each dancer owes, in paise, by dancer id. The amount starts at this, so most dancers only tap Send. */
+  owed?: Record<string, number>;
   parse: (fields: ClaimFields) => Parsed<T>;
   send: (data: T) => Promise<{ upload: { path: string; token: string } | null }>;
   onSent?: () => void;
@@ -49,7 +52,12 @@ export function ClaimForm<T>({
   onCancel: () => void;
 }) {
   const [studentId, setStudentId] = useState(students[0]?.id ?? "");
-  const [amount, setAmount] = useState("");
+  const owedFor = (id: string) => {
+    const paise = owed?.[id] ?? 0;
+    return paise > 0 ? String(paise / 100) : "";
+  };
+  const [amount, setAmount] = useState(() => owedFor(students[0]?.id ?? ""));
+  const [amountEdited, setAmountEdited] = useState(false);
   const [method, setMethod] = useState<(typeof methods)[number]["value"]>("upi");
   const [paidOn, setPaidOn] = useState(todayInIndia());
   const [reference, setReference] = useState("");
@@ -118,14 +126,21 @@ export function ClaimForm<T>({
     mutation.mutate(parsed.data);
   }
 
+  const rupees = parseRupees(amount);
+  const owedNow = owed?.[studentId] ?? 0;
+  const needsReference = method === "upi" || method === "bank";
+
   return (
-    <form className="console-form" onSubmit={onSubmit} noValidate>
+    <form className="console-form claim-form" onSubmit={onSubmit} noValidate>
       {students.length > 1 && (
         <Field label="Who is this for?">
           <select
             className="field"
             value={studentId}
-            onChange={(event) => setStudentId(event.target.value)}
+            onChange={(event) => {
+              setStudentId(event.target.value);
+              if (!amountEdited) setAmount(owedFor(event.target.value));
+            }}
           >
             {students.map((student) => (
               <option key={student.id} value={student.id}>
@@ -135,29 +150,62 @@ export function ClaimForm<T>({
           </select>
         </Field>
       )}
-      <Field label="Amount you paid (₹)" error={errors["amountPaise"]}>
+      <Field
+        label="Amount you paid (₹)"
+        error={errors["amountPaise"]}
+        hint={
+          owedNow > 0
+            ? `You owe ${formatRupees(owedNow)}. Change it if you paid a different amount.`
+            : undefined
+        }
+      >
         <input
-          className="field"
+          className="field claim-amount"
           inputMode="decimal"
           value={amount}
-          onChange={(event) => setAmount(event.target.value)}
+          onChange={(event) => {
+            setAmount(event.target.value);
+            setAmountEdited(true);
+          }}
           placeholder="1,500"
         />
       </Field>
-      <div className="console-two">
-        <Field label="How did you pay?">
-          <select
+      <div className="field-group">
+        <span className="form-label">How did you pay?</span>
+        <div className="claim-methods" role="radiogroup" aria-label="How did you pay?">
+          {methods.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              role="radio"
+              aria-checked={method === item.value}
+              data-on={method === item.value}
+              onClick={() => setMethod(item.value)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {needsReference && (
+        <Field
+          label={method === "upi" ? "UPI transaction ID" : "Bank reference (UTR)"}
+          error={errors["reference"]}
+          hint="Your studio uses this to find the payment. In your UPI or bank app, open the payment and copy the transaction ID."
+        >
+          <input
             className="field"
-            value={method}
-            onChange={(event) => setMethod(event.target.value as typeof method)}
-          >
-            {methods.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+            value={reference}
+            onChange={(event) => setReference(event.target.value)}
+            maxLength={100}
+            autoComplete="off"
+            autoCapitalize="characters"
+            autoFocus
+          />
         </Field>
+      )}
+      <details className="claim-more" open={Boolean(errors["paidOn"] || errors["file"])}>
+        <summary>Paid on another day, or add a screenshot (optional)</summary>
         <Field label="Paid on" error={errors["paidOn"]}>
           <input
             className="field"
@@ -167,37 +215,27 @@ export function ClaimForm<T>({
             onChange={(event) => setPaidOn(event.target.value)}
           />
         </Field>
-      </div>
-      {(method === "upi" || method === "bank") && (
-        <Field
-          label="Reference number"
-          error={errors["reference"]}
-          hint="The UPI transaction or UTR number."
-        >
+        <Field label="Screenshot" error={errors["file"]}>
           <input
             className="field"
-            value={reference}
-            onChange={(event) => setReference(event.target.value)}
-            maxLength={100}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={(event) => pickFile(event.target.files?.[0] ?? null)}
           />
         </Field>
-      )}
-      <Field label="Screenshot (optional)" error={errors["file"]}>
-        <input
-          className="field"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          onChange={(event) => pickFile(event.target.files?.[0] ?? null)}
-        />
-      </Field>
-      <p className="console-hint privacy-note">
-        A screenshot can show your name, UPI ID and phone number. Your studio uses it only to check
-        this payment, and it is deleted once they decide. You can leave it out.
-      </p>
+        <p className="console-hint privacy-note">
+          A screenshot can show your name, UPI ID and phone number. Your studio uses it only to
+          check this payment, and it is deleted once they decide. You can leave it out.
+        </p>
+      </details>
       <FormAlert message={formError} />
       <div className="console-actions">
         <Button variant="retro" type="submit" disabled={mutation.isPending}>
-          Send to my studio
+          {mutation.isPending
+            ? "Sending…"
+            : rupees !== null && rupees > 0
+              ? `Send: I paid ${formatRupees(rupees)}`
+              : "Send to my studio"}
         </Button>
         <Button variant="retroPaper" type="button" onClick={onCancel}>
           Cancel

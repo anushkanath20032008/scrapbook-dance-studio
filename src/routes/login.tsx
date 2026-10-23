@@ -1,12 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
+import { PasswordField } from "@/components/password-field";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
-import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
+import {
+  authProblem,
+  checkPassword,
+  explainAuthError,
+  isExistingAccount,
+  passwordMeetsRubric,
+} from "@/lib/password-rubric";
 
 export const Route = createFileRoute("/login")({
+  // Read on the server too, so the page opens on Register at once and never flashes Sign in first.
+  validateSearch: (search: Record<string, unknown>): { mode?: "register" | "forgot" } =>
+    search["mode"] === "register" || search["mode"] === "forgot" ? { mode: search["mode"] } : {},
   head: () => ({
     meta: [
       { title: "Sign in | ChoreoStudio" },
@@ -28,15 +38,18 @@ const headings: Record<Mode, string> = {
 function Login() {
   const navigate = useNavigate();
   const session = useOwnerSession();
-  const [mode, setMode] = useState<Mode>("sign-in");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(search.mode ?? "sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   // A pop-up the person cannot miss after we send an email, with a way to send it again.
   const [sentTo, setSentTo] = useState<{ email: string; kind: "confirm" | "reset" } | null>(null);
   const [resendNote, setResendNote] = useState("");
   const [error, setError] = useState("");
+  // What the person can do about the error: sign-in problems point at a reset, an unconfirmed email at a resend.
+  const [fix, setFix] = useState<"reset" | "resend" | "existing" | null>(null);
   const [busy, setBusy] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
 
   // Someone who is already signed in goes straight to the console.
   useEffect(() => {
@@ -44,46 +57,51 @@ function Login() {
   }, [session.status, navigate]);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("mode") === "register") setMode("register");
-  }, []);
-
-  useEffect(() => {
     setError("");
-    setMessage("");
+    setFix(null);
+    emailRef.current?.focus();
   }, [mode]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setMessage("");
     setError("");
+    setFix(null);
+    const address = email.trim();
     try {
       if (mode === "forgot") {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(address, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        setSentTo({ email, kind: "reset" });
+        setSentTo({ email: address, kind: "reset" });
         setResendNote("");
       } else if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
-          email,
+        const { data, error } = await supabase.auth.signUp({
+          email: address,
           password,
           options: { emailRedirectTo: `${window.location.origin}/app` },
         });
         if (error) throw error;
-        setSentTo({ email, kind: "confirm" });
-        setResendNote("");
+        if (isExistingAccount(data.user)) {
+          setError("There is already an account with this email.");
+          setFix("existing");
+        } else if (data.session) {
+          void navigate({ to: "/app" });
+        } else {
+          setSentTo({ email: address, kind: "confirm" });
+          setResendNote("");
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ email: address, password });
         if (error) throw error;
       }
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? explainAuthError(caught.message)
-          : "Something went wrong. Please try again.",
-      );
+      const message = caught instanceof Error ? caught.message : "";
+      setError(message ? explainAuthError(message) : "Something went wrong. Please try again.");
+      const problem = authProblem(message);
+      if (problem === "wrong-login") setFix("reset");
+      if (problem === "unconfirmed") setFix("resend");
     } finally {
       setBusy(false);
     }
@@ -94,7 +112,11 @@ function Login() {
     setResendNote("Sending...");
     const { error: resendError } =
       sentTo.kind === "confirm"
-        ? await supabase.auth.resend({ type: "signup", email: sentTo.email })
+        ? await supabase.auth.resend({
+            type: "signup",
+            email: sentTo.email,
+            options: { emailRedirectTo: `${window.location.origin}/app` },
+          })
         : await supabase.auth.resetPasswordForEmail(sentTo.email, {
             redirectTo: `${window.location.origin}/reset-password`,
           });
@@ -105,10 +127,26 @@ function Login() {
     );
   }
 
+  async function resendFromSignIn() {
+    const address = email.trim();
+    setBusy(true);
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email: address,
+      options: { emailRedirectTo: `${window.location.origin}/app` },
+    });
+    setBusy(false);
+    if (resendError) return setError(explainAuthError(resendError.message));
+    setFix(null);
+    setError("");
+    setSentTo({ email: address, kind: "confirm" });
+    setResendNote("");
+  }
+
   async function continueWithGoogle() {
     setBusy(true);
-    setMessage("");
     setError("");
+    setFix(null);
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -117,9 +155,13 @@ function Login() {
         queryParams: { prompt: "select_account" },
       },
     });
-    if (oauthError) setError(oauthError.message);
+    if (oauthError)
+      setError("Google sign-in did not start. Use your email and password, or try again.");
     setBusy(false);
   }
+
+  const registering = mode === "register";
+  const rubricMet = passwordMeetsRubric(password, email);
 
   return (
     <main className="section login-page">
@@ -128,7 +170,7 @@ function Login() {
         <h1 className="display login-title">{headings[mode]}</h1>
         <div className="window">
           <div className="window-bar chrome-font">
-            {mode === "register" ? "Register.dialog" : "Sign-in.dialog"}
+            {registering ? "Register.dialog" : "Sign-in.dialog"}
           </div>
           <div className="window-inner">
             {mode !== "forgot" && (
@@ -145,56 +187,57 @@ function Login() {
                 <Button
                   type="button"
                   role="tab"
-                  aria-selected={mode === "register"}
-                  variant={mode === "register" ? "retro" : "retroPaper"}
+                  aria-selected={registering}
+                  variant={registering ? "retro" : "retroPaper"}
                   onClick={() => setMode("register")}
                 >
                   Register
                 </Button>
               </div>
             )}
+            {registering && (
+              <p className="console-hint login-lede">Free for your first month. No card needed.</p>
+            )}
+            {mode === "forgot" && (
+              <p className="console-hint login-lede">
+                Enter your email and we will send a link to choose a new password.
+              </p>
+            )}
             <form onSubmit={submit}>
               <label className="form-label">
                 Email
                 <input
+                  ref={emailRef}
                   className="field"
                   type="email"
+                  inputMode="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
                   maxLength={255}
                   autoComplete="email"
+                  autoCapitalize="none"
+                  autoFocus
                   aria-invalid={error !== "" && mode === "forgot"}
                 />
               </label>
-              {error !== "" && mode === "forgot" && (
-                <p role="alert" className="login-error">
-                  {error}
-                </p>
-              )}
               {mode !== "forgot" && (
                 <label className="form-label login-field">
                   Password
-                  <input
-                    className="field"
-                    type="password"
+                  <PasswordField
                     value={password}
                     onChange={(event) => {
                       setPassword(event.target.value);
                       setError("");
+                      setFix(null);
                     }}
                     aria-invalid={error !== ""}
                     required
-                    autoComplete={mode === "register" ? "new-password" : "current-password"}
+                    autoComplete={registering ? "new-password" : "current-password"}
                   />
                 </label>
               )}
-              {error !== "" && mode !== "forgot" && (
-                <p role="alert" className="login-error">
-                  {error}
-                </p>
-              )}
-              {mode === "register" && (
+              {registering && (
                 <ul className="login-rubric" aria-label="Password requirements">
                   {checkPassword(password, email).map((rule) => (
                     <li key={rule.id} data-met={rule.met}>
@@ -203,31 +246,71 @@ function Login() {
                   ))}
                 </ul>
               )}
+              {error !== "" && (
+                <p role="alert" className="login-error">
+                  {error}
+                </p>
+              )}
+              {fix === "reset" && (
+                <p className="login-fix">
+                  <button type="button" className="text-link" onClick={() => setMode("forgot")}>
+                    Reset your password
+                  </button>
+                </p>
+              )}
+              {fix === "resend" && (
+                <p className="login-fix">
+                  <button
+                    type="button"
+                    className="text-link"
+                    onClick={() => void resendFromSignIn()}
+                    disabled={busy}
+                  >
+                    Send the confirmation email again
+                  </button>
+                </p>
+              )}
+              {fix === "existing" && (
+                <p className="login-fix">
+                  <button type="button" className="text-link" onClick={() => setMode("sign-in")}>
+                    Sign in instead
+                  </button>
+                  {" · "}
+                  <button type="button" className="text-link" onClick={() => setMode("forgot")}>
+                    Forgot your password?
+                  </button>
+                </p>
+              )}
               <div className="login-actions">
                 <Button
                   variant="retro"
                   type="submit"
-                  disabled={busy || (mode === "register" && !passwordMeetsRubric(password, email))}
+                  disabled={busy || (registering && !rubricMet)}
                 >
-                  {mode === "forgot"
-                    ? "Send reset link"
-                    : mode === "register"
-                      ? "Create account"
-                      : "Sign in"}
+                  {busy
+                    ? "One moment…"
+                    : mode === "forgot"
+                      ? "Send reset link"
+                      : registering
+                        ? "Create account"
+                        : "Sign in"}
                 </Button>
               </div>
             </form>
             {mode !== "forgot" && (
-              <div className="login-actions">
-                <Button
-                  variant="retroPaper"
-                  type="button"
-                  onClick={continueWithGoogle}
-                  disabled={busy}
-                >
-                  Continue with Google
-                </Button>
-              </div>
+              <>
+                <p className="login-or">or</p>
+                <div className="login-actions login-actions-tight">
+                  <Button
+                    variant="retroPaper"
+                    type="button"
+                    onClick={continueWithGoogle}
+                    disabled={busy}
+                  >
+                    Continue with Google
+                  </Button>
+                </div>
+              </>
             )}
             <p className="login-links">
               {mode === "forgot" ? (
@@ -240,7 +323,7 @@ function Login() {
                 >
                   Back to sign in
                 </a>
-              ) : (
+              ) : mode === "sign-in" ? (
                 <a
                   href="#"
                   onClick={(event) => {
@@ -250,10 +333,7 @@ function Login() {
                 >
                   Forgot password?
                 </a>
-              )}
-            </p>
-            <p role="status" className="login-message">
-              {message}
+              ) : null}
             </p>
           </div>
         </div>
@@ -271,14 +351,16 @@ function Login() {
               {sentTo.kind === "confirm" ? "One more step." : "Reset link sent."}
             </p>
             <p>
-              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"} to{" "}
-              <strong>{sentTo.email}</strong>.{" "}
+              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"}{" "}
+              to <strong>{sentTo.email}</strong>.{" "}
               {sentTo.kind === "confirm"
-                ? "Open it to finish signing up, then come back here and sign in."
+                ? "Open it on this device and you will land in your studio."
                 : "Open it to choose a new password."}
             </p>
             <p className="console-hint">
-              It can take a minute. Check your spam or promotions folder too.
+              It can take a few minutes. Check spam or promotions too. Nothing yet? Send it again,
+              try Continue with Google, or write to support@choreostudio.live and we will sort it
+              out.
             </p>
             {resendNote && <p role="status">{resendNote}</p>}
             <div className="console-form-actions">

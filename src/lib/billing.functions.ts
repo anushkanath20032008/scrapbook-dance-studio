@@ -29,3 +29,11 @@ export const openBillingPortal = createServerFn({ method: "POST" })
       requestOrigin: new URL(getRequest().url).origin,
     });
   });
+
+/** Whether paid plans can be bought and the billing page opened yet. */
+export const getBillingAvailability = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const { billingAvailability } = await import("@/lib/billing.server");
+    return billingAvailability();
+  });

@@ -8,6 +8,7 @@ import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
+import { PasteDancers } from "@/components/console/paste-dancers";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
@@ -38,6 +39,7 @@ function Dancers() {
 
   const [showArchived, setShowArchived] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [pasteOpen, setPasteOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -73,8 +75,21 @@ function Dancers() {
     <section>
       <h1 className="display console-title">Dancers</h1>
       <div className="console-toolbar">
-        <Button variant="retro" type="button" disabled={!ready || atLimit} onClick={() => setAddOpen(true)}>
+        <Button
+          variant="retro"
+          type="button"
+          disabled={!ready || atLimit}
+          onClick={() => setAddOpen(true)}
+        >
           + Add dancer
+        </Button>
+        <Button
+          variant="retroPaper"
+          type="button"
+          disabled={atLimit}
+          onClick={() => setPasteOpen(true)}
+        >
+          Paste a list
         </Button>
         <label className="console-check">
           <input
@@ -91,8 +106,7 @@ function Dancers() {
           {atLimit && (
             <>
               {" "}
-              You have reached the limit.{" "}
-              <Link to="/account">Upgrade to Studio+ to add more</Link>.
+              You have reached the limit. <Link to="/account">Upgrade to Studio+ to add more</Link>.
             </>
           )}
         </p>
@@ -162,6 +176,10 @@ function Dancers() {
           </li>
         ))}
       </ul>
+
+      <ConsoleDialog open={pasteOpen} onOpenChange={setPasteOpen} title="Paste a list of dancers">
+        {pasteOpen && <PasteDancers onDone={() => setPasteOpen(false)} />}
+      </ConsoleDialog>
 
       <ConsoleDialog open={addOpen} onOpenChange={setAddOpen} title="New dancer">
         {ready && (

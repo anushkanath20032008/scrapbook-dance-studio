@@ -20,6 +20,41 @@ type CheckoutContext = {
   requestOrigin: string;
 };
 
+function dodoClient() {
+  return new DodoPayments({
+    bearerToken: process.env["DODO_PAYMENTS_API_KEY"],
+    environment:
+      process.env["DODO_PAYMENTS_ENVIRONMENT"] === "live_mode" ? "live_mode" : "test_mode",
+  });
+}
+
+/**
+ * A link to Dodo's hosted billing page for the studio: update the card, change plan, cancel, download invoices.
+ * Only for a studio that already has a Dodo customer, and only ever for the signed-in owner's own studio.
+ */
+export async function openBillingPortal(context: CheckoutContext) {
+  if (!process.env["DODO_PAYMENTS_API_KEY"])
+    throw new Error("Billing isn't available yet. Please try again later.");
+  const { data: profile, error } = await context.supabase
+    .from("studio_profiles")
+    .select("dodo_customer_id")
+    .eq("user_id", context.userId)
+    .maybeSingle();
+  if (error) throw new Error("Could not load your studio details.");
+  const customerId = profile?.dodo_customer_id?.trim();
+  if (!customerId) throw new Error("You don't have a subscription to manage yet.");
+  const baseUrl = (process.env["PUBLIC_APP_URL"] || context.requestOrigin).replace(/\/+$/, "");
+  try {
+    const session = await dodoClient().customers.customerPortal.create(customerId, {
+      return_url: `${baseUrl}/account`,
+    });
+    if (session.link) return { portalUrl: session.link };
+  } catch (err) {
+    console.error("[billing] Dodo customer portal failed", err);
+  }
+  throw new Error("Could not open billing. Please try again.");
+}
+
 // The checkout logic behind createSubscriptionCheckout, for an already-authenticated studio owner.
 export async function startSubscriptionCheckout(plan: StudioPlanId, context: CheckoutContext) {
   const productId = productIdFor(plan);
@@ -44,11 +79,7 @@ export async function startSubscriptionCheckout(plan: StudioPlanId, context: Che
     if (!ended) throw new Error("Your studio already has a subscription.");
   }
 
-  const client = new DodoPayments({
-    bearerToken: process.env["DODO_PAYMENTS_API_KEY"],
-    environment:
-      process.env["DODO_PAYMENTS_ENVIRONMENT"] === "live_mode" ? "live_mode" : "test_mode",
-  });
+  const client = dodoClient();
   const baseUrl = (process.env["PUBLIC_APP_URL"] || context.requestOrigin).replace(/\/+$/, "");
   let checkoutUrl: string | null | undefined;
   try {

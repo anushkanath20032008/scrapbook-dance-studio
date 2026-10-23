@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { createSubscriptionCheckout } from "@/lib/billing.functions";
+import { createSubscriptionCheckout, openBillingPortal } from "@/lib/billing.functions";
 import { studioPlans, subscriptionNote, type StudioPlanId } from "@/lib/plans";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
 import { useServerFn } from "@tanstack/react-start";
@@ -44,7 +44,8 @@ function Account() {
   const canChoosePlan = !justPaid && billing.status === "not_started";
   const loadProfile = useServerFn(getProfile),
     save = useServerFn(saveProfile),
-    startCheckout = useServerFn(createSubscriptionCheckout);
+    startCheckout = useServerFn(createSubscriptionCheckout),
+    openPortal = useServerFn(openBillingPortal);
   useEffect(() => {
     setJustPaid(new URLSearchParams(window.location.search).get("billing") === "success");
   }, []);
@@ -124,6 +125,17 @@ function Account() {
       setBusy(false);
     }
   }
+  async function manageBilling() {
+    setBusy(true);
+    setMessage("");
+    try {
+      const { portalUrl } = await openPortal();
+      window.location.assign(portalUrl);
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not open billing.");
+      setBusy(false);
+    }
+  }
   async function choosePlan(plan: StudioPlanId) {
     setCheckoutPlan(plan);
     setMessage("");
@@ -195,12 +207,25 @@ function Account() {
                     Current plan: <strong>{readable(billing.plan)}</strong> · Billing:{" "}
                     <strong>{readable(billing.status)}</strong>
                   </p>
+                  {billing.status === "not_started" && (
+                    <p>Your first month is free. Choose a plan when you want to keep going.</p>
+                  )}
                   <p className="pricing-footnote">{subscriptionNote}</p>
                   {justPaid && (
                     <p role="status">
                       <strong>Payment received.</strong> Your plan activates once Dodo Payments
                       confirms it.
                     </p>
+                  )}
+                  {!canChoosePlan && billing.status !== "not_started" && (
+                    <div style={{ marginTop: 12 }}>
+                      <Button variant="retro" type="button" disabled={busy} onClick={manageBilling}>
+                        Manage billing
+                      </Button>
+                      <p className="pricing-footnote">
+                        Update your card, change plan, cancel or download invoices on Dodo's secure page.
+                      </p>
+                    </div>
                   )}
                   {canChoosePlan && (
                     <div className="pricing-grid">

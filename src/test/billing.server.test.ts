@@ -1,18 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { StudioPlanId } from "@/lib/plans";
 
-const dodo = vi.hoisted(() => ({ create: vi.fn(), options: [] as unknown[] }));
+const dodo = vi.hoisted(() => ({ create: vi.fn(), portal: vi.fn(), options: [] as unknown[] }));
 
 vi.mock("dodopayments", () => ({
   default: class {
     checkoutSessions = { create: dodo.create };
+    customers = { customerPortal: { create: dodo.portal } };
     constructor(options: unknown) {
       dodo.options.push(options);
     }
   },
 }));
 
-const { startSubscriptionCheckout } = await import("@/lib/billing.server");
+const { openBillingPortal, startSubscriptionCheckout } = await import("@/lib/billing.server");
 
 type Profile = { studio_name: string; billing_status: string; plan?: string } | null;
 
@@ -162,5 +163,51 @@ describe("startSubscriptionCheckout", () => {
     await expect(checkout("starter")).rejects.toThrow(
       "Could not start checkout. Please try again.",
     );
+  });
+});
+
+describe("openBillingPortal", () => {
+  const owner = (customerId: string | null, dbError = false) => {
+    const query = {
+      select: () => query,
+      eq: () => query,
+      maybeSingle: async () =>
+        dbError
+          ? { data: null, error: { message: "boom" } }
+          : { data: customerId === null ? { dodo_customer_id: null } : { dodo_customer_id: customerId }, error: null },
+    };
+    return {
+      supabase: { from: () => query } as never,
+      userId: "user-1",
+      requestOrigin: "https://choreostudio.live",
+    };
+  };
+
+  beforeEach(() => {
+    vi.stubEnv("DODO_PAYMENTS_API_KEY", "test-key");
+    vi.stubEnv("PUBLIC_APP_URL", "https://www.choreostudio.live/");
+    dodo.portal.mockReset().mockResolvedValue({ link: "https://portal.dodo/xyz" });
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("opens the portal for the studio's own Dodo customer and returns to the account page", async () => {
+    expect(await openBillingPortal(owner("cus_123"))).toEqual({ portalUrl: "https://portal.dodo/xyz" });
+    expect(dodo.portal).toHaveBeenCalledWith("cus_123", {
+      return_url: "https://www.choreostudio.live/account",
+    });
+  });
+
+  it("refuses a studio with no subscription yet, without calling Dodo", async () => {
+    await expect(openBillingPortal(owner(null))).rejects.toThrow("don't have a subscription");
+    expect(dodo.portal).not.toHaveBeenCalled();
+  });
+
+  it("says billing is unavailable when Dodo is not configured, and handles Dodo failing", async () => {
+    vi.stubEnv("DODO_PAYMENTS_API_KEY", "");
+    await expect(openBillingPortal(owner("cus_123"))).rejects.toThrow("isn't available yet");
+    vi.stubEnv("DODO_PAYMENTS_API_KEY", "test-key");
+    dodo.portal.mockRejectedValue(new Error("down"));
+    await expect(openBillingPortal(owner("cus_123"))).rejects.toThrow("Could not open billing");
+    await expect(openBillingPortal(owner("cus_123", true))).rejects.toThrow("Could not load your studio");
   });
 });

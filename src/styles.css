@@ -364,3 +364,41 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
   .hero-type h1 span, .hero-sub, .hero-type .size-picker, .hero-window { animation:none; }
   .window:hover, .pricing-card:hover, .desktop-icon:hover { scale:none; }
 }
+
+/* Landing polish: skip link, tap sizes, compact nav and consent bar on phones, legal page layout. */
+.skip-link { position:absolute; left:8px; top:-60px; z-index:100; background:var(--ink); color:var(--paper); padding:10px 14px; font-weight:800; text-decoration:none; }
+.skip-link:focus { top:8px; }
+.soon-tag { display:inline-block; margin-left:4px; padding:1px 7px; border:2px solid var(--ink); background:var(--paper); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+.site-nav .brand { min-width:0; display:inline-flex; align-items:center; min-height:44px; }
+.nav-links a { display:inline-flex; align-items:center; min-height:44px; }
+.nav-links a.nav-cta { padding:0 14px; }
+.text-link { display:inline-flex; align-items:center; min-height:44px; }
+.footer .wrap > div { display:flex; flex-wrap:wrap; gap:0 14px; align-items:center; }
+.footer .wrap > div a, .footer .wrap > div button { display:inline-flex; align-items:center; min-height:44px; }
+.range-row input[type="range"] { height:32px; }
+.video-window video { aspect-ratio:16 / 9; background:var(--ink); }
+.legal-wrap { max-width:760px; }
+.legal-back { display:inline-flex; align-items:center; min-height:44px; font-weight:800; color:var(--ink); }
+.legal-title { font-size:clamp(38px,9vw,56px); margin:18px 0 8px; overflow-wrap:anywhere; }
+.legal-page { min-height:100vh; }
+.legal-page .window-inner { overflow-wrap:anywhere; }
+.legal-page a { color:var(--blue); }
+.legal-foot { margin:24px 0 0; font-size:14px; font-weight:700; }
+.legal-foot a { display:inline-flex; align-items:center; min-height:44px; padding-inline:2px; }
+@media(max-width:540px){
+  .site-nav { gap:8px; }
+  .site-nav .brand { font-size:18px; }
+  .site-nav .brand .brand-mark { width:26px; height:26px; margin-right:6px; }
+  .nav-links { gap:2px; }
+  .nav-links a:not(.nav-cta) { padding:0 10px; }
+  .hero-actions a.text-link { padding:0 4px; }
+  .consent-bar { left:8px; right:8px; bottom:8px; padding:10px 12px; font-size:13px; gap:8px; border-width:2px; box-shadow:3px 3px 0 var(--ink); }
+  .consent-bar p { flex-basis:100%; }
+  .consent-actions { width:100%; }
+  .consent-actions button { flex:1; min-height:44px; padding:6px 10px; }
+  .legal-page .window-inner { padding:14px; }
+}
+.retro-button { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
+.consent-actions button { min-height:44px; }
+.final-cta :focus-visible, .faq :focus-visible, .footer :focus-visible, .problem :focus-visible { outline-color:var(--marigold); }
+.faq details :focus-visible { outline-color:var(--blue); }

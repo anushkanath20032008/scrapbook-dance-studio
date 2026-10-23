@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { studioPlans, subscriptionNote } from "@/lib/plans";
+import { useScrollReveal } from "@/lib/scroll-reveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -32,6 +33,7 @@ function Home() {
   const problem = useRef<HTMLElement>(null);
   const solution = useRef<HTMLElement>(null);
   const estimate = Math.round(students * fee * late / 100);
+  useScrollReveal(".section .wrap > *, .footer .wrap");
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let ctx: { revert: () => void } | undefined;

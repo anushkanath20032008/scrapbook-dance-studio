@@ -1,4 +1,5 @@
 import { unwrap, type StudioContext } from "./studio.server";
+import { collectedByMethod, overdueAging } from "./month-end";
 import { firstOfMonth } from "./validators";
 
 const emptySnapshot = {
@@ -28,4 +29,34 @@ export async function getHomeReport({ supabase }: StudioContext, input: { period
 /** Billed, collected and missing for each of the last six months, oldest first, from the database. */
 export async function getMonthlyTrend({ supabase }: StudioContext) {
   return unwrap(await supabase.rpc("monthly_trend", { p_months: 6 }));
+}
+
+const nextMonth = (period: string) => {
+  const [year = 0, month = 0] = period.split("-").map(Number);
+  return month === 12 ? `${year + 1}-01-01` : `${year}-${String(month + 1).padStart(2, "0")}-01`;
+};
+
+/** The month-end close: billed against collected, how it was paid, what is waiting to be checked, and how late the rest is. */
+export async function getMonthEnd({ supabase }: StudioContext, input: { period: string }) {
+  const { period, snapshot, unpaid } = await getHomeReport({ supabase } as StudioContext, input);
+  const [paymentsResult, claimsResult] = await Promise.all([
+    supabase
+      .from("payments")
+      .select("amount_paise, method")
+      .gte("paid_on", period)
+      .lt("paid_on", nextMonth(period))
+      .is("voided_at", null),
+    supabase.from("payment_claims").select("amount_paise").eq("status", "pending"),
+  ]);
+  const claims = unwrap(claimsResult);
+  return {
+    period,
+    snapshot,
+    byMethod: collectedByMethod(unwrap(paymentsResult)),
+    aging: overdueAging(unpaid),
+    pendingClaims: {
+      count: claims.length,
+      paise: claims.reduce((sum, claim) => sum + claim.amount_paise, 0),
+    },
+  };
 }

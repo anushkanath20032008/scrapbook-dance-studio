@@ -13,3 +13,10 @@ export const getHomeReport = createServerFn({ method: "GET" })
 export const getMonthlyTrend = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => (await import("@/lib/reports.server")).getMonthlyTrend(context));
+
+export const getMonthEnd = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ period: isoDate })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/reports.server")).getMonthEnd(context, data),
+  );

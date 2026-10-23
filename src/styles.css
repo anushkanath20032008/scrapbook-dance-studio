@@ -402,3 +402,12 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .consent-actions button { min-height:44px; }
 .final-cta :focus-visible, .faq :focus-visible, .footer :focus-visible, .problem :focus-visible { outline-color:var(--marigold); }
 .faq details :focus-visible { outline-color:var(--blue); }
+.me-list { list-style:none; margin:0 0 12px; padding:0; display:grid; gap:10px; }
+.me-row { display:grid; grid-template-columns:110px 1fr auto; gap:12px; align-items:center; }
+.me-label { font-weight:700; }
+.me-track { display:block; height:16px; border:2px solid var(--ink,#1a1a1a); background:#fff; }
+.me-fill { display:block; height:100%; background:#273FA3; }
+.me-meter { height:22px; border:2px solid var(--ink,#1a1a1a); background:#fff; margin-bottom:16px; }
+.me-meter span { display:block; height:100%; background:#5E9C76; }
+.me-value { text-align:right; font-variant-numeric:tabular-nums; }
+@media(max-width:540px){ .me-row { grid-template-columns:1fr auto; } .me-track { grid-column:1 / -1; order:3; } }

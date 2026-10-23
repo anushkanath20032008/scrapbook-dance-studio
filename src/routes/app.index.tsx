@@ -64,6 +64,8 @@ function Overview() {
   });
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => loadCounts() });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : false;
+  // A studio with no dancers yet sees the setup card first, with the paste box in it.
+  const firstRun = counts.data?.students === 0;
 
   const generateMutation = useMutation({
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
@@ -88,6 +90,15 @@ function Overview() {
   return (
     <section>
       <h1 className="display console-title">Overview</h1>
+      {firstRun && (
+        <div className="window setup-card">
+          <div className="window-bar chrome-font">Start here.dialog</div>
+          <div className="window-inner">
+            <h2 className="setup-first-title">Add your dancers to get started.</h2>
+            <SetupChecklist />
+          </div>
+        </div>
+      )}
       <div className="console-toolbar">
         <label className="console-inline-label">
           Month
@@ -235,7 +246,7 @@ function Overview() {
         }}
       />
 
-      {!setupDone && (
+      {!setupDone && !firstRun && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Setup.dialog</div>
           <div className="window-inner">

@@ -1,11 +1,32 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
+import { buildSetupSteps, nextSetupStep, setupProgress, type SetupStep } from "@/lib/setup-progress";
+import { PasteDancers } from "@/components/console/paste-dancers";
 import { setupCountsKey } from "@/components/console/console-data";
 import { getSetupCounts } from "@/lib/setup.functions";
 
-/** Five steps from an empty studio to a studio ready for its first month, ticked from the real data. */
+function StepRow({ step, next }: { step: SetupStep; next: boolean }) {
+  return (
+    <li data-done={step.done} data-next={next}>
+      <span className="setup-mark" aria-hidden="true">
+        {step.done ? "✓" : next ? "→" : "○"}
+      </span>
+      <div>
+        <strong>{step.title}</strong>
+        <span className="console-hint">{step.detail}</span>
+      </div>
+      <Link to={step.to} className="setup-go">
+        {step.done ? "Review" : step.action}
+      </Link>
+    </li>
+  );
+}
+
+/**
+ * Three steps from an empty studio to a list of who owes this month, ticked from the real data. A studio with no
+ * dancers yet gets the paste box right here, because typing the list is the slowest part of starting.
+ */
 export function SetupChecklist() {
   const load = useServerFn(getSetupCounts);
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => load() });
@@ -16,9 +37,13 @@ export function SetupChecklist() {
 
   const steps = buildSetupSteps(counts.data);
   const progress = setupProgress(steps);
+  const next = nextSetupStep(steps);
+  const required = steps.filter((step) => !step.optional);
+  const optional = steps.filter((step) => step.optional);
 
   return (
     <div>
+      {counts.data.students === 0 && <PasteDancers />}
       <p className="setup-progress-label">
         <strong>
           {progress.done} of {progress.total}
@@ -28,6 +53,7 @@ export function SetupChecklist() {
       <div
         className="setup-bar"
         role="progressbar"
+        aria-label="Setup progress"
         aria-valuemin={0}
         aria-valuemax={progress.total}
         aria-valuenow={progress.done}
@@ -35,21 +61,14 @@ export function SetupChecklist() {
         <span style={{ width: `${(progress.done / progress.total) * 100}%` }} />
       </div>
       <ol className="setup-steps">
-        {steps.map((step) => (
-          <li key={step.id} data-done={step.done}>
-            <span className="setup-mark" aria-hidden="true">
-              {step.done ? "✓" : "○"}
-            </span>
-            <div>
-              <strong>{step.title}</strong>
-              <span className="console-hint">
-                {step.done ? "Done" : "To do"}: {step.detail}
-              </span>
-            </div>
-            <Link to={step.to} className="setup-go">
-              {step.done ? "Review" : "Open"}
-            </Link>
-          </li>
+        {required.map((step) => (
+          <StepRow key={step.id} step={step} next={next?.id === step.id} />
+        ))}
+      </ol>
+      <h3 className="console-subhead setup-later">When you want them</h3>
+      <ol className="setup-steps">
+        {optional.map((step) => (
+          <StepRow key={step.id} step={step} next={false} />
         ))}
       </ol>
     </div>

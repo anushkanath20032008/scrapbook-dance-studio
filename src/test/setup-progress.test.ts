@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildSetupSteps, setupProgress, type SetupCounts } from "@/lib/setup-progress";
+import {
+  buildSetupSteps,
+  nextSetupStep,
+  setupProgress,
+  type SetupCounts,
+} from "@/lib/setup-progress";
 import { getSetupCounts, listStudentOverview } from "@/lib/setup.server";
 import { fakeSupabase, stepsOf } from "./fake-supabase";
 
@@ -10,40 +15,53 @@ const empty: SetupCounts = {
   studentsWithContact: 0,
   studentsOnBatch: 0,
   studentsWithPlan: 0,
+  chargesThisMonth: 0,
 };
+// students, fees, charges, batches, roster
 const done = (counts: SetupCounts) => buildSetupSteps(counts).map((step) => step.done);
 
 describe("setup checklist", () => {
-  it("starts with nothing done", () => {
+  it("starts with nothing done, and only three steps are required", () => {
     expect(done(empty)).toEqual([false, false, false, false, false]);
-    expect(setupProgress(buildSetupSteps(empty))).toEqual({ done: 0, total: 5, complete: false });
+    expect(setupProgress(buildSetupSteps(empty))).toEqual({ done: 0, total: 3, complete: false });
+    expect(buildSetupSteps(empty).filter((step) => step.optional).map((step) => step.id)).toEqual([
+      "batches",
+      "roster",
+    ]);
   });
 
   it("ticks each step only when its own rows exist", () => {
-    expect(done({ ...empty, feePlans: 2 })).toEqual([true, false, false, false, false]);
-    expect(done({ ...empty, batches: 1 })).toEqual([false, true, false, false, false]);
-    expect(done({ ...empty, students: 3 })).toEqual([false, false, false, false, false]);
-    expect(done({ ...empty, students: 3, studentsWithContact: 2 })[2]).toBe(true);
-    expect(done({ ...empty, studentsOnBatch: 1 })[3]).toBe(true);
+    expect(done({ ...empty, batches: 1 })).toEqual([false, false, false, true, false]);
+    expect(done({ ...empty, students: 3 })[0]).toBe(false);
+    expect(done({ ...empty, students: 3, studentsWithContact: 2 })[0]).toBe(true);
+    expect(done({ ...empty, studentsOnBatch: 1 })[4]).toBe(true);
+    expect(done({ ...empty, chargesThisMonth: 4 })[2]).toBe(true);
   });
 
-  it("needs every student on a plan before the last step is done", () => {
+  it("needs every student on a plan before the fee step is done", () => {
     const base = { ...empty, students: 5, studentsWithContact: 5 };
-    expect(done({ ...base, studentsWithPlan: 4 })[4]).toBe(false);
-    expect(done({ ...base, studentsWithPlan: 5 })[4]).toBe(true);
-    expect(done({ ...empty, studentsWithPlan: 0 })[4]).toBe(false);
+    expect(done({ ...base, studentsWithPlan: 4 })[1]).toBe(false);
+    expect(done({ ...base, studentsWithPlan: 5 })[1]).toBe(true);
+    expect(done({ ...empty, studentsWithPlan: 0 })[1]).toBe(false);
   });
 
-  it("is complete when all five steps are done", () => {
-    const all = {
-      feePlans: 2,
-      batches: 2,
+  it("is complete once the three required steps are done, without batches", () => {
+    const ready = {
+      ...empty,
       students: 5,
       studentsWithContact: 5,
-      studentsOnBatch: 5,
       studentsWithPlan: 5,
+      chargesThisMonth: 5,
     };
-    expect(setupProgress(buildSetupSteps(all)).complete).toBe(true);
+    expect(setupProgress(buildSetupSteps(ready))).toEqual({ done: 3, total: 3, complete: true });
+    expect(nextSetupStep(buildSetupSteps(ready))).toBeNull();
+  });
+
+  it("points at the first required step still to do", () => {
+    expect(nextSetupStep(buildSetupSteps(empty))?.id).toBe("students");
+    const dancers = { ...empty, students: 2, studentsWithContact: 2 };
+    expect(nextSetupStep(buildSetupSteps(dancers))?.id).toBe("fees");
+    expect(nextSetupStep(buildSetupSteps({ ...dancers, studentsWithPlan: 2 }))?.id).toBe("charges");
   });
 });
 
@@ -77,6 +95,8 @@ describe("getSetupCounts", () => {
           };
         case "fee_plan_assignments":
           return { data: [{ student_id: "s1" }, { student_id: "gone" }] };
+        case "charges":
+          return { data: [{ student_id: "s1" }, { student_id: "s1" }, { student_id: "gone" }] };
         default:
           return {};
       }
@@ -89,6 +109,7 @@ describe("getSetupCounts", () => {
       studentsWithContact: 1,
       studentsOnBatch: 1,
       studentsWithPlan: 1,
+      chargesThisMonth: 1,
     });
     // Archived records are filtered out in the query itself.
     for (const table of ["fee_plans", "batches", "students", "guardians"]) {

@@ -1,5 +1,6 @@
 import { ensureStudio, unwrap, type StudioContext } from "./studio.server";
 import type { SetupCounts } from "./setup-progress";
+import { firstOfMonth, todayInIndia } from "./validators";
 
 const MAX_ROWS = 1000;
 
@@ -14,6 +15,7 @@ export async function getSetupCounts(context: StudioContext): Promise<SetupCount
     guardiansResult,
     membersResult,
     assignmentsResult,
+    chargesResult,
   ] = await Promise.all([
     supabase.from("fee_plans").select("id").is("archived_at", null).limit(MAX_ROWS),
     supabase.from("batches").select("id").is("archived_at", null).limit(MAX_ROWS),
@@ -34,6 +36,11 @@ export async function getSetupCounts(context: StudioContext): Promise<SetupCount
       .select("student_id")
       .is("ends_on", null)
       .limit(MAX_ROWS * 5),
+    supabase
+      .from("charges")
+      .select("student_id")
+      .eq("period", firstOfMonth(todayInIndia()))
+      .limit(MAX_ROWS),
   ]);
   const plans = unwrap(plansResult);
   const batches = unwrap(batchesResult);
@@ -41,6 +48,7 @@ export async function getSetupCounts(context: StudioContext): Promise<SetupCount
   const guardians = unwrap(guardiansResult);
   const members = unwrap(membersResult);
   const assignments = unwrap(assignmentsResult);
+  const charges = unwrap(chargesResult);
 
   const activeStudents = new Set(students.map((student) => student.id));
   const activeBatches = new Set(batches.map((batch) => batch.id));
@@ -62,6 +70,9 @@ export async function getSetupCounts(context: StudioContext): Promise<SetupCount
     ).size,
     studentsWithPlan: new Set(
       assignments.map((a) => a.student_id).filter((id) => activeStudents.has(id)),
+    ).size,
+    chargesThisMonth: new Set(
+      charges.map((charge) => charge.student_id).filter((id) => activeStudents.has(id)),
     ).size,
   };
 }

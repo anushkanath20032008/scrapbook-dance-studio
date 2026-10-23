@@ -14,8 +14,8 @@ function Setup() {
         <div className="window-bar chrome-font">Checklist.dialog</div>
         <div className="window-inner">
           <p>
-            Five steps to your first month of fees. Leave any time: each step ticks itself from what
-            you have added.
+            Three steps and you can see who owes this month: add your dancers, set their fees, create
+            this month&apos;s fees. Batches can wait.
           </p>
           <SetupChecklist />
         </div>

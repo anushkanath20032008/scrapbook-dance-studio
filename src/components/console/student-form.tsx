@@ -123,6 +123,9 @@ export function StudentForm({
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    // Enter submits like the main button; only the "add another" button keeps the form open.
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    addAnother.current = submitter?.getAttribute("data-another") === "true";
     setFormError("");
     const found: FieldErrors = {};
     const dancer = personName.safeParse(name);
@@ -215,7 +218,6 @@ export function StudentForm({
           variant="retro"
           type="submit"
           disabled={mutation.isPending}
-          onClick={() => (addAnother.current = false)}
         >
           {initial ? "Save details" : "Add dancer"}
         </Button>
@@ -224,7 +226,7 @@ export function StudentForm({
             variant="retroPaper"
             type="submit"
             disabled={mutation.isPending}
-            onClick={() => (addAnother.current = true)}
+            data-another="true"
           >
             Add and add another
           </Button>

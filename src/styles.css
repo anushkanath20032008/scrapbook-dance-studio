@@ -421,3 +421,23 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .consent-actions button { min-height:44px; }
 .final-cta :focus-visible, .faq :focus-visible, .footer :focus-visible, .problem :focus-visible { outline-color:var(--marigold); }
 .faq details :focus-visible { outline-color:var(--blue); }
+@media (max-width:760px) {
+  .console-topbar { gap:10px; padding-inline:12px; }
+  .console-topbar .brand { white-space:nowrap; font-size:17px; display:inline-flex; align-items:center; gap:6px; }
+  .console-studio { max-width:34vw; font-size:12px; }
+  .totals-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .totals-grid > div { padding:8px 10px; }
+  .totals-grid dd { font-size:1rem; }
+  .console-main { padding:16px 14px 28px; }
+  .console-title { margin-bottom:14px; }
+}
+@media (max-width:760px) {
+  .console-menu-button { width:44px; height:44px; }
+  .console-nav.open { position:fixed; top:56px; left:0; right:0; bottom:0; z-index:25; overflow-y:auto; border-bottom:0; }
+}
+.setup-card, .generate-card { margin-top:24px; }
+@media (max-width:640px) {
+  .attend-row { flex-direction:row !important; align-items:center !important; padding:8px 10px; }
+  .attend-row .console-row-actions { flex-wrap:nowrap; justify-content:flex-end; }
+  .attend-row .mark-button { min-width:78px; }
+}

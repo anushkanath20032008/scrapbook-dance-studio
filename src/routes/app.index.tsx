@@ -84,8 +84,10 @@ function Overview() {
   const unpaidRows = report.data?.unpaid ?? [];
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
-  // A studio with nothing charged yet starts with the checklist; later it moves to the bottom.
-  const showSetupFirst = !setupDone && counts.data !== undefined && (snapshot?.charged_students ?? 0) === 0;
+  // A studio with no dancers yet starts with the checklist; once there are dancers it moves to the bottom.
+  const showSetupFirst = !setupDone && counts.data !== undefined && snapshot !== undefined && snapshot.active_students === 0;
+  // Nothing else to show for a studio with no dancers yet: the checklist is the whole page.
+  const brandNew = showSetupFirst;
   const defaultDue = `${month}-05`;
 
   return (
@@ -120,7 +122,7 @@ function Overview() {
       )}
       {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
-      {snapshot && <MonthTotals snapshot={snapshot} />}
+      {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
 
       {unpaidRows.length > 0 && (
         <div className="console-banner" role="status">
@@ -145,7 +147,7 @@ function Overview() {
         </div>
       )}
 
-      {needsCharges && (
+      {needsCharges && !brandNew && (
         <div className="window generate-card">
           <div className="window-bar chrome-font">Charges.dialog</div>
           <div className="window-inner console-form">

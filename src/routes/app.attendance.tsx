@@ -195,7 +195,7 @@ function Attendance() {
                 {rows.map((row) => {
                   const mark = marks[row.student_id] ?? null;
                   return (
-                    <li key={row.student_id} className="console-row">
+                    <li key={row.student_id} className="console-row attend-row">
                       <strong>{row.student_name}</strong>
                       <div
                         className="console-row-actions"

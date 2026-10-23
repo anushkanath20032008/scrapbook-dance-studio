@@ -82,11 +82,16 @@ function PaymentForm({
   // Most payments settle what is owed, so start with that amount selected: Enter records it, typing replaces it.
   const amountInput = useRef<HTMLInputElement>(null);
   const edited = useRef(false);
+  const [prefilled, setPrefilled] = useState(false);
   useEffect(() => {
     if (owed === undefined || owed <= 0 || edited.current) return;
     setAmount(String(owed / 100));
-    requestAnimationFrame(() => amountInput.current?.select());
+    setPrefilled(true);
   }, [owed]);
+  // Select after the value is on screen, so typing replaces it.
+  useEffect(() => {
+    if (prefilled && !edited.current) amountInput.current?.select();
+  }, [prefilled]);
 
   const mutation = useMutation({
     mutationFn: (data: Parameters<typeof record>[0]["data"]) => record({ data }),

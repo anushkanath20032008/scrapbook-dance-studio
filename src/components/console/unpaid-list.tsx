@@ -47,11 +47,15 @@ export function UnpaidList({
           </div>
           <div className="unpaid-owed">
             <strong>{formatRupees(row.outstanding_paise)}</strong>
-            <span className="status-pill" data-tone={row.status === "overdue" ? "warn" : "idle"}>
+            <span
+              className="status-pill"
+              style={{ textTransform: "none" }}
+              data-tone={row.status === "overdue" ? "warn" : "idle"}
+            >
               {dueText(row)}
             </span>
             {reminded.has(row.charge_id) && (
-              <span className="status-pill" data-tone="good">
+              <span className="status-pill" style={{ textTransform: "none" }} data-tone="good">
                 Reminded today
               </span>
             )}

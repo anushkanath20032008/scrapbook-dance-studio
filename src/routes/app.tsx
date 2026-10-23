@@ -168,7 +168,7 @@ function ConsoleLayout() {
                 <dt>Plan</dt>
                 <dd>
                   <span className="status-pill" data-tone="plan">
-                    {readable(context.data?.plan ?? "waitlist")}
+                    {context.data?.plan && context.data.plan !== "waitlist" ? readable(context.data.plan) : "No plan yet"}
                   </span>
                 </dd>
                 <dt>Billing</dt>

@@ -29,7 +29,7 @@ function Student({ name, batch, amount, status }: { name:string; batch:string; a
 function Home() {
   const [students,setStudents] = useState(40), [fee,setFee] = useState(2500), [late,setLate] = useState(20);
   const [paid,setPaid] = useState(false);
-  const DEMO_VIDEO_URL = ""; // paste the demo video file URL here when it is ready
+  const DEMO_VIDEO_URL = "/demo.mp4"; // hosted from /public; poster is /demo-poster.jpg
   const hero = useRef<HTMLElement>(null);
   const problem = useRef<HTMLElement>(null);
   const solution = useRef<HTMLElement>(null);

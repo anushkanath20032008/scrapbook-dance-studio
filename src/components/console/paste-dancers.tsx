@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useRefreshMoney, useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
@@ -59,6 +59,14 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const refresh = useRefreshStudents();
   const refreshMoney = useRefreshMoney();
   const [result, setResult] = usePasteResult();
+  // In a pop-up the outcome belongs to that pop-up: closing it must not leave it waiting for next time.
+  useEffect(() => {
+    if (!onDone) return undefined;
+    return () => {
+      setResult(null);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const addFn = useServerFn(bulkAddDancers);
   const listPlansFn = useServerFn(listFeePlans);
   const loadProfile = useServerFn(getProfile);
@@ -79,7 +87,12 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const [error, setError] = useState("");
 
   const feeText =
-    fee ?? suggestFeeRupees(plans.data?.map((plan) => Number(plan.amount_paise)) ?? []);
+    fee ??
+    suggestFeeRupees(
+      plans.data?.flatMap((plan) =>
+        Array.from({ length: plan.students_assigned }, () => Number(plan.amount_paise)),
+      ) ?? [],
+    );
   const defaultFeePaise = parseRupees(feeText);
   const rows = useMemo(() => parseDancerList(text), [text]);
   const good = addableDancers(rows);
@@ -147,8 +160,9 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
         </p>
         {result.skipped > 0 && (
           <p className="console-hint">
-            {result.skipped} {result.skipped === 1 ? "was" : "were"} already on your list, so
-            {result.skipped === 1 ? " it was" : " they were"} left as they are.
+            {result.skipped === 1
+              ? "1 was already on your list, so it was left as it is."
+              : `${result.skipped} were already on your list, so they were left as they are.`}
           </p>
         )}
         {result.billed && (

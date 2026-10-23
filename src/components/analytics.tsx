@@ -117,8 +117,8 @@ export function Analytics() {
   return (
     <div className="consent-bar" role="dialog" aria-label="Analytics choice">
       <p>
-        We use Microsoft Clarity to see how visitors use this site, for example where they click. It is off unless you
-        say yes. <a href="/privacy">Read how we use it</a>.
+        We use Microsoft Clarity to see where visitors click. It stays off unless you allow it.{" "}
+        <a href="/privacy">Privacy</a>
       </p>
       <div className="consent-actions">
         <button type="button" className="consent-yes" onClick={() => choose("yes")}>

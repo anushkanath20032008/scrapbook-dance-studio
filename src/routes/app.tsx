@@ -101,10 +101,10 @@ function ConsoleLayout() {
     return (
       <div className="console" aria-busy="true">
         <header className="console-topbar">
-          <span className="brand">
+          <a className="brand" href="/" aria-label="ChoreoStudio home">
             <img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24" />
             ChoreoStudio
-          </span>
+          </a>
         </header>
         <div className="console-body">
           <nav className="console-nav console-skeleton-nav" aria-hidden="true">
@@ -147,7 +147,7 @@ function ConsoleLayout() {
         >
           ☰
         </button>
-        <span className="brand"><img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24"/>ChoreoStudio</span>
+        <a className="brand" href="/" aria-label="ChoreoStudio home"><img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24"/>ChoreoStudio</a>
         <span className="console-studio">{context.data?.studioName || session.email}</span>
       </header>
       <div className="console-body">

@@ -56,3 +56,13 @@ describe("reminder log", () => {
     expect(() => markReminded("c1", "2026-10-20", broken)).not.toThrow();
   });
 });
+
+describe("reminder wording", () => {
+  it("says 'is due' before the date and 'was due' after it", async () => {
+    const { reminderText } = await import("@/lib/manual-reminders");
+    const row = { student_name: "Bindu", outstanding_paise: 150000, due_on: "2026-10-23" };
+    expect(reminderText(row, "", "2026-10-23")).toContain("is due on 23 Oct");
+    expect(reminderText(row, "", "2026-10-22")).toContain("is due on 23 Oct");
+    expect(reminderText(row, "", "2026-10-24")).toContain("was due on 23 Oct");
+  });
+});

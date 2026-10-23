@@ -396,3 +396,19 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .account-footer { margin-top:22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
 .account-notice { margin:12px 0; padding:9px 11px; border:2px solid var(--ink); background:var(--paper); font-weight:700; font-size:.92rem; }
 .account-plan-line { font-size:1.2rem; margin:0 0 4px; }
+
+/* Dancer's private link: the amount owed and one big button */
+.family-owe { border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); padding:18px 16px; display:grid; gap:4px; background:var(--paper); margin:0 0 16px; }
+.family-owe[data-tone="warn"] { background:#f6c9c5; }
+.family-owe[data-tone="good"] { background:#dcefdc; }
+.family-owe strong { font-family:"Space Grotesk",Arial,sans-serif; font-size:clamp(44px,14vw,68px); line-height:1; }
+.family-pending { margin-top:6px; font-weight:700; font-size:.95rem; }
+.family-pay.family-pay { display:block; width:100%; min-height:58px; font-size:1.15rem; margin:0 0 18px; }
+.family-success { margin:0 0 18px; padding:12px 14px; border:3px solid var(--ink); background:#dcefdc; font-weight:800; box-shadow:4px 4px 0 var(--ink); }
+.claim-methods { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:4px; }
+.claim-methods button { border:2px solid var(--ink); background:var(--paper); font:inherit; font-weight:800; font-size:.9rem; padding:12px 4px; min-height:48px; cursor:pointer; }
+.claim-methods button[data-on="true"] { background:var(--marigold); box-shadow:2px 2px 0 var(--ink); }
+.claim-amount { font-size:1.4rem; font-weight:800; }
+.claim-more { border-top:2px solid var(--ink); padding-top:10px; }
+.claim-more summary { cursor:pointer; font-weight:800; font-size:.92rem; margin-bottom:10px; }
+@media (max-width:420px) { .claim-methods { grid-template-columns:repeat(2,1fr); } }

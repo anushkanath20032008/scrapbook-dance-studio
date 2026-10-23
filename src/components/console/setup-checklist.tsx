@@ -1,8 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { buildSetupSteps, nextSetupStep, setupProgress, type SetupStep } from "@/lib/setup-progress";
-import { PasteDancers } from "@/components/console/paste-dancers";
+import {
+  buildSetupSteps,
+  nextSetupStep,
+  setupProgress,
+  type SetupStep,
+} from "@/lib/setup-progress";
+import { PasteDancers, usePasteResult } from "@/components/console/paste-dancers";
 import { setupCountsKey } from "@/components/console/console-data";
 import { getSetupCounts } from "@/lib/setup.functions";
 
@@ -30,6 +35,7 @@ function StepRow({ step, next }: { step: SetupStep; next: boolean }) {
 export function SetupChecklist() {
   const load = useServerFn(getSetupCounts);
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => load() });
+  const [pasted] = usePasteResult();
 
   if (counts.isError)
     return <p role="alert">Could not load your setup progress. Please refresh.</p>;
@@ -43,7 +49,7 @@ export function SetupChecklist() {
 
   return (
     <div>
-      {counts.data.students === 0 && <PasteDancers />}
+      {(counts.data.students === 0 || pasted !== null) && <PasteDancers />}
       <p className="setup-progress-label">
         <strong>
           {progress.done} of {progress.total}

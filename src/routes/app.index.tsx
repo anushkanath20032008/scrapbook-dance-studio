@@ -8,6 +8,7 @@ import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthTotals } from "@/components/console/month-totals";
+import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
@@ -65,7 +66,8 @@ function Overview() {
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => loadCounts() });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : false;
   // A studio with no dancers yet sees the setup card first, with the paste box in it.
-  const firstRun = counts.data?.students === 0;
+  const [pasted] = usePasteResult();
+  const firstRun = counts.data?.students === 0 || pasted !== null;
 
   const generateMutation = useMutation({
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
@@ -94,7 +96,9 @@ function Overview() {
         <div className="window setup-card">
           <div className="window-bar chrome-font">Start here.dialog</div>
           <div className="window-inner">
-            <h2 className="setup-first-title">Add your dancers to get started.</h2>
+            <h2 className="setup-first-title">
+              {pasted ? "Your studio is set up." : "Add your dancers to get started."}
+            </h2>
             <SetupChecklist />
           </div>
         </div>

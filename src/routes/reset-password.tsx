@@ -79,10 +79,14 @@ function ResetPassword() {
             {phase === "invalid" && (
               <>
                 <p role="alert" className="login-error">
-                  This reset link has expired or was already used. Links work once, so ask for a new one.
+                  This reset link has expired or was already used. Links work once, so ask for a new
+                  one.
                 </p>
                 <div className="login-actions">
-                  <Button variant="retro" onClick={() => window.location.assign("/login?mode=forgot")}>
+                  <Button
+                    variant="retro"
+                    onClick={() => window.location.assign("/login?mode=forgot")}
+                  >
                     Send me a new link
                   </Button>
                 </div>

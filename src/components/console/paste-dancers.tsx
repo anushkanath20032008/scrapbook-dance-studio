@@ -1,27 +1,54 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { useRefreshStudents } from "@/components/console/console-data";
+import { useRefreshMoney, useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { bulkAddDancers } from "@/lib/bulk-dancers.functions";
 import { addableDancers, parseDancerList, suggestFeeRupees } from "@/lib/bulk-dancers";
 import { listFeePlans } from "@/lib/fees.functions";
+import { getProfile, saveProfile } from "@/lib/profile.functions";
 import { formatDay } from "@/lib/format";
 import { formatRupees, parseRupees } from "@/lib/money";
 import { firstOfMonth, todayInIndia } from "@/lib/validators";
 
+export type PasteResult = {
+  added: number;
+  skipped: number;
+  charged: number;
+  billed: boolean;
+  dueOn: string;
+};
+const pasteResultKey = ["paste-result"] as const;
+
+/**
+ * The outcome of the last paste, kept in the query cache so it survives the screen around it changing: the moment
+ * the first dancer is added the studio is no longer empty, and the card that held the form would otherwise vanish
+ * before the owner has seen what happened.
+ */
+export function usePasteResult() {
+  const queryClient = useQueryClient();
+  const query = useQuery<PasteResult | null>({
+    queryKey: pasteResultKey,
+    queryFn: () => null,
+    initialData: null,
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+  return [
+    query.data,
+    (result: PasteResult | null) => queryClient.setQueryData(pasteResultKey, result),
+  ] as const;
+}
+
 const EXAMPLE = "Asha Rao, 98765 43210\nBela Shah, 91234 56789, 1800\nChirag Nair, 99887 76655";
 
-/** The 5th of this month, or tomorrow if the 5th has gone, so the first reminders are not already "overdue". */
+/** The 5th of this month, or today once the 5th has gone, so the first reminders do not read as long overdue. */
 function defaultDueDate(today: string): string {
   const fifth = `${firstOfMonth(today).slice(0, 8)}05`;
-  if (fifth >= today) return fifth;
-  const tomorrow = new Date(`${today}T00:00:00Z`);
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  return tomorrow.toISOString().slice(0, 10);
+  return fifth >= today ? fifth : today;
 }
 
 /**
@@ -30,20 +57,26 @@ function defaultDueDate(today: string): string {
  */
 export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const refresh = useRefreshStudents();
+  const refreshMoney = useRefreshMoney();
+  const [result, setResult] = usePasteResult();
   const addFn = useServerFn(bulkAddDancers);
   const listPlansFn = useServerFn(listFeePlans);
-  const plans = useQuery({ queryKey: ["fee-plans", false], queryFn: () => listPlansFn({ data: {} }) });
+  const loadProfile = useServerFn(getProfile);
+  const saveProfileFn = useServerFn(saveProfile);
+  const queryClient = useQueryClient();
+  const profile = useQuery({ queryKey: ["account-profile"], queryFn: () => loadProfile() });
+  const [studioName, setStudioName] = useState("");
+  const askStudioName = profile.data !== undefined && (profile.data?.studio_name ?? "") === "";
+  const plans = useQuery({
+    queryKey: ["fee-plans", false],
+    queryFn: () => listPlansFn({ data: {} }),
+  });
 
   const today = todayInIndia();
   const [text, setText] = useState("");
   const [fee, setFee] = useState<string | null>(null);
   const [bill, setBill] = useState(true);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<{
-    added: number;
-    skipped: number;
-    charged: number;
-  } | null>(null);
 
   const feeText =
     fee ?? suggestFeeRupees(plans.data?.map((plan) => Number(plan.amount_paise)) ?? []);
@@ -69,9 +102,28 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
         },
       }),
     onSuccess: (done) => {
+      // The studio name goes into every reminder and private link, so it is asked for once, here.
+      const typed = studioName.trim();
+      if (askStudioName && typed.length >= 2) {
+        const current = profile.data;
+        void saveProfileFn({
+          data: {
+            name: current?.name && current.name.length >= 2 ? current.name : typed,
+            studioName: typed,
+            phone: current?.phone ?? "",
+            city: current?.city ?? "",
+          },
+        })
+          .then(() => {
+            void queryClient.invalidateQueries({ queryKey: ["console-context"] });
+            void queryClient.invalidateQueries({ queryKey: ["account-profile"] });
+          })
+          .catch(() => undefined);
+      }
       refresh();
+      refreshMoney();
       setError("");
-      setResult({ added: done.added, skipped: done.skipped, charged: done.charged });
+      setResult({ ...done, billed: bill, dueOn });
     },
     onError: (e) => setError(messageOf(e)),
   });
@@ -89,7 +141,9 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
     return (
       <div className="paste-done" role="status">
         <p className="paste-done-big">
-          {none ? "Nobody new to add." : `${result.added} dancer${result.added === 1 ? "" : "s"} added.`}
+          {none
+            ? "Nobody new to add."
+            : `${result.added} dancer${result.added === 1 ? "" : "s"} added.`}
         </p>
         {result.skipped > 0 && (
           <p className="console-hint">
@@ -97,17 +151,23 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
             {result.skipped === 1 ? " it was" : " they were"} left as they are.
           </p>
         )}
-        {bill && (
+        {result.billed && (
           <p>
             {result.charged > 0
-              ? `${result.charged} charge${result.charged === 1 ? "" : "s"} created for this month, due ${formatDay(dueOn)}.`
+              ? `${result.charged} charge${result.charged === 1 ? "" : "s"} created for this month, due ${formatDay(result.dueOn)}.`
               : "This month's charges were already there."}
           </p>
         )}
         <div className="console-actions">
           <Button asChild variant="retro">
-            <Link to="/app" onClick={onDone}>
-              {bill ? "See who hasn't paid" : "Go to Overview"}
+            <Link
+              to="/app"
+              onClick={() => {
+                setResult(null);
+                onDone?.();
+              }}
+            >
+              {result.billed ? "See who hasn't paid" : "Go to Overview"}
             </Link>
           </Button>
           <Button
@@ -144,6 +204,22 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
           fee after a name if it differs.
         </span>
       </label>
+
+      {askStudioName && (
+        <label className="form-label console-field">
+          Your studio&apos;s name
+          <input
+            className="field"
+            value={studioName}
+            onChange={(event) => setStudioName(event.target.value)}
+            maxLength={120}
+            autoComplete="organization"
+          />
+          <span className="console-hint">
+            Shown in your reminders and on your dancers&apos; links.
+          </span>
+        </label>
+      )}
 
       <label className="form-label console-field">
         Monthly fee for everyone (₹)

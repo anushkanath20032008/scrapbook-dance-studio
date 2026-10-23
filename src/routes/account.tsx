@@ -175,8 +175,8 @@ function Account() {
                 </p>
                 <form onSubmit={handleProfile}>
                   <p className="console-hint">
-                    Your studio name appears in the reminders you send and on your dancers&apos; private
-                    links.
+                    Your studio name appears in the reminders you send and on your dancers&apos;
+                    private links.
                   </p>
                   <label className="form-label account-field">
                     Your name
@@ -272,8 +272,8 @@ function Account() {
                     <>
                       {availability.data && !canBuy && (
                         <p className="account-notice" role="status">
-                          Paid plans cannot be bought online yet. Nothing for you to do now: your free
-                          month and everything you have added are not affected.
+                          Paid plans cannot be bought online yet. Nothing for you to do now: your
+                          free month and everything you have added are not affected.
                         </p>
                       )}
                       <div className="pricing-grid">

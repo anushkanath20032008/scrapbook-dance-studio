@@ -196,9 +196,7 @@ function Login() {
               </div>
             )}
             {registering && (
-              <p className="console-hint login-lede">
-                Free for your first month. No card needed.
-              </p>
+              <p className="console-hint login-lede">Free for your first month. No card needed.</p>
             )}
             {mode === "forgot" && (
               <p className="console-hint login-lede">
@@ -284,7 +282,11 @@ function Login() {
                 </p>
               )}
               <div className="login-actions">
-                <Button variant="retro" type="submit" disabled={busy || (registering && !rubricMet)}>
+                <Button
+                  variant="retro"
+                  type="submit"
+                  disabled={busy || (registering && !rubricMet)}
+                >
                   {busy
                     ? "One moment…"
                     : mode === "forgot"
@@ -349,8 +351,8 @@ function Login() {
               {sentTo.kind === "confirm" ? "One more step." : "Reset link sent."}
             </p>
             <p>
-              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"} to{" "}
-              <strong>{sentTo.email}</strong>.{" "}
+              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"}{" "}
+              to <strong>{sentTo.email}</strong>.{" "}
               {sentTo.kind === "confirm"
                 ? "Open it on this device and you will land in your studio."
                 : "Open it to choose a new password."}

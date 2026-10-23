@@ -23,13 +23,13 @@ function Privacy() {
 
       <h2>1. Who is responsible for what</h2>
       <ul>
-        <li><strong>Studio owners, visitors and people who contact us.</strong> For your own data (your account, billing, walkthrough requests, support messages and website visits), we are the Data Fiduciary.</li>
+        <li><strong>Studio owners, visitors and people who contact us.</strong> For your own data (your account, billing, earlier walkthrough requests, support messages and website visits), we are the Data Fiduciary.</li>
         <li><strong>Dancers.</strong> A studio enters its dancers' details into ChoreoStudio. For that data the studio is the Data Fiduciary and we are its Data Processor: we hold and process it only to run the service for that studio. If you are a dancer, your studio decides what it holds about you and why, so please ask it first. We will help the studio answer you.</li>
       </ul>
 
       <h2>2. What we collect and why</h2>
       <ul>
-        <li><strong>Walkthrough request (website form).</strong> Studio name, WhatsApp number and the range of students you have. Why: to contact you about your walkthrough. You tick a box to agree, and you can opt out any time.</li>
+        <li><strong>Earlier walkthrough requests.</strong> The website no longer has this form. If you sent one before, we hold your studio name, WhatsApp number and the range of students you gave us, only to contact you about that request. You agreed by ticking a box, and you can opt out any time.</li>
         <li><strong>Studio owner account.</strong> Your name, email, studio name, phone and city, and your sign-in details. If you sign in with Google, we receive your name and email from Google. Why: to give you an account and the service. Passwords are handled by our sign-in provider and are not readable by us.</li>
         <li><strong>Subscription.</strong> Your plan, status and renewal date, and a customer reference from our payment partner. Card or UPI details go to Dodo Payments and are not seen or stored by us.</li>
         <li><strong>Dancer records entered by a studio.</strong> Dancer name and phone number, fees and charges, payments, attendance, class batches, and whether the dancer asked not to be messaged. Why: so the studio can track fees and classes and prepare reminders.</li>
@@ -42,7 +42,7 @@ function Privacy() {
 
       <h2>3. Why we may use it</h2>
       <p>
-        We rely on your consent (for example the walkthrough form and the analytics choice), and on the fact that you
+        We rely on your consent (for example the analytics choice), and on the fact that you
         gave us the data voluntarily for a stated purpose, such as signing up. You can withdraw consent at any time. It
         should be as easy to withdraw as it was to give, and doing so does not affect anything done before.
       </p>
@@ -67,7 +67,7 @@ function Privacy() {
       <ul>
         <li>Account and dancer records: while the account is open. When it closes, you can ask for an export for 30 days, and we delete the data within a further 30 days, except what the law requires us to keep.</li>
         <li>Payment screenshots: removed when the studio decides the claim, and automatically after 30 days if it is still undecided.</li>
-        <li>Walkthrough requests: until you opt out or ask us to delete them.</li>
+        <li>Earlier walkthrough requests: until you opt out or ask us to delete them.</li>
         <li>Support emails: for as long as needed to help you and keep a record of it.</li>
       </ul>
 

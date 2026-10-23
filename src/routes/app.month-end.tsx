@@ -44,13 +44,13 @@ function MonthEnd() {
   return (
     <section>
       <h1 className="display console-title">Month end</h1>
-      <label>
-        <span className="console-hint">Month </span>
+      <label className="console-inline-label" style={{ marginBottom: 16 }}>
+        Month
         <input className="field" style={{ width: "auto" }} type="month" value={month} onChange={(event) => event.target.value && setMonth(event.target.value)} />
       </label>
 
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
-      {report.isLoading && <p className="console-hint">Loading…</p>}
+      {report.isLoading && <p className="console-empty">Loading this month…</p>}
       {noCharges && (
         <p className="console-empty">
           {formatMonthLong(period)} has no charges yet. Generate them from <Link to="/app">Overview</Link>.
@@ -73,7 +73,7 @@ function MonthEnd() {
                 <div><dt>Billed</dt><dd>{formatRupees(snapshot.billed_paise)}</dd></div>
                 <div><dt>Collected</dt><dd>{formatRupees(snapshot.collected_paise)}</dd></div>
                 <div><dt>Still owed</dt><dd>{formatRupees(snapshot.missing_paise)}</dd></div>
-                <div><dt>Collected</dt><dd>{percent}%</dd></div>
+                <div><dt>Share collected</dt><dd>{percent}%</dd></div>
               </dl>
               {data.pendingClaims.count > 0 && (
                 <p className="console-banner">
@@ -88,6 +88,9 @@ function MonthEnd() {
           <div className="window">
             <div className="window-bar chrome-font">How it was paid</div>
             <div className="window-inner">
+              {data.byMethod.length === 0 && (
+                <p className="console-empty">No payments recorded for {formatMonthLong(period)} yet.</p>
+              )}
               <ul className="me-list">
                 {data.byMethod.map((row) => (
                   <Bar key={row.method} label={paymentMethodLabel(row.method)} paise={row.paise} max={methodMax} />

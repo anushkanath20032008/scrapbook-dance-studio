@@ -497,3 +497,13 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .me-meter span { display:block; height:100%; background:#5E9C76; }
 .me-value { text-align:right; font-variant-numeric:tabular-nums; }
 @media(max-width:540px){ .me-row { grid-template-columns:1fr auto; } .me-track { grid-column:1 / -1; order:3; } }
+.skeleton-block { display:block; height:36px; background:linear-gradient(90deg,#ecd8c8,#f3e3d6,#ecd8c8); background-size:200% 100%; animation:skeleton-shimmer 1.4s linear infinite; border:2px solid rgba(26,26,26,.15); }
+.skeleton-title { width:min(320px,70%); height:52px; margin-bottom:20px; }
+.skeleton-card { height:120px; margin-bottom:14px; }
+.console-skeleton-nav { gap:10px; }
+@keyframes skeleton-shimmer { to { background-position:-200% 0; } }
+@media (prefers-reduced-motion:reduce) { .skeleton-block { animation:none; } }
+.setup-slim { margin-bottom:16px; }
+.console-main > section > .window + .window { margin-top:20px; }
+.me-label::first-letter { text-transform:uppercase; }
+.me-label { text-transform:none; }

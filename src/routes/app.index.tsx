@@ -89,13 +89,14 @@ function Overview() {
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
+  const optionalLeft = counts.data ? counts.data.batches === 0 : false;
   const brandNew = counts.data?.students === 0;
   const defaultDue = `${month}-05`;
 
   return (
     <section>
       <h1 className="display console-title">Overview</h1>
-      {firstRun && (
+      {firstRun && !setupDone && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Start here.dialog</div>
           <div className="window-inner">
@@ -105,6 +106,14 @@ function Overview() {
             <SetupChecklist />
           </div>
         </div>
+      )}
+      {firstRun && setupDone && optionalLeft && (
+        <p className="console-banner setup-slim" role="status">
+          <span>✓ Setup done. Optional: add your batches so you can mark attendance.</span>
+          <Link to="/app/batches" className="setup-go">
+            Add batches
+          </Link>
+        </p>
       )}
       <div className="console-toolbar">
         <label className="console-inline-label">

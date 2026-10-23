@@ -123,6 +123,7 @@ function PaymentForm({
     });
     if (!parsed.success) Object.assign(found, { ...fieldErrors(parsed.error), ...found });
     setErrors(found);
+    if (found["amountPaise"]) amountInput.current?.focus();
     if (Object.keys(found).length > 0 || !parsed.success) return;
     if (excess > 0 && !acknowledged) return;
     mutation.mutate(parsed.data);
@@ -226,7 +227,7 @@ function PaymentForm({
         <Button
           variant="retro"
           type="submit"
-          disabled={mutation.isPending || !typed || (excess > 0 && !acknowledged)}
+          disabled={mutation.isPending || (excess > 0 && !acknowledged)}
         >
           {typed && paise !== null ? `Record ${formatRupees(paise)}` : "Record payment"}
         </Button>

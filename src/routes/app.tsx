@@ -99,9 +99,26 @@ function ConsoleLayout() {
 
   if (session.status !== "signed-in") {
     return (
-      <main className="console-loading">
-        <p>Loading your studio…</p>
-      </main>
+      <div className="console" aria-busy="true">
+        <header className="console-topbar">
+          <span className="brand">
+            <img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24" />
+            ChoreoStudio
+          </span>
+        </header>
+        <div className="console-body">
+          <nav className="console-nav console-skeleton-nav" aria-hidden="true">
+            {Array.from({ length: 7 }, (_, index) => (
+              <span key={index} className="skeleton-block" />
+            ))}
+          </nav>
+          <main className="console-main" aria-label="Loading your studio">
+            <span className="skeleton-block skeleton-title" />
+            <span className="skeleton-block skeleton-card" />
+            <span className="skeleton-block skeleton-card" />
+          </main>
+        </div>
+      </div>
     );
   }
 

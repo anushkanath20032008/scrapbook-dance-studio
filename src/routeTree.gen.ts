@@ -24,6 +24,7 @@ import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
+import { Route as AppMonthEndRouteImport } from './routes/app.month-end'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
@@ -110,6 +111,11 @@ const AppMessagesRoute = AppMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMonthEndRoute = AppMonthEndRouteImport.update({
+  id: '/month-end',
+  path: '/month-end',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/month-end': typeof AppMonthEndRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/month-end': typeof AppMonthEndRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/app/billing': typeof AppBillingRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
+  '/app/month-end': typeof AppMonthEndRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/insights'
     | '/app/messages'
+    | '/app/month-end'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/insights'
     | '/app/messages'
+    | '/app/month-end'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/insights'
     | '/app/messages'
+    | '/app/month-end'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -450,6 +462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMessagesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/month-end': {
+      id: '/app/month-end'
+      path: '/month-end'
+      fullPath: '/app/month-end'
+      preLoaderRoute: typeof AppMonthEndRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -529,6 +548,7 @@ interface AppRouteChildren {
   AppBillingRoute: typeof AppBillingRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppMessagesRoute: typeof AppMessagesRoute
+  AppMonthEndRoute: typeof AppMonthEndRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
@@ -542,6 +562,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBillingRoute: AppBillingRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppMessagesRoute: AppMessagesRoute,
+  AppMonthEndRoute: AppMonthEndRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,

@@ -6,7 +6,8 @@ export type BulkDancer = { name: string; phone: string | null; feePaise: number 
 
 const CHUNK = 8;
 const digitsOf = (phone: string | null) => (phone ?? "").replace(/\D/g, "");
-const keyOf = (name: string, phone: string | null) => `${name.trim().toLowerCase()}|${digitsOf(phone)}`;
+const keyOf = (name: string, phone: string | null) =>
+  `${name.trim().toLowerCase()}|${digitsOf(phone)}`;
 
 /**
  * Add a pasted list of dancers in one go: each gets a contact record (the database's guardian, which carries
@@ -32,7 +33,10 @@ export async function bulkAddDancers(
   const existingPhones = new Map<string, string>();
   if (guardianIds.length > 0) {
     for (const guardian of unwrap(
-      await supabase.from("guardians").select("id, phone").in("id", guardianIds as string[]),
+      await supabase
+        .from("guardians")
+        .select("id, phone")
+        .in("id", guardianIds as string[]),
     ))
       existingPhones.set(guardian.id, guardian.phone ?? "");
   }
@@ -61,10 +65,13 @@ export async function bulkAddDancers(
     const guardians = unwrap(
       await supabase
         .from("guardians")
-        .insert(fresh.map((dancer) => ({ studio_id: studioId, name: dancer.name, phone: dancer.phone })))
+        .insert(
+          fresh.map((dancer) => ({ studio_id: studioId, name: dancer.name, phone: dancer.phone })),
+        )
         .select("id"),
     );
-    if (guardians.length !== fresh.length) throw new Error("Could not add the dancers. Please try again.");
+    if (guardians.length !== fresh.length)
+      throw new Error("Could not add the dancers. Please try again.");
 
     const studentsResult = await supabase
       .from("students")
@@ -108,17 +115,22 @@ export async function bulkAddDancers(
           .in("amount_paise", amounts)
           .order("created_at"),
       )) {
-        if (!planByAmount.has(Number(plan.amount_paise))) planByAmount.set(Number(plan.amount_paise), plan.id);
+        if (!planByAmount.has(Number(plan.amount_paise)))
+          planByAmount.set(Number(plan.amount_paise), plan.id);
       }
       for (const amount of amounts) {
         if (planByAmount.has(amount)) continue;
-        const plan = (unwrap(
+        const plan = unwrap(
           await supabase
             .from("fee_plans")
-            .insert({ studio_id: studioId, name: `Monthly ${formatRupees(amount)}`, amount_paise: amount })
+            .insert({
+              studio_id: studioId,
+              name: `Monthly ${formatRupees(amount)}`,
+              amount_paise: amount,
+            })
             .select("id")
             .single(),
-        ) as { id: string } | null);
+        ) as { id: string } | null;
         if (!plan) throw new Error("Could not set up the monthly fee. Please try again.");
         planByAmount.set(amount, plan.id);
         plansCreated += 1;

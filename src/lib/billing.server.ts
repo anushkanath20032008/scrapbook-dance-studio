@@ -99,3 +99,15 @@ export async function startSubscriptionCheckout(plan: StudioPlanId, context: Che
   if (!checkoutUrl) throw new Error("Could not start checkout. Please try again.");
   return { checkoutUrl };
 }
+
+/**
+ * Whether checkout and the billing page can work right now, so the account screen can say plainly when they cannot
+ * instead of offering a button that fails. Only yes/no answers leave the server, never the keys.
+ */
+export function billingAvailability() {
+  const hasKey = Boolean(process.env["DODO_PAYMENTS_API_KEY"]?.trim());
+  const plans = Object.fromEntries(
+    studioPlans.map((plan) => [plan.id, hasKey && productIdFor(plan.id) !== undefined]),
+  ) as Record<StudioPlanId, boolean>;
+  return { checkout: Object.values(plans).some(Boolean), portal: hasKey, plans };
+}

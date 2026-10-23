@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { PasswordField } from "@/components/password-field";
 import { supabase } from "@/integrations/supabase/client";
 import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
 
@@ -78,9 +79,13 @@ function ResetPassword() {
             {phase === "invalid" && (
               <>
                 <p role="alert" className="login-error">
-                  This reset link is invalid or has expired. Request a new one from the sign-in
-                  page.
+                  This reset link has expired or was already used. Links work once, so ask for a new one.
                 </p>
+                <div className="login-actions">
+                  <Button variant="retro" onClick={() => window.location.assign("/login?mode=forgot")}>
+                    Send me a new link
+                  </Button>
+                </div>
                 <p className="login-links">
                   <a href="/login">Back to sign in</a>
                 </p>
@@ -89,7 +94,7 @@ function ResetPassword() {
             {phase === "done" && (
               <>
                 <p role="status" className="login-message">
-                  Password updated.
+                  Password updated. You are signed in.
                 </p>
                 <div className="login-actions">
                   <Button variant="retro" onClick={() => window.location.assign("/app")}>
@@ -102,10 +107,9 @@ function ResetPassword() {
               <form onSubmit={submit}>
                 <label className="form-label">
                   New password
-                  <input
-                    className="field"
-                    type="password"
+                  <PasswordField
                     required
+                    autoFocus
                     autoComplete="new-password"
                     value={password}
                     aria-invalid={error !== ""}
@@ -117,9 +121,7 @@ function ResetPassword() {
                 </label>
                 <label className="form-label login-field">
                   Re-enter new password
-                  <input
-                    className="field"
-                    type="password"
+                  <PasswordField
                     required
                     autoComplete="new-password"
                     value={confirm}

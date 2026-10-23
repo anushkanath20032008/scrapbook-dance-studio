@@ -380,3 +380,19 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .setup-later { margin:18px 0 8px; }
 .setup-steps li[data-next="true"] { background:#fff3c4; box-shadow:3px 3px 0 var(--ink); }
 .setup-first-title { font-family:"Space Grotesk",Arial,sans-serif; font-size:24px; margin:0 0 12px; }
+
+/* Login: password field with a Show/Hide button */
+.password-field { position:relative; display:block; }
+.password-field .field { padding-right:68px; }
+.password-toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); border:0; background:transparent; font:inherit; font-weight:800; font-size:.85rem; text-decoration:underline; cursor:pointer; padding:8px; color:var(--ink); }
+.login-or { margin:14px 0 0; font-size:.9rem; opacity:.75; }
+.login-switch { font-weight:700; }
+.login-lede { margin:0 0 14px; }
+.login-fix { margin:8px 0 0; font-weight:700; }
+.login-actions-tight { margin-top:8px; }
+
+/* Account */
+.account-field { margin-bottom:13px; }
+.account-footer { margin-top:22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+.account-notice { margin:12px 0; padding:9px 11px; border:2px solid var(--ink); background:var(--paper); font-weight:700; font-size:.92rem; }
+.account-plan-line { font-size:1.2rem; margin:0 0 4px; }

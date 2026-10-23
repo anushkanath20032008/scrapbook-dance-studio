@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
+import {
+  authProblem,
+  checkPassword,
+  explainAuthError,
+  isExistingAccount,
+  passwordMeetsRubric,
+} from "@/lib/password-rubric";
 
 describe("password rubric", () => {
   it("accepts a long mixed passphrase", () => {
@@ -17,6 +23,17 @@ describe("password rubric", () => {
   });
   it("explains the backend weak-password refusal", () => {
     expect(explainAuthError("Password is known to be weak and easy to guess")).toMatch(/breaches/);
-    expect(explainAuthError("Invalid login credentials")).toBe("Invalid login credentials");
+  });
+  it("turns a wrong password and an unconfirmed email into advice", () => {
+    expect(authProblem("Invalid login credentials")).toBe("wrong-login");
+    expect(explainAuthError("Invalid login credentials")).toMatch(/do not match/);
+    expect(authProblem("Email not confirmed")).toBe("unconfirmed");
+    expect(authProblem("email rate limit exceeded")).toBe("too-many-emails");
+    expect(explainAuthError("Something unexpected")).toBe("Something unexpected");
+  });
+  it("spots a sign-up for an email that already has an account", () => {
+    expect(isExistingAccount({ identities: [] })).toBe(true);
+    expect(isExistingAccount({ identities: [{}] })).toBe(false);
+    expect(isExistingAccount(null)).toBe(false);
   });
 });

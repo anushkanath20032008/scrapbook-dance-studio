@@ -43,7 +43,8 @@ function findPhone(text: string): { raw: string; start: number; end: number } | 
       offset += group.length;
       end = offset;
     }
-    if (digits.length >= 10) return { raw: match[0].slice(0, end), start: origin, end: origin + end };
+    if (digits.length >= 10)
+      return { raw: match[0].slice(0, end), start: origin, end: origin + end };
   }
   return null;
 }
@@ -122,7 +123,8 @@ function parseLine(raw: string, line: number): ParsedDancer | null {
   }
 
   const name = names.join(" ").slice(0, 120);
-  if (/\d{7,}/.test(name.replace(/[\s-]/g, ""))) problem ??= "That phone number does not look right";
+  if (/\d{7,}/.test(name.replace(/[\s-]/g, "")))
+    problem ??= "That phone number does not look right";
   if (name === "") problem ??= "No name on this line";
   return { line, name, phone, feePaise, problem };
 }

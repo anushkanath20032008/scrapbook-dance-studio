@@ -551,3 +551,4 @@ body:has(.consent-bar) .float-cta { bottom:132px; }
 @media (max-width:900px) {
   body:has(.consent-bar) .float-cta { display:none !important; }
 }
+.console-banner-actions { display:inline-flex; align-items:center; gap:14px; flex-wrap:wrap; }

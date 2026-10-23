@@ -1,7 +1,84 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
-import { optOutWaitlist } from "@/lib/waitlist.functions";
-export const Route=createFileRoute("/opt-out")({head:()=>({meta:[{title:"Opt out | ChoreoStudio"},{name:"description",content:"Stop being contacted about your ChoreoStudio walkthrough request."},{property:"og:title",content:"Opt out | ChoreoStudio"},{property:"og:description",content:"Manage your ChoreoStudio contact preference."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:OptOut});
-function OptOut(){const [status,setStatus]=useState("");const [busy,setBusy]=useState(false);const optOut=useServerFn(optOutWaitlist);return <main className="section features" style={{minHeight:"100vh"}}><div className="wrap" style={{maxWidth:600}}><a href="/">← ChoreoStudio</a><h1 className="display" style={{fontSize:64,margin:"30px 0"}}>Opt out.</h1><div className="window"><div className="window-bar chrome-font">Preference.dialog</div><div className="window-inner"><p>Stop being contacted about your walkthrough request. This works in the browser where you joined.</p><Button variant="retro" disabled={busy} onClick={async()=>{const token=new URLSearchParams(location.search).get("token")??localStorage.getItem("choreoOptOut");if(!token){setStatus("We couldn't find your signup in this browser. Please contact ChoreoStudio to remove your details.");return}setBusy(true);try{await optOut({data:{token}});setStatus("Done. We won't contact you about your walkthrough request.");localStorage.removeItem("choreoOptOut")}catch{setStatus("Could not update your preference. Please try again.")}finally{setBusy(false)}}}>Opt out</Button><p role="status">{status}</p></div></div></div></main>}
+import { LegalPage } from "@/components/legal-page";
+import { optOutByNumber, optOutWaitlist } from "@/lib/waitlist.functions";
+
+export const Route = createFileRoute("/opt-out")({
+  head: () => ({
+    meta: [
+      { title: "Opt out | ChoreoStudio" },
+      { name: "description", content: "Stop being contacted about your ChoreoStudio walkthrough request." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: OptOut,
+});
+
+function OptOut() {
+  const optOutToken = useServerFn(optOutWaitlist);
+  const optOutNumber = useServerFn(optOutByNumber);
+  const [number, setNumber] = useState("");
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function byNumber(event: FormEvent) {
+    event.preventDefault();
+    if (!/^\+?[0-9\s-]{10,18}$/.test(number.trim())) {
+      setStatus("Enter the WhatsApp number you gave us, with 10 digits.");
+      return;
+    }
+    setBusy(true);
+    setStatus("");
+    try {
+      await optOutNumber({ data: { number } });
+      // Also clears this browser's saved link if there is one.
+      const token = new URLSearchParams(location.search).get("token") ?? localStorage.getItem("choreoOptOut");
+      if (token) await optOutToken({ data: { token } }).catch(() => undefined);
+      localStorage.removeItem("choreoOptOut");
+      setStatus("Done. If that number was on our list, it has been removed and we won't contact you about it.");
+    } catch {
+      setStatus("Could not update your preference. Please try again, or email support@choreostudio.live.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <LegalPage title="Opt out." windowTitle="Preference.dialog" updated="23 October 2026">
+      <p>
+        Stop being contacted about a walkthrough request you made on our website. It works on any phone or computer:
+        type the WhatsApp number you gave us.
+      </p>
+      <form onSubmit={byNumber}>
+        <label className="form-label">
+          WhatsApp number
+          <input
+            className="field"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="+91 ..."
+            value={number}
+            onChange={(event) => {
+              setNumber(event.target.value);
+              setStatus("");
+            }}
+            maxLength={18}
+          />
+        </label>
+        <div style={{ marginTop: 14 }}>
+          <Button variant="retro" type="submit" disabled={busy}>
+            {busy ? "One moment…" : "Opt out"}
+          </Button>
+        </div>
+      </form>
+      <p role="status">{status}</p>
+      <p className="console-hint">
+        You can also email <a href="mailto:support@choreostudio.live">support@choreostudio.live</a> and we will remove
+        your details.
+      </p>
+    </LegalPage>
+  );
+}

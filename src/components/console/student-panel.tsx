@@ -1,3 +1,4 @@
+import { formatDayWithYear } from "@/lib/format";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -143,7 +144,7 @@ export function StudentPanel({
       <h3>Monthly fee</h3>
       <p className="console-hint">
         {student.plan
-          ? `${formatRupees(student.plan.amount_paise)} a month since ${student.plan.starts_on}`
+          ? `${formatRupees(student.plan.amount_paise)} a month since ${formatDayWithYear(student.plan.starts_on)}`
           : "No monthly fee yet."}
       </p>
       <div className="console-inline">

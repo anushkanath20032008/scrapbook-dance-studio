@@ -52,6 +52,27 @@ export const optOutWaitlist = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Opt out from any device by typing the WhatsApp number used on the old walkthrough form. The answer is always the
+ * same, so nobody can use this to find out who is on the list.
+ */
+export const optOutByNumber = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ number: z.string().trim().regex(/^\+?[0-9\s-]{10,18}$/, "Enter a valid WhatsApp number") }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sameNumber } = await import("@/lib/waitlist-optout");
+    const { data: rows, error } = await supabaseAdmin.from("waitlist_signups")
+      .select("id, whatsapp_number").is("opted_out_at", null).limit(5000);
+    if (error) throw new Error("Could not update your preference. Please try again.");
+    const ids = (rows ?? []).filter((row) => sameNumber(row.whatsapp_number, data.number)).map((row) => row.id);
+    if (ids.length > 0) {
+      const { error: updateError } = await supabaseAdmin.from("waitlist_signups")
+        .update({ opted_out_at: new Date().toISOString() }).in("id", ids);
+      if (updateError) throw new Error("Could not update your preference. Please try again.");
+    }
+    return { ok: true };
+  });
+
 export const getWaitlist = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

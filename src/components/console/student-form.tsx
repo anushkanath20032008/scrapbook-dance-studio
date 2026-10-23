@@ -1,6 +1,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FormAlert } from "@/components/console/form-helpers";
 import { feeLabel, messageOf, type FieldErrors } from "@/components/console/form-utils";
@@ -49,6 +50,8 @@ export function StudentForm({
   const [startsOn, setStartsOn] = useState(todayInIndia());
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
+  const addAnother = useRef(false);
+  const nameInput = useRef<HTMLInputElement>(null);
 
   const existing = initial?.guardian
     ? guardians.find((guardian) => guardian.id === initial.guardian?.id)
@@ -90,15 +93,26 @@ export function StudentForm({
       }
       return { warnings };
     },
-    onSuccess: ({ warnings }) => {
+    onSuccess: ({ warnings }, values) => {
       refresh();
+      if (warnings.length === 0) {
+        toast.success(initial ? `Saved ${values.name}.` : `Added ${values.name}.`);
+        if (!initial && addAnother.current) {
+          // Keep the batch and fee: the next dancer is usually in the same class.
+          setName("");
+          setDancerPhone("");
+          setErrors({});
+          nameInput.current?.focus();
+          return;
+        }
+      }
       if (warnings.length > 0) {
         setName("");
         setDancerPhone("");
         setBatchId("");
         setPlanId("");
         setFormError(
-          `The dancer was saved, but ${warnings.join(" and ")}. Use Manage on their row to finish.`,
+          `The dancer was saved, but ${warnings.join(" and ")}. Use Edit on their row to finish.`,
         );
         return;
       }
@@ -109,6 +123,9 @@ export function StudentForm({
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    // Enter submits like the main button; only the "add another" button keeps the form open.
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    addAnother.current = submitter?.getAttribute("data-another") === "true";
     setFormError("");
     const found: FieldErrors = {};
     const dancer = personName.safeParse(name);
@@ -132,9 +149,11 @@ export function StudentForm({
       <Field label="Dancer name" error={errors["name"]}>
         <input
           className="field"
+          ref={nameInput}
           value={name}
           onChange={(event) => setName(event.target.value)}
           maxLength={120}
+          autoFocus
         />
       </Field>
       <Field label="Phone" error={errors["phone"]} hint="For WhatsApp fee reminders.">
@@ -164,7 +183,10 @@ export function StudentForm({
             </select>
           </Field>
           <div className="console-two">
-            <Field label="Monthly fee (optional)">
+            <Field
+              label="Monthly fee (optional)"
+              hint={plans.length === 0 ? "No fee plans yet. Add one on the Fee plans page." : undefined}
+            >
               <select
                 className="field"
                 value={planId}
@@ -192,9 +214,23 @@ export function StudentForm({
       )}
       <FormAlert message={formError} />
       <div className="console-actions">
-        <Button variant="retro" type="submit" disabled={mutation.isPending}>
+        <Button
+          variant="retro"
+          type="submit"
+          disabled={mutation.isPending}
+        >
           {initial ? "Save details" : "Add dancer"}
         </Button>
+        {!initial && (
+          <Button
+            variant="retroPaper"
+            type="submit"
+            disabled={mutation.isPending}
+            data-another="true"
+          >
+            Add and add another
+          </Button>
+        )}
         <Button variant="retroPaper" type="button" onClick={onDone}>
           Cancel
         </Button>

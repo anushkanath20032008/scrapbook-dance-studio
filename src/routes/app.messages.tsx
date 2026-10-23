@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -6,7 +6,7 @@ import { getMessagingStatus, listReminders } from "@/lib/reminders.functions";
 import { formatRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/messages")({
-  head: () => ({ meta: [{ title: "Messages | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Messages | ChoreoStudio" }] }),
   component: Messages,
 });
 
@@ -46,7 +46,8 @@ function Messages() {
       <h1 className="display console-title">Messages</h1>
       {messaging.data && !messaging.data.providerConfigured && (
         <p className="console-warning" role="status">
-          WhatsApp isn&apos;t connected yet, so reminders are queued and not sent.
+          Automatic WhatsApp sending isn&apos;t switched on. Reminders are not sent by the app: use the
+          WhatsApp buttons on Overview, which open your own WhatsApp with the message filled in.
         </p>
       )}
       <div className="console-toolbar" role="group" aria-label="Filter by status">
@@ -62,9 +63,15 @@ function Messages() {
           </button>
         ))}
       </div>
+      {reminders.isPending && <p className="console-hint">Loading…</p>}
       {reminders.isError && <p role="alert">Could not load your messages. Please refresh.</p>}
       {reminders.data?.length === 0 && (
-        <p className="console-empty">No reminders yet. Use Remind on Overview.</p>
+        <p className="console-empty">
+          Nothing queued yet.{" "}
+          <Link to="/app" className="setup-go">
+            Go to Overview
+          </Link>
+        </p>
       )}
       <ul className="console-list">
         {reminders.data?.map((reminder) => {

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { VoidDialog, type VoidTarget } from "@/components/console/void-dialog";
@@ -11,7 +12,9 @@ import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
 
 export const Route = createFileRoute("/app/billing")({
-  head: () => ({ meta: [{ title: "Billing | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Billing | ChoreoStudio" }] }),
+  validateSearch: (search: Record<string, unknown>): { student?: string } =>
+    typeof search["student"] === "string" ? { student: search["student"] } : {},
   component: Billing,
 });
 
@@ -20,10 +23,10 @@ function Billing() {
   const loadCharges = useServerFn(getStudentCharges);
   const loadLedger = useServerFn(getStudentLedger);
 
-  const [studentId, setStudentId] = useState("");
+  const initial = Route.useSearch();
+  const [studentId, setStudentId] = useState(initial.student ?? "");
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [voiding, setVoiding] = useState<VoidTarget | null>(null);
-  const [notice, setNotice] = useState("");
 
   const students = useQuery({
     queryKey: ["students-overview", false],
@@ -52,10 +55,7 @@ function Billing() {
           <select
             className="field month-field"
             value={studentId}
-            onChange={(event) => {
-              setStudentId(event.target.value);
-              setNotice("");
-            }}
+            onChange={(event) => setStudentId(event.target.value)}
           >
             <option value="">Choose a dancer</option>
             {students.data?.map((row) => (
@@ -66,14 +66,14 @@ function Billing() {
           </select>
         </label>
       </div>
-      {notice && (
-        <p role="status" className="console-notice">
-          ✓ {notice}
-        </p>
-      )}
+      {students.isPending && <p className="console-empty">Loading your dancers…</p>}
       {students.isError && <p role="alert">Could not load your dancers. Please refresh.</p>}
       {!studentId && (
-        <p className="console-empty">Choose a dancer to see their charges and payments.</p>
+        <p className="console-empty">
+          {students.data?.length === 0
+            ? "No dancers yet. Add one on the Dancers page first."
+            : "Choose a dancer to see their charges and payments."}
+        </p>
       )}
 
       {studentId && student && (
@@ -103,7 +103,12 @@ function Billing() {
           <div className="console-list-head">
             <h2>Charges</h2>
           </div>
-          {charges.data?.length === 0 && <p className="console-empty">No charges yet.</p>}
+          {charges.isPending && <p className="console-hint">Loading…</p>}
+          {charges.data?.length === 0 && (
+            <p className="console-empty">
+              No charges yet. Generate this month&apos;s charges from Overview.
+            </p>
+          )}
           <ul className="console-list">
             {charges.data?.map((charge) => (
               <li
@@ -200,8 +205,12 @@ function Billing() {
         </>
       )}
 
-      <RecordPaymentDialog student={paying} onClose={() => setPaying(null)} onSaved={setNotice} />
-      <VoidDialog target={voiding} onClose={() => setVoiding(null)} onDone={setNotice} />
+      <RecordPaymentDialog student={paying} onClose={() => setPaying(null)} onSaved={() => {}} />
+      <VoidDialog
+        target={voiding}
+        onClose={() => setVoiding(null)}
+        onDone={(message) => toast.success(message)}
+      />
     </section>
   );
 }

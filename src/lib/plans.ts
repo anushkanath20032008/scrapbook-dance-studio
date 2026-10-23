@@ -1,4 +1,4 @@
-// Choreo Studio's own subscription tiers. Ids match the plans accepted by createSubscriptionCheckout. "growth" is
+// ChoreoStudio's own subscription tiers. Ids match the plans accepted by createSubscriptionCheckout. "growth" is
 // an older tier that is no longer sold; it stays in the type so existing subscriptions and webhooks keep working.
 export type StudioPlanId = "starter" | "growth" | "studio";
 
@@ -16,9 +16,9 @@ export const studioPlans: readonly {
     name: "Regular",
     price: "₹249",
     features: [
-      "Up to 50 students",
+      "Up to 50 dancers",
       "Fees, attendance and batches",
-      "WhatsApp reminders, one tap each",
+      "A WhatsApp reminder for each unpaid dancer, amount filled in",
       "Dancer payment claims",
       "Monthly trend reports",
     ],
@@ -28,7 +28,7 @@ export const studioPlans: readonly {
     name: "Studio+",
     price: "₹479",
     features: [
-      "More than 50 students",
+      "More than 50 dancers",
       "Everything in Regular",
       "Automated WhatsApp messages from your own WhatsApp Business account (coming soon)",
       "Priority support",
@@ -37,4 +37,4 @@ export const studioPlans: readonly {
 ];
 
 export const subscriptionNote =
-  "This subscription is for the studio using ChoreoStudio. Student payments are ledger-only and are not processed by ChoreoStudio.";
+  "This subscription is for the studio using ChoreoStudio. Dancer payments are ledger-only and are not processed by ChoreoStudio.";

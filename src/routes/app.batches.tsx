@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { setupCountsKey } from "@/components/console/console-data";
@@ -16,7 +17,7 @@ import { listBatches, saveBatch, setBatchArchived } from "@/lib/batches.function
 import { batchInput } from "@/lib/schemas";
 
 export const Route = createFileRoute("/app/batches")({
-  head: () => ({ meta: [{ title: "Batches | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Batches | ChoreoStudio" }] }),
   component: Batches,
 });
 
@@ -24,10 +25,17 @@ type Batch = Awaited<ReturnType<typeof listBatches>>[number];
 
 const clock = (value: string | null) => (value ? value.slice(0, 5) : "");
 
+/** "18:30" read the way it is said in a studio: "6:30 pm". */
+const spoken = (value: string) => {
+  const [h = "0", m = "00"] = value.slice(0, 5).split(":");
+  const hour = Number(h);
+  return `${hour % 12 === 0 ? 12 : hour % 12}${m === "00" ? "" : `:${m}`} ${hour >= 12 ? "pm" : "am"}`;
+};
+
 function describe(batch: Batch) {
   const days = batch.weekdays.map((day) => weekdayNames[day]).join(", ");
   const time = batch.starts_at
-    ? `${clock(batch.starts_at)}${batch.ends_at ? `–${clock(batch.ends_at)}` : ""}`
+    ? `${spoken(batch.starts_at)}${batch.ends_at ? ` to ${spoken(batch.ends_at)}` : ""}`
     : "";
   return [days, time, batch.trainer_name, batch.room].filter(Boolean).join(" · ");
 }
@@ -79,7 +87,7 @@ function Batches() {
     mutationFn: (data: Parameters<typeof save>[0]["data"]) => save({ data }),
     onSuccess: (_row, variables) => {
       setOpen(false);
-      setNotice(variables.id ? "Batch updated." : "Batch added.");
+      toast.success(variables.id ? "Batch updated." : "Batch added.");
       refresh();
     },
     onError: (error) => setFormError(messageOf(error)),
@@ -133,9 +141,19 @@ function Batches() {
           ✓ {notice}
         </p>
       )}
+      {batches.isPending && <p className="console-empty">Loading your batches…</p>}
       {batches.isError && <p role="alert">Could not load your batches. Please refresh.</p>}
       {batches.data?.length === 0 && (
-        <p className="console-empty">No batches yet. Add your first.</p>
+        <div className="console-empty-card">
+          <p className="console-empty">No batches yet.</p>
+          <p className="console-hint">
+            A batch is one regular class, like &quot;Hip Hop evenings&quot;. Add the days and time, then put
+            dancers in it to mark attendance.
+          </p>
+          <Button variant="retro" type="button" onClick={() => openForm(null)}>
+            + Add your first batch
+          </Button>
+        </div>
       )}
       <ul className="console-list">
         {batches.data?.map((batch) => (
@@ -182,6 +200,7 @@ function Batches() {
               onChange={(event) => setName(event.target.value)}
               maxLength={120}
               placeholder="Hip Hop evenings"
+              autoFocus
             />
           </Field>
           <fieldset className="console-field">

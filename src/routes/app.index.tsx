@@ -3,11 +3,13 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthTotals } from "@/components/console/month-totals";
+import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
@@ -64,16 +66,19 @@ function Overview() {
   });
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => loadCounts() });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : false;
+  // A studio with no dancers yet sees the setup card first, with the paste box in it.
+  const [pasted] = usePasteResult();
+  const firstRun = counts.data?.students === 0 || pasted !== null;
 
   const generateMutation = useMutation({
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
     onSuccess: ({ created }) => {
       setError("");
-      setNotice(
-        created === 0
-          ? "No charges created. Dancers need a monthly fee that covers this month."
-          : `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
-      );
+      if (created === 0) setNotice("No charges created. Dancers need a monthly fee that covers this month.");
+      else
+        toast.success(
+          `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
+        );
       void queryClient.invalidateQueries({ queryKey: ["home-report"] });
     },
     onError: (e) => setError(messageOf(e)),
@@ -83,11 +88,33 @@ function Overview() {
   const unpaidRows = report.data?.unpaid ?? [];
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
+  // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
+  const optionalLeft = counts.data ? counts.data.batches === 0 : false;
+  const brandNew = counts.data?.students === 0;
   const defaultDue = `${month}-05`;
 
   return (
     <section>
       <h1 className="display console-title">Overview</h1>
+      {firstRun && !setupDone && (
+        <div className="window setup-card">
+          <div className="window-bar chrome-font">Start here.dialog</div>
+          <div className="window-inner">
+            <h2 className="setup-first-title">
+              {pasted ? "Your studio is set up." : "Add your dancers to get started."}
+            </h2>
+            <SetupChecklist />
+          </div>
+        </div>
+      )}
+      {firstRun && setupDone && optionalLeft && (
+        <p className="console-banner setup-slim" role="status">
+          <span>✓ Setup done. Optional: add your batches so you can mark attendance.</span>
+          <Link to="/app/batches" className="setup-go">
+            Add batches
+          </Link>
+        </p>
+      )}
       <div className="console-toolbar">
         <label className="console-inline-label">
           Month
@@ -107,8 +134,9 @@ function Overview() {
         </label>
       </div>
 
+      {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
-      {snapshot && <MonthTotals snapshot={snapshot} />}
+      {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
 
       {unpaidRows.length > 0 && (
         <div className="console-banner" role="status">
@@ -133,7 +161,7 @@ function Overview() {
         </div>
       )}
 
-      {needsCharges && (
+      {needsCharges && !brandNew && (
         <div className="window generate-card">
           <div className="window-bar chrome-font">Charges.dialog</div>
           <div className="window-inner console-form">
@@ -229,13 +257,10 @@ function Overview() {
       <RecordPaymentDialog
         student={paying}
         onClose={() => setPaying(null)}
-        onSaved={(message) => {
-          setError("");
-          setNotice(message);
-        }}
+        onSaved={() => setError("")}
       />
 
-      {!setupDone && (
+      {!setupDone && !firstRun && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Setup.dialog</div>
           <div className="window-inner">

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <!-- The real console styles, copied from src/styles.css without the tailwind lines. -->
+    <link rel="stylesheet" href="console.css" />
+    <style>
+      html, body { margin:0; width:1920px; height:1080px; overflow:hidden; background:#F7E8DC; }
+      #root { position:relative; width:1920px; height:1080px; overflow:hidden; background:#F7E8DC; font-family:"DM Sans",Arial,sans-serif; }
+      .scene { position:absolute; inset:0; width:1920px; height:1080px; }
+      .stage { position:absolute; left:0; top:0; width:1422px; height:800px; transform:scale(1.35); transform-origin:0 0; }
+      .stage .console-toolbar { display:none; }
+      .stage .console-title { font-size:40px; margin:0 0 12px; }
+      .stage .console-list-head { margin:16px 0 8px; }
+      .stage .totals { margin-bottom:12px; }
+      .stage .console-main { padding-top:18px; }
+      .stage .console { min-height:0; height:800px; overflow:hidden; }
+      .stage .console-body { min-height:0; height:744px; }
+      .stage .retro-button { display:inline-flex; align-items:center; text-decoration:none; color:var(--ink); }
+      .b-sec { background:var(--marigold); }
+      .b-card { background:var(--paper); }
+      .caption { position:absolute; left:50%; bottom:46px; transform:translateX(-50%); background:var(--ink); color:var(--paper); font-weight:800; font-size:38px; padding:14px 28px; border:3px solid var(--ink); box-shadow:6px 6px 0 var(--blue); white-space:nowrap; z-index:50; }
+      .title-scene { background:var(--paper); display:grid; place-items:center; }
+      .title-win { width:1280px; box-shadow:10px 10px 0 var(--ink); }
+      .title-win .window-bar { min-height:56px; }
+      .title-win .chrome-font { font-size:36px; }
+      .title-win .window-controls i { width:22px; height:22px; }
+      .title-body { padding:70px 60px 78px; text-align:center; background:var(--paper); }
+      .title-body h1 { font-size:150px; margin:0; color:var(--blue); line-height:.98; }
+      .title-body p { font-size:40px; font-weight:700; margin:28px 0 0; }
+      .chat-wrap { position:absolute; right:70px; top:96px; width:620px; display:grid; gap:22px; z-index:30; }
+      .phone { border:4px solid var(--ink); background:#e5ddd5; box-shadow:10px 10px 0 var(--ink); }
+      .phone-bar { background:#075e54; color:#fff; padding:12px 18px; font-weight:800; font-size:26px; display:flex; justify-content:space-between; }
+      .phone-body { padding:16px; display:grid; gap:10px; min-height:120px; }
+      .bubble { max-width:86%; padding:10px 14px; font-size:23px; line-height:1.3; border-radius:10px; box-shadow:0 1px 1px rgba(0,0,0,.2); }
+      .bubble.out { justify-self:end; background:#dcf8c6; }
+      .bubble.in { justify-self:start; background:#fff; }
+      .bubble small { display:block; text-align:right; font-size:17px; opacity:.6; margin-top:2px; }
+      .sample-tag { position:absolute; right:70px; top:1004px; z-index:40; font-family:VT323,monospace; font-size:30px; background:var(--marigold); border:3px solid var(--ink); padding:2px 12px; }
+      .end-scene { background:var(--blue); display:grid; place-items:center; }
+      .end-win { width:1180px; box-shadow:10px 10px 0 var(--ink); background:var(--paper); }
+      .end-body { padding:64px 60px 70px; text-align:center; }
+      .end-body h2 { font-size:104px; margin:0; color:var(--blue); line-height:1; }
+      .end-body .retro-button { font-size:40px; padding:20px 40px; margin-top:44px; display:inline-block; background:var(--marigold); box-shadow:6px 6px 0 var(--ink); }
+      .end-body .url { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; font-size:68px; margin:40px 0 0; }
+      .end-body .note { font-size:34px; font-weight:700; margin:16px 0 0; }
+      .brand-tag { position:absolute; left:50px; top:36px; font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; font-size:34px; text-transform:uppercase; color:var(--paper); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="44" data-width="1920" data-height="1080">
+
+      <!-- 0 title -->
+      <div id="s-title" class="scene title-scene clip" data-start="0" data-duration="3.7" data-track-index="0">
+        <div class="window title-win" id="title-win">
+          <div class="window-bar"><span class="chrome-font">Choreo Studio</span><span class="window-controls" aria-hidden="true"><i></i><i></i></span></div>
+          <div class="title-body"><h1 class="display">It's the 5th.<br />Who paid?</h1><p>Fees, attendance and reminders for your dance studio.</p></div>
+        </div>
+      </div>
+
+      <!-- 1 overview, before -->
+      <div id="s-over1" class="scene clip" data-start="3.5" data-duration="23.8" data-track-index="1">
+        <div class="stage">
+          <div class="console">
+            <header class="console-topbar"><span class="brand">Choreo Studio</span><span class="console-studio">owner@sample-studio</span></header>
+            <div class="console-body">
+              <nav class="console-nav" aria-label="Console navigation">
+                <span class="console-nav-label">Manage</span>
+                <a class="console-nav-item active" id="nav-over">Overview</a><a class="console-nav-item">Setup</a><a class="console-nav-item">Dancers</a><a class="console-nav-item">Billing</a><a class="console-nav-item" id="nav-verify">To verify</a><a class="console-nav-item">Attendance</a><a class="console-nav-item">Messages</a><a class="console-nav-item">Insights</a><a class="console-nav-item">Batches</a><a class="console-nav-item">Fee plans</a>
+              </nav>
+              <main class="console-main">
+                <section>
+                  <h1 class="display console-title">Overview</h1>
+                  <div class="console-toolbar"><label class="console-inline-label">Month<input class="field month-field" value="October 2026" /></label></div>
+                  <div class="totals">
+                    <div class="totals-headline" data-tone="warn" id="headline"><span class="totals-label">Overdue</span><strong>₹5,900</strong><span class="console-hint">₹5,900 missing in all, ₹0 not yet due</span></div>
+                    <dl class="totals-grid">
+                      <div><dt>Billed</dt><dd>₹8,000</dd></div><div><dt>Collected</dt><dd>₹2,100</dd></div><div><dt>Paid</dt><dd>1 of 4</dd></div><div><dt>Dancers</dt><dd>4</dd></div><div><dt>Batches</dt><dd>4</dd></div>
+                    </dl>
+                  </div>
+                  <div class="console-banner" id="banner"><span><strong>3 unpaid</strong> · ₹5,900 owed this month</span><a class="retro-button b-sec" id="btn-remind">Remind on WhatsApp</a></div>
+                  <div class="console-list-head"><h2>Who hasn't paid</h2></div>
+                  <ul class="console-list" id="list1">
+                    <li class="console-row unpaid-row" id="row-anand"><div><strong>Anand K.</strong><span class="console-hint">9800000001 · due 5 Oct</span></div><div class="unpaid-owed"><strong>₹1,800</strong><span class="status-pill" data-tone="warn">16 days overdue</span></div><div class="console-row-actions"><a class="retro-button b-sec">Record payment</a><a class="retro-button b-card">WhatsApp</a></div></li>
+                    <li class="console-row unpaid-row" id="row-bela"><div><strong>Bela S.</strong><span class="console-hint">9800000002 · due 12 Oct</span></div><div class="unpaid-owed"><strong>₹2,500</strong><span class="status-pill" data-tone="warn">9 days overdue</span></div><div class="console-row-actions"><a class="retro-button b-sec">Record payment</a><a class="retro-button b-card">WhatsApp</a></div></li>
+                    <li class="console-row unpaid-row" id="row-naina"><div><strong>Naina K.</strong><span class="console-hint">9800000004 · due 15 Oct</span></div><div class="unpaid-owed"><strong>₹1,600</strong><span class="status-pill" data-tone="warn">6 days overdue</span></div><div class="console-row-actions"><a class="retro-button b-sec">Record payment</a><a class="retro-button b-card">WhatsApp</a></div></li>
+                  </ul>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WhatsApp chats -->
+      <div id="s-chats" class="chat-wrap clip" data-start="17" data-duration="10" data-track-index="3">
+        <div class="phone" id="chat-anand"><div class="phone-bar"><span>Anand K.</span><span>WhatsApp</span></div><div class="phone-body"><div class="bubble out">Hi Anand K., a reminder: your fee of ₹1,800 was due on 5 Oct. Thank you!<small>sent ✓✓</small></div><div class="bubble in" id="reply">paid 🙏<small>just now</small></div></div></div>
+        <div class="phone" id="chat-bela"><div class="phone-bar"><span>Bela S.</span><span>WhatsApp</span></div><div class="phone-body"><div class="bubble out">Hi Bela S., a reminder: your fee of ₹2,500 was due on 12 Oct. Thank you!<small>sent ✓✓</small></div></div></div>
+        <div class="phone" id="chat-naina"><div class="phone-bar"><span>Naina K.</span><span>WhatsApp</span></div><div class="phone-body"><div class="bubble out">Hi Naina K., a reminder: your fee of ₹1,600 was due on 15 Oct. Thank you!<small>sent ✓✓</small></div></div></div>
+      </div>
+      <div id="s-tag" class="sample-tag clip" data-start="17" data-duration="10" data-track-index="4">Sample chats</div>
+
+      <!-- 2 to verify -->
+      <div id="s-verify" class="scene clip" data-start="27.1" data-duration="6.2" data-track-index="2">
+        <div class="stage">
+          <div class="console">
+            <header class="console-topbar"><span class="brand">Choreo Studio</span><span class="console-studio">owner@sample-studio</span></header>
+            <div class="console-body">
+              <nav class="console-nav" aria-label="Console navigation">
+                <span class="console-nav-label">Manage</span>
+                <a class="console-nav-item">Overview</a><a class="console-nav-item">Setup</a><a class="console-nav-item">Dancers</a><a class="console-nav-item">Billing</a><a class="console-nav-item active">To verify</a><a class="console-nav-item">Attendance</a><a class="console-nav-item">Messages</a><a class="console-nav-item">Insights</a><a class="console-nav-item">Batches</a><a class="console-nav-item">Fee plans</a>
+              </nav>
+              <main class="console-main">
+                <section>
+                  <h1 class="display console-title">To verify</h1>
+                  <p class="console-hint verify-intro">A dancer says they paid. Nothing changes until you confirm it. Check the reference number against your own bank or UPI statement.</p>
+                  <p role="status" class="console-notice" id="notice" style="opacity:0">✓ Confirmed ₹1,800 for Anand K.</p>
+                  <ul class="console-list" id="claims">
+                    <li class="claim-card" id="claim">
+                      <div class="claim-head"><div><strong>Anand K.</strong><span class="console-hint">21 Oct · UPI · ref 402815</span></div></div>
+                      <dl class="claim-numbers"><div><dt>Claimed</dt><dd>₹1,800</dd></div><div><dt>Owed</dt><dd>₹1,800</dd></div><div><dt>Left after</dt><dd>₹0</dd></div></dl>
+                      <div class="console-actions"><a class="retro-button b-sec" id="btn-confirm">Confirm</a><a class="retro-button b-card">Adjust amount</a><a class="retro-button b-card">Reject</a></div>
+                    </li>
+                  </ul>
+                  <p class="console-empty" id="empty" style="opacity:0;position:absolute;margin-top:-120px">Nothing is waiting to be checked.</p>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 overview, after -->
+      <div id="s-over2" class="scene clip" data-start="33.1" data-duration="2.4" data-track-index="2">
+        <div class="stage">
+          <div class="console">
+            <header class="console-topbar"><span class="brand">Choreo Studio</span><span class="console-studio">owner@sample-studio</span></header>
+            <div class="console-body">
+              <nav class="console-nav" aria-label="Console navigation">
+                <span class="console-nav-label">Manage</span>
+                <a class="console-nav-item active">Overview</a><a class="console-nav-item">Setup</a><a class="console-nav-item">Dancers</a><a class="console-nav-item">Billing</a><a class="console-nav-item">To verify</a><a class="console-nav-item">Attendance</a><a class="console-nav-item">Messages</a><a class="console-nav-item">Insights</a><a class="console-nav-item">Batches</a><a class="console-nav-item">Fee plans</a>
+              </nav>
+              <main class="console-main">
+                <section>
+                  <h1 class="display console-title">Overview</h1>
+                  <div class="console-toolbar"><label class="console-inline-label">Month<input class="field month-field" value="October 2026" /></label></div>
+                  <div class="totals">
+                    <div class="totals-headline" data-tone="warn" id="headline2"><span class="totals-label">Overdue</span><strong>₹4,100</strong><span class="console-hint">₹4,100 missing in all, ₹0 not yet due</span></div>
+                    <dl class="totals-grid">
+                      <div><dt>Billed</dt><dd>₹8,000</dd></div><div id="collected2"><dt>Collected</dt><dd>₹3,900</dd></div><div id="paid2"><dt>Paid</dt><dd>2 of 4</dd></div><div><dt>Dancers</dt><dd>4</dd></div><div><dt>Batches</dt><dd>4</dd></div>
+                    </dl>
+                  </div>
+                  <div class="console-banner"><span><strong>2 unpaid</strong> · ₹4,100 owed this month</span><a class="retro-button b-sec">Remind on WhatsApp</a></div>
+                  <div class="console-list-head"><h2>Who hasn't paid</h2></div>
+                  <ul class="console-list">
+                    <li class="console-row unpaid-row"><div><strong>Bela S.</strong><span class="console-hint">9800000002 · due 12 Oct</span></div><div class="unpaid-owed"><strong>₹2,500</strong><span class="status-pill" data-tone="warn">9 days overdue</span></div><div class="console-row-actions"><a class="retro-button b-sec">Record payment</a><a class="retro-button b-card">WhatsApp</a></div></li>
+                    <li class="console-row unpaid-row"><div><strong>Naina K.</strong><span class="console-hint">9800000004 · due 15 Oct</span></div><div class="unpaid-owed"><strong>₹1,600</strong><span class="status-pill" data-tone="warn">6 days overdue</span></div><div class="console-row-actions"><a class="retro-button b-sec">Record payment</a><a class="retro-button b-card">WhatsApp</a></div></li>
+                  </ul>
+                </section>
+              </main>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 end card -->
+      <div id="s-end" class="scene end-scene clip" data-start="35.36" data-duration="8.64" data-track-index="5">
+        <div class="window end-win" id="end-win">
+          <div class="window-bar"><span class="chrome-font" style="font-size:34px">Choreo Studio</span><span class="window-controls" aria-hidden="true"><i></i><i></i></span></div>
+          <div class="end-body"><h2 class="display">Free for your<br />first month.</h2><a class="retro-button" id="end-cta">Start free trial</a><p class="url">choreostudio.live</p><p class="note">No card needed.</p></div>
+        </div>
+      </div>
+
+      <!-- captions -->
+      <div id="c1" class="caption clip" data-start="3.7" data-duration="3.3" data-track-index="6">The month, already sorted</div>
+      <div id="c2" class="caption clip" data-start="7.1" data-duration="9.4" data-track-index="6">Overdue in red · everyone who owes, in one list</div>
+      <div id="c3" class="caption clip" data-start="16.6" data-duration="6.4" data-track-index="6">Remind on WhatsApp · their own name and amount</div>
+      <div id="c4" class="caption clip" data-start="23.1" data-duration="2.3" data-track-index="6">You tap send, from your own number</div>
+      <div id="c5" class="caption clip" data-start="25.5" data-duration="1.5" data-track-index="6">A dancer replies: paid</div>
+      <div id="c6" class="caption clip" data-start="27.1" data-duration="4.4" data-track-index="6">To verify · check it against your bank</div>
+      <div id="c7" class="caption clip" data-start="31.9" data-duration="3.3" data-track-index="6">Confirmed · the totals update</div>
+
+      <audio id="vo" src="assets/voiceover.mp3" data-start="0.3" data-duration="41.2" data-track-index="9" data-volume="1"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const ease = "power2.out";
+      // title
+      tl.fromTo("#title-win", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease }, 0.1);
+      tl.to("#title-win", { opacity: 0, duration: 0.25 }, 3.4);
+      // overview before
+      tl.fromTo("#s-over1", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 3.5);
+      tl.fromTo("#headline", { scale: 1 }, { scale: 1.035, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut", transformOrigin: "0 50%" }, 7.1);
+      tl.fromTo("#row-anand", { boxShadow: "0 0 0 0 #c4372f" }, { boxShadow: "0 0 0 5px #c4372f", duration: 0.3, yoyo: true, repeat: 3 }, 11.8);
+      tl.fromTo("#btn-remind", { scale: 1 }, { scale: 0.94, duration: 0.15, yoyo: true, repeat: 1 }, 16.7);
+      // chats
+      tl.fromTo("#chat-anand", { x: 700, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease }, 17.0);
+      tl.fromTo("#chat-bela", { x: 700, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease }, 19.2);
+      tl.fromTo("#chat-naina", { x: 700, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease }, 21.2);
+      tl.fromTo("#reply", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35 }, 25.7);
+      tl.to("#s-chats", { opacity: 0, duration: 0.3 }, 26.8);
+      tl.to("#s-tag", { opacity: 0, duration: 0.3 }, 26.8);
+      // to verify
+      tl.fromTo("#s-verify", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 27.1);
+      tl.fromTo("#btn-confirm", { scale: 1 }, { scale: 0.92, duration: 0.15, yoyo: true, repeat: 1 }, 31.6);
+      tl.to("#claim", { opacity: 0, duration: 0.3 }, 31.9);
+      tl.to("#notice", { opacity: 1, duration: 0.3 }, 32.1);
+      tl.to("#empty", { opacity: 1, duration: 0.3 }, 32.3);
+      // overview after
+      tl.fromTo("#s-over2", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 33.1);
+      tl.fromTo("#collected2, #paid2", { scale: 1 }, { scale: 1.08, duration: 0.3, yoyo: true, repeat: 3 }, 33.5);
+      // end
+      tl.fromTo("#end-win", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease }, 35.5);
+      tl.fromTo("#end-cta", { scale: 1 }, { scale: 1.06, duration: 0.5, yoyo: true, repeat: 7, ease: "sine.inOut" }, 38);
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

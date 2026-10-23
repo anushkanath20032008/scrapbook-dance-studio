@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { setupCountsKey } from "@/components/console/console-data";
@@ -12,7 +13,7 @@ import { formatRupees, parseRupees } from "@/lib/money";
 import { feePlanInput } from "@/lib/schemas";
 
 export const Route = createFileRoute("/app/plans")({
-  head: () => ({ meta: [{ title: "Fee plans | Choreo Studio" }] }),
+  head: () => ({ meta: [{ title: "Fee plans | ChoreoStudio" }] }),
   component: FeePlans,
 });
 
@@ -69,7 +70,7 @@ function FeePlans() {
     mutationFn: (data: Parameters<typeof save>[0]["data"]) => save({ data }),
     onSuccess: (_row, variables) => {
       setOpen(false);
-      setNotice(variables.id ? "Fee plan updated." : "Fee plan added.");
+      toast.success(variables.id ? "Fee plan updated." : "Fee plan added.");
       refresh();
     },
     onError: (error) => setFormError(messageOf(error)),
@@ -122,9 +123,19 @@ function FeePlans() {
           ✓ {notice}
         </p>
       )}
+      {plans.isPending && <p className="console-empty">Loading your fee plans…</p>}
       {plans.isError && <p role="alert">Could not load your fee plans. Please refresh.</p>}
       {plans.data?.length === 0 && (
-        <p className="console-empty">No fee plans yet. Add your first.</p>
+        <div className="console-empty-card">
+          <p className="console-empty">No fee plans yet.</p>
+          <p className="console-hint">
+            A fee plan is what a dancer pays each month, for example ₹1,500 for two classes a week.
+            Dancers are billed from the plan you give them.
+          </p>
+          <Button variant="retro" type="button" onClick={() => openForm(null)}>
+            + Add your first fee plan
+          </Button>
+        </div>
       )}
       <ul className="console-list">
         {plans.data?.map((plan) => (
@@ -169,6 +180,7 @@ function FeePlans() {
               onChange={(event) => setName(event.target.value)}
               maxLength={120}
               placeholder="Twice a week"
+              autoFocus
             />
           </Field>
           <Field

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
@@ -31,24 +32,30 @@ export function UnpaidList({
   showQueue: boolean;
 }) {
   if (rows.length === 0)
-    return <p className="console-empty">Nobody owes anything for this month.</p>;
+    return <p className="console-empty">✓ Everyone has paid for this month. Nothing to chase.</p>;
   return (
     <ul className="console-list">
       {rows.map((row) => (
         <li key={row.charge_id} className="console-row unpaid-row">
           <div>
-            <strong>{row.student_name}</strong>
+            <Link to="/app/billing" search={{ student: row.student_id }} className="row-link">
+              <strong>{row.student_name}</strong>
+            </Link>
             <span className="console-hint">
-              {row.phone ?? "No phone"} · due {formatDay(row.due_on)}
+              {row.phone ?? "No phone number yet"}
             </span>
           </div>
           <div className="unpaid-owed">
             <strong>{formatRupees(row.outstanding_paise)}</strong>
-            <span className="status-pill" data-tone={row.status === "overdue" ? "warn" : "idle"}>
+            <span
+              className="status-pill"
+              style={{ textTransform: "none" }}
+              data-tone={row.status === "overdue" ? "warn" : "idle"}
+            >
               {dueText(row)}
             </span>
             {reminded.has(row.charge_id) && (
-              <span className="status-pill" data-tone="good">
+              <span className="status-pill" style={{ textTransform: "none" }} data-tone="good">
                 Reminded today
               </span>
             )}

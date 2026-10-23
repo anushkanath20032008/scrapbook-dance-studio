@@ -314,3 +314,240 @@ button { cursor:pointer; }
 .site-nav .brand, .nav-links a { white-space:nowrap; }
 @media(max-width:1000px){ .nav-links { gap:14px; } .nav-links a.nav-hide:nth-child(-n+2) { display:none; } }
 .trial-note { margin:10px 0 0; font-size:13px; font-weight:700; }
+.brand-mark { display:inline-block; vertical-align:middle; margin-right:8px; margin-top:-3px; }
+.brand-line { display:inline-flex; align-items:center; }
+.brand-line .brand-mark { margin:0 8px 0 0; }
+
+/* Analytics choice bar (shown on public pages until the visitor chooses). */
+.consent-bar { position:fixed; left:12px; right:12px; bottom:12px; z-index:60; max-width:720px; margin:0 auto; display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:14px 16px; background:var(--paper); color:var(--ink); border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); font-size:14px; line-height:1.45; }
+.consent-bar p { margin:0; flex:1 1 320px; }
+.consent-bar a { color:var(--blue); font-weight:800; }
+.consent-actions { display:flex; gap:10px; }
+.consent-actions button { border:2px solid var(--ink); padding:8px 14px; font:inherit; font-weight:800; cursor:pointer; box-shadow:3px 3px 0 var(--ink); }
+.consent-yes { background:var(--paper); color:var(--ink); }
+.consent-no { background:var(--paper); color:var(--ink); }
+.legal-page h2 { font-family:"Space Grotesk",Arial,sans-serif; font-size:22px; margin:26px 0 8px; }
+.legal-page p, .legal-page li { font-size:15px; line-height:1.6; }
+.legal-page ul { padding-left:22px; margin:6px 0 10px; }
+.legal-meta { font-size:13px; opacity:.8; }
+button.text-link { background:none; border:0; padding:0; font:inherit; font-weight:800; color:inherit; cursor:pointer; }
+.email-sent-big { font-family:"Space Grotesk",Arial,sans-serif; font-size:30px; font-weight:700; margin:0 0 8px; text-transform:uppercase; }
+
+
+/* Elements fade and rise into place as they scroll into view (see src/lib/scroll-reveal.ts). Uses the separate
+   translate property so it never replaces a card's own rotation. */
+.reveal { opacity:0; translate:0 26px; transition:opacity .55s ease, translate .55s ease; transition-delay:var(--reveal-delay, 0ms); }
+.reveal.reveal-in { opacity:1; translate:0 0; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity:1; translate:none; transition:none; } }
+
+/* Hero entrance on load: the headline words, subhead, buttons and the sample window arrive in turn. */
+@keyframes rise-in { from { opacity:0; translate:0 22px; } to { opacity:1; translate:0 0; } }
+@keyframes pop-in { from { opacity:0; scale:.94; translate:0 18px; } to { opacity:1; scale:1; translate:0 0; } }
+.hero-type h1 span { animation:rise-in .6s cubic-bezier(.2,.7,.2,1) backwards; }
+.hero-type h1 span:nth-child(1) { animation-delay:.05s; }
+.hero-type h1 span:nth-child(2) { animation-delay:.18s; }
+.hero-type h1 span:nth-child(3) { animation-delay:.31s; }
+.hero-type h1 span:nth-child(4) { animation-delay:.44s; }
+.hero-sub { animation:rise-in .6s ease .6s backwards; }
+.hero-type .size-picker { animation:rise-in .6s ease .75s backwards; }
+.hero-window { animation:pop-in .7s cubic-bezier(.2,.7,.2,1) .35s backwards; }
+
+/* Cards respond to the pointer. Uses scale and shadow so a card's own rotation is kept. */
+.window, .pricing-card, .desktop-icon, .size-option { transition:scale .2s ease 0s, box-shadow .2s ease 0s, opacity .55s ease var(--reveal-delay, 0ms), translate .55s ease var(--reveal-delay, 0ms); }
+.pricing-card:hover, .desktop-icon:hover { scale:1.025; }
+.window:hover { scale:1.008; }
+.pricing-card:hover { box-shadow:9px 9px 0 var(--ink); }
+.text-link { transition:letter-spacing .2s ease; }
+.text-link:hover { letter-spacing:.03em; }
+.calc-total { transition:scale .25s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-type h1 span, .hero-sub, .hero-type .size-picker, .hero-window { animation:none; }
+  .window:hover, .pricing-card:hover, .desktop-icon:hover { scale:none; }
+}
+
+/* Console: owner-console polish */
+.console-nav-item { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.console-nav-badge { min-width:22px; padding:1px 6px; text-align:center; background:var(--status-overdue); color:var(--ink); border:2px solid var(--ink); font-size:12px; font-weight:800; line-height:1.3; }
+.row-link { color:inherit; text-decoration:none; }
+.row-link:hover strong { text-decoration:underline; text-underline-offset:3px; }
+.reminder-preview { margin:0; padding:10px 12px; border-left:4px solid var(--blue); background:#fff7ef; font-size:.9rem; line-height:1.45; }
+.console-search { max-width:320px; }
+.attend-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; position:sticky; bottom:0; padding:10px 0; background:var(--paper); }
+.attend-count { font-weight:800; font-size:.9rem; margin-left:auto; }
+.mark-button { min-height:40px; }
+@media (max-width:760px) {
+  .console-topbar { position:sticky; top:0; z-index:30; }
+  .console-nav-item { padding:12px 11px; }
+  .console-row-actions .retro-button, .console-actions .retro-button { min-height:44px; }
+  .mark-button { min-height:44px; min-width:92px; }
+}
+.console-empty-card { display:grid; gap:10px; justify-items:start; padding:18px; border:2px dashed var(--ink); background:var(--paper); }
+.console-empty-card p { margin:0; }
+/* Setup: paste a list of dancers */
+.paste-box { min-height:150px; resize:vertical; font-family:inherit; line-height:1.4; }
+.paste-fee { max-width:180px; }
+.paste-preview { border:2px solid var(--ink); background:var(--paper); padding:10px 12px; }
+.paste-preview p { margin:0 0 6px; }
+.paste-fix { color:#7a1812; font-weight:700; }
+.paste-rows { list-style:none; margin:0; padding:0; max-height:220px; overflow:auto; display:grid; gap:4px; }
+.paste-rows li { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; font-size:.92rem; }
+.paste-rows li[data-bad="true"] { color:#7a1812; font-weight:700; }
+.paste-rows li[data-bad="true"] .console-hint { color:#7a1812; }
+.paste-done-big { font-family:"Space Grotesk",Arial,sans-serif; font-size:28px; font-weight:700; margin:0 0 8px; text-transform:uppercase; }
+.paste-form { margin-bottom:18px; padding-bottom:18px; border-bottom:3px solid var(--ink); }
+.setup-later { margin:18px 0 8px; }
+.setup-steps li[data-next="true"] { background:#fff3c4; box-shadow:3px 3px 0 var(--ink); }
+.setup-first-title { font-family:"Space Grotesk",Arial,sans-serif; font-size:24px; margin:0 0 12px; }
+
+/* Login: password field with a Show/Hide button */
+.password-field { position:relative; display:block; }
+.password-field .field { padding-right:68px; }
+.password-toggle { position:absolute; right:6px; top:50%; transform:translateY(-50%); border:0; background:transparent; font:inherit; font-weight:800; font-size:.85rem; text-decoration:underline; cursor:pointer; padding:8px; color:var(--ink); }
+.login-or { margin:14px 0 0; font-size:.9rem; opacity:.75; }
+.login-switch { font-weight:700; }
+.login-lede { margin:0 0 14px; }
+.login-fix { margin:8px 0 0; font-weight:700; }
+.login-actions-tight { margin-top:8px; }
+
+/* Account */
+.account-field { margin-bottom:13px; }
+.account-footer { margin-top:22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; }
+.account-notice { margin:12px 0; padding:9px 11px; border:2px solid var(--ink); background:var(--paper); font-weight:700; font-size:.92rem; }
+.account-plan-line { font-size:1.2rem; margin:0 0 4px; }
+
+/* Dancer's private link: the amount owed and one big button */
+.family-owe { border:3px solid var(--ink); box-shadow:5px 5px 0 var(--ink); padding:18px 16px; display:grid; gap:4px; background:var(--paper); margin:0 0 16px; }
+.family-owe[data-tone="warn"] { background:#f6c9c5; }
+.family-owe[data-tone="good"] { background:#dcefdc; }
+.family-owe strong { font-family:"Space Grotesk",Arial,sans-serif; font-size:clamp(44px,14vw,68px); line-height:1; }
+.family-pending { margin-top:6px; font-weight:700; font-size:.95rem; }
+.family-pay.family-pay { display:block; width:100%; min-height:58px; font-size:1.15rem; margin:0 0 18px; }
+.family-success { margin:0 0 18px; padding:12px 14px; border:3px solid var(--ink); background:#dcefdc; font-weight:800; box-shadow:4px 4px 0 var(--ink); }
+.claim-methods { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:4px; }
+.claim-methods button { border:2px solid var(--ink); background:var(--paper); font:inherit; font-weight:800; font-size:.9rem; padding:12px 4px; min-height:48px; cursor:pointer; }
+.claim-methods button[data-on="true"] { background:var(--marigold); box-shadow:2px 2px 0 var(--ink); }
+.claim-amount { font-size:1.4rem; font-weight:800; }
+.claim-more { border-top:2px solid var(--ink); padding-top:10px; }
+.claim-more summary { cursor:pointer; font-weight:800; font-size:.92rem; margin-bottom:10px; }
+@media (max-width:420px) { .claim-methods { grid-template-columns:repeat(2,1fr); } }
+
+/* Landing polish: skip link, tap sizes, compact nav and consent bar on phones, legal page layout. */
+.skip-link { position:absolute; left:8px; top:-60px; z-index:100; background:var(--ink); color:var(--paper); padding:10px 14px; font-weight:800; text-decoration:none; }
+.skip-link:focus { top:8px; }
+.soon-tag { display:inline-block; margin-left:4px; padding:1px 7px; border:2px solid var(--ink); background:var(--paper); font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+.site-nav .brand { min-width:0; display:inline-flex; align-items:center; min-height:44px; }
+.nav-links a { display:inline-flex; align-items:center; min-height:44px; }
+.nav-links a.nav-cta { padding:0 14px; }
+.text-link { display:inline-flex; align-items:center; min-height:44px; }
+.footer .wrap > div { display:flex; flex-wrap:wrap; gap:0 14px; align-items:center; }
+.footer .wrap > div a, .footer .wrap > div button { display:inline-flex; align-items:center; min-height:44px; }
+.range-row input[type="range"] { height:32px; }
+.video-window video { aspect-ratio:16 / 9; background:var(--ink); }
+.legal-wrap { max-width:760px; }
+.legal-back { display:inline-flex; align-items:center; min-height:44px; font-weight:800; color:var(--ink); }
+.legal-title { font-size:clamp(38px,9vw,56px); margin:18px 0 8px; overflow-wrap:anywhere; }
+.legal-page { min-height:100vh; }
+.legal-page .window-inner { overflow-wrap:anywhere; }
+.legal-page a { color:var(--blue); }
+.legal-foot { margin:24px 0 0; font-size:14px; font-weight:700; }
+.legal-foot a { display:inline-flex; align-items:center; min-height:44px; padding-inline:2px; }
+@media(max-width:540px){
+  .site-nav { gap:8px; }
+  .site-nav .brand { font-size:18px; }
+  .site-nav .brand .brand-mark { width:26px; height:26px; margin-right:6px; }
+  .nav-links { gap:2px; }
+  .nav-links a:not(.nav-cta) { padding:0 10px; }
+  .hero-actions a.text-link { padding:0 4px; }
+  .consent-bar { left:8px; right:8px; bottom:8px; padding:10px 12px; font-size:13px; gap:8px; border-width:2px; box-shadow:3px 3px 0 var(--ink); }
+  .consent-bar p { flex-basis:100%; }
+  .consent-actions { width:100%; }
+  .consent-actions button { flex:1; min-height:44px; padding:6px 10px; }
+  .legal-page .window-inner { padding:14px; }
+}
+.retro-button { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
+.consent-actions button { min-height:44px; }
+.final-cta :focus-visible, .faq :focus-visible, .footer :focus-visible, .problem :focus-visible { outline-color:var(--marigold); }
+.faq details :focus-visible { outline-color:var(--blue); }
+@media (max-width:760px) {
+  .console-topbar { gap:10px; padding-inline:12px; }
+  .console-topbar .brand { white-space:nowrap; font-size:17px; display:inline-flex; align-items:center; gap:6px; }
+  .console-studio { max-width:34vw; font-size:12px; }
+  .totals-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .totals-grid > div { padding:8px 10px; }
+  .totals-grid dd { font-size:1rem; }
+  .console-main { padding:16px 14px 28px; }
+  .console-title { margin-bottom:14px; }
+}
+@media (max-width:760px) {
+  .console-menu-button { width:44px; height:44px; }
+  .console-nav.open { position:fixed; top:56px; left:0; right:0; bottom:0; z-index:25; overflow-y:auto; border-bottom:0; }
+}
+.setup-card, .generate-card { margin-top:24px; }
+@media (max-width:640px) {
+  .attend-row { flex-direction:row !important; align-items:center !important; padding:8px 10px; }
+  .attend-row .console-row-actions { flex-wrap:nowrap; justify-content:flex-end; }
+  .attend-row .mark-button { min-width:78px; }
+}
+.me-list { list-style:none; margin:0 0 12px; padding:0; display:grid; gap:10px; }
+.me-row { display:grid; grid-template-columns:110px 1fr auto; gap:12px; align-items:center; }
+.me-label { font-weight:700; }
+.me-track { display:block; height:16px; border:2px solid var(--ink,#1a1a1a); background:#fff; }
+.me-fill { display:block; height:100%; background:#273FA3; }
+.me-meter { height:22px; border:2px solid var(--ink,#1a1a1a); background:#fff; margin-bottom:16px; }
+.me-meter span { display:block; height:100%; background:#5E9C76; }
+.me-value { text-align:right; font-variant-numeric:tabular-nums; }
+@media(max-width:540px){ .me-row { grid-template-columns:1fr auto; } .me-track { grid-column:1 / -1; order:3; } }
+.skeleton-block { display:block; height:36px; background:linear-gradient(90deg,#ecd8c8,#f3e3d6,#ecd8c8); background-size:200% 100%; animation:skeleton-shimmer 1.4s linear infinite; border:2px solid rgba(26,26,26,.15); }
+.skeleton-title { width:min(320px,70%); height:52px; margin-bottom:20px; }
+.skeleton-card { height:120px; margin-bottom:14px; }
+.console-skeleton-nav { gap:10px; }
+@keyframes skeleton-shimmer { to { background-position:-200% 0; } }
+@media (prefers-reduced-motion:reduce) { .skeleton-block { animation:none; } }
+.setup-slim { margin-bottom:16px; }
+.console-main > section > .window + .window { margin-top:20px; }
+.me-label::first-letter { text-transform:uppercase; }
+.me-label { text-transform:none; }
+
+.console-topbar a.brand { color:inherit; text-decoration:none; display:inline-flex; align-items:center; }
+
+/* Only real buttons and links respond to the pointer: no lift or zoom on boxes that do nothing. */
+.window:hover, .pricing-card:hover, .desktop-icon:hover { scale:none; }
+.pricing-card:hover { box-shadow:6px 6px 0 var(--ink); }
+.desktop-icon { cursor:default; }
+
+/* The first screen shows the headline, one line of what it does, and the button, without scrolling. */
+.hero-body { min-height:0; padding-block:28px 40px; }
+.hero-type { min-height:0; }
+.hero-type h1 { font-size:clamp(44px,5.6vw,88px); line-height:1; }
+.hero-type h1 span { display:block; }
+.hero-sub { margin-top:20px; }
+.hero-type .size-picker { margin-top:18px; }
+
+/* A call to action that stays in view on every screen of the landing page. */
+.float-cta { position:fixed; right:18px; bottom:18px; z-index:55; display:inline-flex; flex-direction:column; align-items:center; gap:2px; padding:12px 22px; background:var(--secondary); color:var(--ink); border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); font-weight:800; font-size:16px; text-decoration:none; line-height:1.2; }
+.float-cta small { font-weight:600; font-size:11px; letter-spacing:.02em; }
+.float-cta small:empty { display:none; }
+.float-cta:hover { translate:-1px -1px; box-shadow:5px 5px 0 var(--ink); }
+.float-cta:active { translate:2px 2px; box-shadow:2px 2px 0 var(--ink); }
+body:has(.consent-bar) .float-cta { bottom:132px; }
+@media (max-width:640px) {
+  /* On a phone the nav already shows the button on the first screen; the floating one appears once you scroll. */
+  .float-cta { display:none; left:14px; right:14px; bottom:14px; padding:12px 16px; }
+  .float-cta[data-scrolled="true"] { display:inline-flex; }
+  body:has(.consent-bar) .float-cta { bottom:104px; }
+  .consent-bar { left:8px; right:8px; bottom:8px; padding:10px 12px; gap:10px; font-size:13px; line-height:1.4; box-shadow:3px 3px 0 var(--ink); }
+  .consent-bar p { flex:1 1 100%; }
+  .consent-actions { width:100%; }
+  .consent-actions button { flex:1; padding:8px 10px; box-shadow:2px 2px 0 var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) { .float-cta:hover, .float-cta:active { translate:none; } }
+
+/* Consent bar and floating button never sit on top of each other: side by side on wide screens, and the button
+   waits until the visitor has answered on narrow ones. */
+@media (min-width:901px) {
+  .consent-bar { left:18px; right:auto; margin:0; max-width:440px; }
+  body:has(.consent-bar) .float-cta { bottom:18px; }
+}
+@media (max-width:900px) {
+  body:has(.consent-bar) .float-cta { display:none !important; }
+}

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { ConsoleDialog } from "@/components/console/console-dialog";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import { checkPassword, explainAuthError, passwordMeetsRubric } from "@/lib/password-rubric";
@@ -31,6 +32,9 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  // A pop-up the person cannot miss after we send an email, with a way to send it again.
+  const [sentTo, setSentTo] = useState<{ email: string; kind: "confirm" | "reset" } | null>(null);
+  const [resendNote, setResendNote] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -59,7 +63,8 @@ function Login() {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        setMessage("Check your email for a password reset link.");
+        setSentTo({ email, kind: "reset" });
+        setResendNote("");
       } else if (mode === "register") {
         const { error } = await supabase.auth.signUp({
           email,
@@ -67,7 +72,8 @@ function Login() {
           options: { emailRedirectTo: `${window.location.origin}/app` },
         });
         if (error) throw error;
-        setMessage("Check your email to confirm your account, then sign in.");
+        setSentTo({ email, kind: "confirm" });
+        setResendNote("");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -81,6 +87,22 @@ function Login() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function sendAgain() {
+    if (!sentTo) return;
+    setResendNote("Sending...");
+    const { error: resendError } =
+      sentTo.kind === "confirm"
+        ? await supabase.auth.resend({ type: "signup", email: sentTo.email })
+        : await supabase.auth.resetPasswordForEmail(sentTo.email, {
+            redirectTo: `${window.location.origin}/reset-password`,
+          });
+    setResendNote(
+      resendError
+        ? explainAuthError(resendError.message)
+        : "Sent again. It can take a minute to arrive.",
+    );
   }
 
   async function continueWithGoogle() {
@@ -236,6 +258,40 @@ function Login() {
           </div>
         </div>
       </div>
+      <ConsoleDialog
+        open={sentTo !== null}
+        onOpenChange={(open) => {
+          if (!open) setSentTo(null);
+        }}
+        title="Check your email"
+      >
+        {sentTo && (
+          <div role="alert" className="email-sent">
+            <p className="email-sent-big">
+              {sentTo.kind === "confirm" ? "One more step." : "Reset link sent."}
+            </p>
+            <p>
+              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"} to{" "}
+              <strong>{sentTo.email}</strong>.{" "}
+              {sentTo.kind === "confirm"
+                ? "Open it to finish signing up, then come back here and sign in."
+                : "Open it to choose a new password."}
+            </p>
+            <p className="console-hint">
+              It can take a minute. Check your spam or promotions folder too.
+            </p>
+            {resendNote && <p role="status">{resendNote}</p>}
+            <div className="console-form-actions">
+              <Button variant="retro" type="button" onClick={() => setSentTo(null)}>
+                OK, got it
+              </Button>
+              <Button variant="retroPaper" type="button" onClick={sendAgain}>
+                Send it again
+              </Button>
+            </div>
+          </div>
+        )}
+      </ConsoleDialog>
     </main>
   );
 }

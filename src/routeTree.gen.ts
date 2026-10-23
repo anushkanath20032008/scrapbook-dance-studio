@@ -29,6 +29,8 @@ import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
 import { Route as AppVerifyRouteImport } from './routes/app.verify'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as FamilyTokenRouteImport } from './routes/family.$token'
 import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-nudge'
 import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
@@ -136,6 +138,16 @@ const AppVerifyRoute = AppVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => AppRoute,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FamilyTokenRoute = FamilyTokenRouteImport.update({
   id: '/family/$token',
   path: '/family/$token',
@@ -187,8 +199,10 @@ export interface FileRoutesByFullPath {
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
   '/app/verify': typeof AppVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
@@ -214,8 +228,10 @@ export interface FileRoutesByTo {
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
   '/app/verify': typeof AppVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app': typeof AppIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
@@ -243,8 +259,10 @@ export interface FileRoutesById {
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
   '/app/verify': typeof AppVerifyRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/jobs/owner-nudge': typeof ApiJobsOwnerNudgeRoute
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
@@ -273,8 +291,10 @@ export interface FileRouteTypes {
     | '/app/setup'
     | '/app/students'
     | '/app/verify'
+    | '/blog/$slug'
     | '/family/$token'
     | '/app/'
+    | '/blog/'
     | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
@@ -300,8 +320,10 @@ export interface FileRouteTypes {
     | '/app/setup'
     | '/app/students'
     | '/app/verify'
+    | '/blog/$slug'
     | '/family/$token'
     | '/app'
+    | '/blog'
     | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
@@ -328,8 +350,10 @@ export interface FileRouteTypes {
     | '/app/setup'
     | '/app/students'
     | '/app/verify'
+    | '/blog/$slug'
     | '/family/$token'
     | '/app/'
+    | '/blog/'
     | '/api/jobs/owner-nudge'
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
@@ -347,7 +371,9 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   FamilyTokenRoute: typeof FamilyTokenRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiJobsOwnerNudgeRoute: typeof ApiJobsOwnerNudgeRoute
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
@@ -497,6 +523,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVerifyRouteImport
       parentRoute: typeof AppRoute
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/family/$token': {
       id: '/family/$token'
       path: '/family/$token'
@@ -582,7 +622,9 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
+  BlogSlugRoute: BlogSlugRoute,
   FamilyTokenRoute: FamilyTokenRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ApiJobsOwnerNudgeRoute: ApiJobsOwnerNudgeRoute,
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,

@@ -34,6 +34,7 @@ function Account() {
   const [studioName, setStudioName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
+  const [feeDueDay, setFeeDueDay] = useState(5);
   const [saved, setSaved] = useState("");
   const [saveError, setSaveError] = useState("");
   const [billingError, setBillingError] = useState("");
@@ -96,6 +97,7 @@ function Account() {
     setStudioName(p.studio_name);
     setPhone(p.phone ?? "");
     setCity(p.city ?? "");
+    setFeeDueDay(p.fee_due_day ?? 5);
   }, [profile.data]);
 
   async function handleProfile(e: FormEvent) {
@@ -104,7 +106,7 @@ function Account() {
     setSaved("");
     setSaveError("");
     try {
-      await save({ data: { name, studioName, phone, city } });
+      await save({ data: { name, studioName, phone, city, feeDueDay } });
       setSaved("Saved.");
     } catch (err) {
       setSaveError(
@@ -219,6 +221,20 @@ function Account() {
                       autoComplete="address-level2"
                     />
                   </label>
+                  <label className="form-label account-field">
+                    Fees are due on
+                    <select
+                      className="field"
+                      value={feeDueDay}
+                      onChange={(e) => setFeeDueDay(Number(e.target.value))}
+                    >
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                        <option key={day} value={day}>
+                          {day === 31 ? "Last day of the month" : `${day}${ordinal(day)} of every month`}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <Button variant="retro" type="submit" disabled={busy}>
                     Save studio details
                   </Button>
@@ -329,4 +345,9 @@ function Account() {
       </div>
     </main>
   );
+}
+
+function ordinal(day: number): string {
+  if (day % 100 >= 11 && day % 100 <= 13) return "th";
+  return ["th", "st", "nd", "rd"][day % 10 > 3 ? 0 : day % 10] ?? "th";
 }

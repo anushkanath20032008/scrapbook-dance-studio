@@ -201,17 +201,23 @@ describe("fee plan server functions", () => {
 
   it("assigns through the database function with the student, plan and start date", async () => {
     const { client, calls } = fakeSupabase((call) =>
-      call.fn === "assign_fee_plan" ? { data: "assignment-1" } : {},
+      call.fn === "assign_fee_plan"
+        ? { data: "assignment-1" }
+        : call.fn === "generate_student_charges"
+          ? { data: 2 }
+          : {},
     );
     const result = await assignFeePlan(
       { supabase: client, userId: user },
       { studentId, planId, startsOn: "2026-11-01" },
     );
-    expect(result).toEqual({ id: "assignment-1" });
+    expect(result).toEqual({ id: "assignment-1", charged: 2 });
     const rpc = calls.find((call) => call.fn === "assign_fee_plan");
     expect(rpc?.args).toEqual([
       { p_student: studentId, p_plan: planId, p_starts_on: "2026-11-01" },
     ]);
+    const backfill = calls.find((call) => call.fn === "generate_student_charges");
+    expect(backfill?.args).toEqual([{ p_student: studentId, p_from: "2026-11-01" }]);
   });
 
   it("passes through the readable reason when the database refuses an assignment", async () => {

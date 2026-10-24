@@ -84,6 +84,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const [text, setText] = useState("");
   const [fee, setFee] = useState<string | null>(null);
   const [bill, setBill] = useState(true);
+  const [dueChoice, setDueChoice] = useState("");
   const [error, setError] = useState("");
 
   const feeText =
@@ -98,7 +99,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const good = addableDancers(rows);
   const fixes = rows.length - good.length;
   const needsFee = good.some((row) => row.feePaise === null) && defaultFeePaise === null;
-  const dueOn = defaultDueDate(today);
+  const dueOn = /^\d{4}-\d{2}-\d{2}$/.test(dueChoice) ? dueChoice : defaultDueDate(today);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -275,8 +276,19 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
 
       <label className="console-check">
         <input type="checkbox" checked={bill} onChange={(event) => setBill(event.target.checked)} />
-        Also create this month&apos;s fee for each, due {formatDay(dueOn)}
+        Also create this month&apos;s fee for each
       </label>
+      {bill && (
+        <label className="form-label">
+          Due date
+          <input
+            className="field"
+            type="date"
+            value={dueOn}
+            onChange={(event) => setDueChoice(event.target.value)}
+          />
+        </label>
+      )}
       <FormAlert message={error} />
       <div className="console-actions">
         <Button variant="retro" type="submit" disabled={mutation.isPending || good.length === 0}>

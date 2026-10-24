@@ -410,6 +410,45 @@ export type Database = {
         }
         Relationships: []
       }
+      studio_instructors: {
+        Row: {
+          accepted_at: string | null
+          code_hash: string
+          created_at: string
+          email: string | null
+          expires_at: string
+          id: string
+          revoked_at: string | null
+          studio_id: string
+          token_hash: string
+          user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          code_hash: string
+          created_at?: string
+          email?: string | null
+          expires_at: string
+          id?: string
+          revoked_at?: string | null
+          studio_id: string
+          token_hash: string
+          user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          code_hash?: string
+          created_at?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          revoked_at?: string | null
+          studio_id?: string
+          token_hash?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payment_claims: {
         Row: {
           amount_paise: number
@@ -957,6 +996,42 @@ export type Database = {
       reject_payment_claim: {
         Args: { p_claim: string; p_reason: string }
         Returns: Database["public"]["Tables"]["payment_claims"]["Row"]
+      }
+      create_instructor_invite: {
+        Args: { p_code_hash: string; p_days: number; p_email: string | null; p_token_hash: string }
+        Returns: { expires_at: string; id: string }[]
+      }
+      redeem_instructor_invite: {
+        Args: { p_secret: string; p_source?: string }
+        Returns: string | null
+      }
+      instructor_me: {
+        Args: Record<PropertyKey, never>
+        Returns: { studio_id: string; studio_name: string }[]
+      }
+      instructor_batches: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          ends_at: string | null
+          id: string
+          name: string
+          room: string | null
+          starts_at: string | null
+          trainer_name: string | null
+          weekdays: number[]
+        }[]
+      }
+      instructor_batch_roster: {
+        Args: { p_batch: string }
+        Returns: { student_id: string; student_name: string }[]
+      }
+      instructor_batch_day: {
+        Args: { p_batch: string; p_on: string }
+        Returns: { present: boolean | null; student_id: string; student_name: string }[]
+      }
+      instructor_mark_attendance: {
+        Args: { p_batch: string; p_marks: Json; p_session_on: string }
+        Returns: number
       }
       create_member_invite: {
         Args: { p_code_hash: string; p_days: number; p_guardian: string; p_token_hash: string }

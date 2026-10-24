@@ -4,7 +4,7 @@ WITH new_tables(name) AS (
   VALUES ('guardians'), ('students'), ('batches'), ('batch_members'), ('fee_plans'),
          ('fee_plan_assignments'), ('class_sessions'), ('attendance_records'), ('charges'),
          ('payments'), ('reminders'), ('family_links'), ('billing_events'), ('payment_claims'),
-         ('member_invites'), ('member_links'), ('invite_attempts')
+         ('member_invites'), ('member_links'), ('invite_attempts'), ('studio_instructors')
 ),
 billing_columns(name) AS (
   VALUES ('plan'), ('billing_status'), ('dodo_customer_id'), ('dodo_subscription_id'),
@@ -57,7 +57,7 @@ SELECT 'owners or members can write ' || g.table_name || '.' || g.column_name ||
 FROM information_schema.column_privileges g
 WHERE g.table_schema = 'public'
   AND g.grantee IN ('authenticated', 'anon', 'PUBLIC')
-  AND g.table_name IN ('member_invites', 'member_links')
+  AND g.table_name IN ('member_invites', 'member_links', 'studio_instructors')
   AND g.privilege_type IN ('INSERT', 'UPDATE')
   AND g.column_name <> 'revoked_at'
 
@@ -68,7 +68,8 @@ WHERE g.table_schema = 'public'
   AND g.grantee IN ('authenticated', 'anon', 'PUBLIC')
   AND g.privilege_type = 'SELECT'
   AND ((g.table_name = 'member_invites' AND g.column_name IN ('token_hash', 'code_hash', 'redeemed_by'))
-    OR (g.table_name = 'member_links' AND g.column_name = 'user_id'))
+    OR (g.table_name = 'member_links' AND g.column_name = 'user_id')
+    OR (g.table_name = 'studio_instructors' AND g.column_name IN ('token_hash', 'code_hash', 'user_id')))
 
 UNION ALL
 SELECT 'a policy lets members in on ' || p.tablename || ': ' || p.policyname
@@ -118,7 +119,10 @@ WHERE p.pronamespace = 'public'::regnamespace
                     'submit_payment_claim', 'claim_screenshots_to_purge', 'confirm_payment_claim',
                     'reject_payment_claim', 'payment_claim_queue', 'has_role', 'create_member_invite',
                     'redeem_member_invite', 'member_studios', 'member_view', 'member_claims',
-                    'submit_payment_claim_member', 'owner_nudge_summary', 'student_limit', 'studio_capacity')
+                    'submit_payment_claim_member', 'owner_nudge_summary', 'student_limit', 'studio_capacity',
+                    'create_instructor_invite', 'redeem_instructor_invite', 'instructor_me', 'instructor_batches',
+                    'instructor_batch_roster', 'instructor_batch_day', 'instructor_mark_attendance',
+                    'caller_instructor_studio', 'block_instructor_studio')
   AND has_function_privilege('anon', p.oid, 'EXECUTE')
 
 UNION ALL

@@ -148,6 +148,13 @@
       "when": 1791202000000,
       "tag": "0020_fee_due_day",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791202100000,
+      "tag": "0021_instructors",
+      "breakpoints": true
     }
   ]
 }

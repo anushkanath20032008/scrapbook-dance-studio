@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -38,7 +38,10 @@ type NavTo =
   | "/app/month-end"
   | "/app/insights"
   | "/app/messages"
-  | "/app/verify";
+  | "/app/verify"
+  | "/app/team"
+  | "/app/class"
+  | "/app/my-batches";
 
 // The things an owner does every week come first; the one-time set-up screens sit under their own label.
 const dailyItems: { to: NavTo; label: string; exact: boolean }[] = [
@@ -53,7 +56,14 @@ const dailyItems: { to: NavTo; label: string; exact: boolean }[] = [
 const studioItems: { to: NavTo; label: string; exact: boolean }[] = [
   { to: "/app/batches", label: "Batches", exact: false },
   { to: "/app/plans", label: "Fee plans", exact: false },
+  { to: "/app/team", label: "Team", exact: false },
 ];
+// An instructor sees only these two screens; the database refuses everything else even if a URL is typed in.
+const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
+  { to: "/app/class", label: "Attendance", exact: false },
+  { to: "/app/my-batches", label: "Batches", exact: false },
+];
+const instructorPaths = instructorItems.map((item) => item.to as string);
 
 const readable = (value: string) => value.replace(/_/g, " ");
 
@@ -64,6 +74,7 @@ function ConsoleLayout() {
   const navigate = useNavigate();
   const session = useOwnerSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
   const context = useQuery({
     queryKey: ["console-context"],
@@ -71,24 +82,28 @@ function ConsoleLayout() {
     enabled: session.status === "signed-in",
   });
 
+  const isInstructor = context.data?.role === "instructor";
+  const isOwner = context.data?.role === "owner";
+
   // Small, shared queries: the same keys the screens use, so they are fetched once and reused.
+  // Only an owner has anything to load here.
   const loadClaims = useServerFn(listClaimQueue);
   const claims = useQuery({
     queryKey: ["claim-queue"],
     queryFn: () => loadClaims(),
-    enabled: session.status === "signed-in",
+    enabled: session.status === "signed-in" && isOwner,
   });
   const loadMessaging = useServerFn(getMessagingStatus);
   const messaging = useQuery({
     queryKey: ["messaging-status"],
     queryFn: () => loadMessaging(),
-    enabled: session.status === "signed-in",
+    enabled: session.status === "signed-in" && isOwner,
   });
   const loadCounts = useServerFn(getSetupCounts);
   const counts = useQuery({
     queryKey: setupCountsKey,
     queryFn: () => loadCounts(),
-    enabled: session.status === "signed-in",
+    enabled: session.status === "signed-in" && isOwner,
   });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : true;
   const toVerify = claims.data?.length ?? 0;
@@ -96,6 +111,13 @@ function ConsoleLayout() {
   useEffect(() => {
     if (session.status === "signed-out") void navigate({ to: "/login" });
   }, [session.status, navigate]);
+
+  // An instructor who lands anywhere but their two screens is sent to Attendance.
+  useEffect(() => {
+    if (isInstructor && !instructorPaths.includes(pathname.replace(/\/+$/, ""))) {
+      void navigate({ to: "/app/class", replace: true });
+    }
+  }, [isInstructor, pathname, navigate]);
 
   if (session.status !== "signed-in") {
     return (
@@ -151,6 +173,20 @@ function ConsoleLayout() {
         <span className="console-studio">{context.data?.studioName || session.email}</span>
       </header>
       <div className="console-body">
+        {isInstructor ? (
+        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Instructor navigation">
+          {instructorItems.map((item) => (
+            <NavLink key={item.to} to={item.to} onPick={() => setMenuOpen(false)}>
+              {item.label}
+            </NavLink>
+          ))}
+          <div className="console-nav-foot">
+            <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
+              Sign out
+            </Button>
+          </div>
+        </nav>
+        ) : (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Console navigation">
           {!setupDone && (
             <NavLink to="/app/setup" onPick={() => setMenuOpen(false)}>
@@ -214,9 +250,11 @@ function ConsoleLayout() {
             </Button>
           </div>
         </nav>
+        )}
         <main className="console-main">
           {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
-          <Outlet />
+          {/* Wait to learn the role, so an instructor never briefly opens an owner screen. */}
+          {context.isPending ? <span className="skeleton-block skeleton-card" /> : <Outlet />}
         </main>
       </div>
     </div>

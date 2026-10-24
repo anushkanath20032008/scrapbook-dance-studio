@@ -1,7 +1,23 @@
+import { getInstructorMe } from "./instructors.server";
 import { ensureStudio, friendlyError, type StudioContext } from "./studio.server";
 
 /** What the console shell needs after sign-in: the studio's identity, plan and billing state, and platform role. */
 export async function getConsoleContext(context: StudioContext) {
+  // An instructor gets the trimmed console and never a studio of their own, so check before ensureStudio.
+  const instructor = await getInstructorMe(context);
+  if (instructor) {
+    return {
+      role: "instructor" as const,
+      studentLimit: null,
+      studentCount: 0,
+      trialEndsAt: null,
+      ownerName: "",
+      studioName: instructor.studio_name,
+      plan: "waitlist",
+      billingStatus: "not_started",
+      isPlatformOwner: false,
+    };
+  }
   await ensureStudio(context);
   const { supabase, userId } = context;
 
@@ -24,6 +40,7 @@ export async function getConsoleContext(context: StudioContext) {
   const cap = capacity.error ? undefined : capacity.data?.[0];
 
   return {
+    role: "owner" as const,
     studentLimit: (cap?.student_limit as number | null | undefined) ?? null,
     studentCount: cap?.student_count ?? 0,
     trialEndsAt: cap?.trial_ends_at ?? null,

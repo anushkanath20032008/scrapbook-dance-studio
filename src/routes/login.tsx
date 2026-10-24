@@ -15,8 +15,15 @@ import {
 
 export const Route = createFileRoute("/login")({
   // Read on the server too, so the page opens on Register at once and never flashes Sign in first.
-  validateSearch: (search: Record<string, unknown>): { mode?: "register" | "forgot" } =>
-    search["mode"] === "register" || search["mode"] === "forgot" ? { mode: search["mode"] } : {},
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mode?: "register" | "forgot"; join?: string } => ({
+    ...(search["mode"] === "register" || search["mode"] === "forgot" ? { mode: search["mode"] } : {}),
+    // An instructor invite in progress: after signing in or registering they go back to accept it.
+    ...(typeof search["join"] === "string" && /^[A-Za-z0-9_-]{8,64}$/.test(search["join"])
+      ? { join: search["join"] }
+      : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Sign in | ChoreoStudio" },
@@ -40,6 +47,10 @@ function Login() {
   const session = useOwnerSession();
   const search = Route.useSearch();
   const [mode, setMode] = useState<Mode>(search.mode ?? "sign-in");
+  const joinCode = search.join;
+  const landingPath = joinCode ? `/join?code=${joinCode}` : "/app";
+  const goToLanding = () =>
+    void (joinCode ? navigate({ to: "/join", search: { code: joinCode } }) : navigate({ to: "/app" }));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // A pop-up the person cannot miss after we send an email, with a way to send it again.
@@ -63,7 +74,7 @@ function Login() {
   }, [mode]);
 
   useEffect(() => {
-    if (session.status === "signed-in") void navigate({ to: "/app" });
+    if (session.status === "signed-in") goToLanding();
   }, [session.status, navigate]);
 
   useEffect(() => {
@@ -90,14 +101,14 @@ function Login() {
         const { data, error } = await supabase.auth.signUp({
           email: address,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/app` },
+          options: { emailRedirectTo: `${window.location.origin}${landingPath}` },
         });
         if (error) throw error;
         if (isExistingAccount(data.user)) {
           setError("There is already an account with this email.");
           setFix("existing");
         } else if (data.session) {
-          void navigate({ to: "/app" });
+          goToLanding();
         } else {
           setSentTo({ email: address, kind: "confirm" });
           setResendNote("");
@@ -125,7 +136,7 @@ function Login() {
         ? await supabase.auth.resend({
             type: "signup",
             email: sentTo.email,
-            options: { emailRedirectTo: `${window.location.origin}/app` },
+            options: { emailRedirectTo: `${window.location.origin}${landingPath}` },
           })
         : await supabase.auth.resetPasswordForEmail(sentTo.email, {
             redirectTo: `${window.location.origin}/reset-password`,
@@ -143,7 +154,7 @@ function Login() {
     const { error: resendError } = await supabase.auth.resend({
       type: "signup",
       email: address,
-      options: { emailRedirectTo: `${window.location.origin}/app` },
+      options: { emailRedirectTo: `${window.location.origin}${landingPath}` },
     });
     setBusy(false);
     if (resendError) return setError(explainAuthError(resendError.message));
@@ -160,7 +171,7 @@ function Login() {
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/app`,
+        redirectTo: `${window.location.origin}${landingPath}`,
         // Always let the person choose which Google account to use.
         queryParams: { prompt: "select_account" },
       },

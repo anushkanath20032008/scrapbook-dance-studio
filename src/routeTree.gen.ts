@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OptOutRouteImport } from './routes/opt-out'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -22,12 +23,15 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAttendanceRouteImport } from './routes/app.attendance'
 import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
+import { Route as AppClassRouteImport } from './routes/app.class'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMonthEndRouteImport } from './routes/app.month-end'
+import { Route as AppMyBatchesRouteImport } from './routes/app.my-batches'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
+import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppVerifyRouteImport } from './routes/app.verify'
 import { Route as FamilyTokenRouteImport } from './routes/family.$token'
 import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-nudge'
@@ -54,6 +58,11 @@ const AdminRoute = AdminRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -101,6 +110,11 @@ const AppBillingRoute = AppBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppRoute,
 } as any)
+const AppClassRoute = AppClassRouteImport.update({
+  id: '/class',
+  path: '/class',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInsightsRoute = AppInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -116,6 +130,11 @@ const AppMonthEndRoute = AppMonthEndRouteImport.update({
   path: '/month-end',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMyBatchesRoute = AppMyBatchesRouteImport.update({
+  id: '/my-batches',
+  path: '/my-batches',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -129,6 +148,11 @@ const AppSetupRoute = AppSetupRouteImport.update({
 const AppStudentsRoute = AppStudentsRouteImport.update({
   id: '/students',
   path: '/students',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => AppRoute,
 } as any)
 const AppVerifyRoute = AppVerifyRouteImport.update({
@@ -172,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/privacy': typeof PrivacyRoute
@@ -180,12 +205,15 @@ export interface FileRoutesByFullPath {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
+  '/app/my-batches': typeof AppMyBatchesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
@@ -199,6 +227,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/privacy': typeof PrivacyRoute
@@ -207,12 +236,15 @@ export interface FileRoutesByTo {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
+  '/app/my-batches': typeof AppMyBatchesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app': typeof AppIndexRoute
@@ -228,6 +260,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
+  '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/opt-out': typeof OptOutRoute
   '/privacy': typeof PrivacyRoute
@@ -236,12 +269,15 @@ export interface FileRoutesById {
   '/app/attendance': typeof AppAttendanceRoute
   '/app/batches': typeof AppBatchesRoute
   '/app/billing': typeof AppBillingRoute
+  '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
+  '/app/my-batches': typeof AppMyBatchesRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
+  '/app/team': typeof AppTeamRoute
   '/app/verify': typeof AppVerifyRoute
   '/family/$token': typeof FamilyTokenRoute
   '/app/': typeof AppIndexRoute
@@ -258,6 +294,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/app'
+    | '/join'
     | '/login'
     | '/opt-out'
     | '/privacy'
@@ -266,12 +303,15 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/class'
     | '/app/insights'
     | '/app/messages'
     | '/app/month-end'
+    | '/app/my-batches'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/team'
     | '/app/verify'
     | '/family/$token'
     | '/app/'
@@ -285,6 +325,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/admin'
+    | '/join'
     | '/login'
     | '/opt-out'
     | '/privacy'
@@ -293,12 +334,15 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/class'
     | '/app/insights'
     | '/app/messages'
     | '/app/month-end'
+    | '/app/my-batches'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/team'
     | '/app/verify'
     | '/family/$token'
     | '/app'
@@ -313,6 +357,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/app'
+    | '/join'
     | '/login'
     | '/opt-out'
     | '/privacy'
@@ -321,12 +366,15 @@ export interface FileRouteTypes {
     | '/app/attendance'
     | '/app/batches'
     | '/app/billing'
+    | '/app/class'
     | '/app/insights'
     | '/app/messages'
     | '/app/month-end'
+    | '/app/my-batches'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
+    | '/app/team'
     | '/app/verify'
     | '/family/$token'
     | '/app/'
@@ -342,6 +390,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
   AppRoute: typeof AppRouteWithChildren
+  JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   OptOutRoute: typeof OptOutRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -383,6 +432,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -448,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBillingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/class': {
+      id: '/app/class'
+      path: '/class'
+      fullPath: '/app/class'
+      preLoaderRoute: typeof AppClassRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/insights': {
       id: '/app/insights'
       path: '/insights'
@@ -469,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMonthEndRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/my-batches': {
+      id: '/app/my-batches'
+      path: '/my-batches'
+      fullPath: '/app/my-batches'
+      preLoaderRoute: typeof AppMyBatchesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -488,6 +558,13 @@ declare module '@tanstack/react-router' {
       path: '/students'
       fullPath: '/app/students'
       preLoaderRoute: typeof AppStudentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/team': {
+      id: '/app/team'
+      path: '/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/verify': {
@@ -546,12 +623,15 @@ interface AppRouteChildren {
   AppAttendanceRoute: typeof AppAttendanceRoute
   AppBatchesRoute: typeof AppBatchesRoute
   AppBillingRoute: typeof AppBillingRoute
+  AppClassRoute: typeof AppClassRoute
   AppInsightsRoute: typeof AppInsightsRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppMonthEndRoute: typeof AppMonthEndRoute
+  AppMyBatchesRoute: typeof AppMyBatchesRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
+  AppTeamRoute: typeof AppTeamRoute
   AppVerifyRoute: typeof AppVerifyRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -560,12 +640,15 @@ const AppRouteChildren: AppRouteChildren = {
   AppAttendanceRoute: AppAttendanceRoute,
   AppBatchesRoute: AppBatchesRoute,
   AppBillingRoute: AppBillingRoute,
+  AppClassRoute: AppClassRoute,
   AppInsightsRoute: AppInsightsRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppMonthEndRoute: AppMonthEndRoute,
+  AppMyBatchesRoute: AppMyBatchesRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,
+  AppTeamRoute: AppTeamRoute,
   AppVerifyRoute: AppVerifyRoute,
   AppIndexRoute: AppIndexRoute,
 }
@@ -577,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
   AppRoute: AppRouteWithChildren,
+  JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   OptOutRoute: OptOutRoute,
   PrivacyRoute: PrivacyRoute,

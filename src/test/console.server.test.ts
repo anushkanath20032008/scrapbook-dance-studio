@@ -12,6 +12,7 @@ describe("getConsoleContext", () => {
     });
     const result = await getConsoleContext({ supabase: client, userId: user });
     expect(result).toEqual({
+      role: "owner",
       studentLimit: null,
       studentCount: 0,
       trialEndsAt: null,
@@ -90,5 +91,17 @@ describe("getConsoleContext capacity", () => {
       studentLimit: null,
       studentCount: 0,
     });
+  });
+});
+
+describe("getConsoleContext for an instructor", () => {
+  it("returns the instructor role and never creates a studio profile", async () => {
+    const { client, calls } = fakeSupabase((call) =>
+      call.fn === "instructor_me" ? { data: [{ studio_id: user, studio_name: "Natya" }] } : {},
+    );
+    const result = await getConsoleContext({ supabase: client, userId: user });
+    expect(result).toMatchObject({ role: "instructor", studioName: "Natya", isPlatformOwner: false });
+    expect(calls.some((call) => call.steps.some(([name]) => name === "upsert"))).toBe(false);
+    expect(calls.some((call) => call.fn === "has_role")).toBe(false);
   });
 });

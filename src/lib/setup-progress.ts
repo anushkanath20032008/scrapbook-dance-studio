@@ -24,7 +24,8 @@ export type SetupStep = {
   action: string;
 };
 
-const count = (n: number, noun: string) => `${n} ${noun}${n === 1 ? "" : "s"}`;
+const count = (n: number, noun: string) =>
+  `${n} ${n === 1 ? noun : /(ch|sh|s|x)$/.test(noun) ? `${noun}es` : `${noun}s`}`;
 
 export function buildSetupSteps(counts: SetupCounts): SetupStep[] {
   const everyoneHasFee = counts.students > 0 && counts.studentsWithPlan === counts.students;

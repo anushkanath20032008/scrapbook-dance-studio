@@ -52,6 +52,17 @@ function Attendance() {
     queryFn: () => dayFn({ data: { batchId, date } }),
     enabled: batchId !== "" && date !== "",
   });
+  const longWeekdays = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+  const pickedBatch = batches.data?.find((batch) => batch.id === batchId);
+  const pickedWeekday = date ? new Date(`${date}T00:00:00`).getDay() : -1;
+  const offDay =
+    pickedBatch && pickedBatch.weekdays.length > 0 && pickedWeekday >= 0 && !pickedBatch.weekdays.includes(pickedWeekday)
+      ? {
+          name: pickedBatch.name,
+          weekday: pickedWeekday,
+          days: pickedBatch.weekdays.map((day) => weekdayNames[day]).join(", "),
+        }
+      : null;
   const { from, to } = rangeFor(range, today);
   const summary = useQuery({
     queryKey: ["attendance-summary", from, to],
@@ -166,6 +177,12 @@ function Attendance() {
               />
             </label>
           </div>
+          {offDay && (
+            <p className="console-warning" role="status">
+              {offDay.name} does not meet on {longWeekdays[offDay.weekday]}
+              {offDay.days ? ` (it meets ${offDay.days})` : ""}. You can still save it.
+            </p>
+          )}
 
           {batches.data?.length === 0 && (
             <p className="console-empty">

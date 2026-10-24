@@ -98,7 +98,9 @@ function Messages() {
                 )}
               </div>
               <span className="status-pill" data-tone={tone(reminder.status)}>
-                {reminder.status}
+                {reminder.status === "queued" && messaging.data && !messaging.data.providerConfigured
+                  ? "not sent"
+                  : reminder.status}
               </span>
             </li>
           );

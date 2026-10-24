@@ -14,7 +14,7 @@ export const Route = createFileRoute("/privacy")({
 
 function Privacy() {
   return (
-    <LegalPage title="Privacy Notice." windowTitle="Privacy.txt" updated="22 October 2026">
+    <LegalPage title="Privacy Notice." windowTitle="Privacy.txt" updated="24 October 2026">
       <p>
         This notice explains what personal data ChoreoStudio ("we", "us") collects, why, who sees it, how long we keep
         it, and how you can use your rights under India's Digital Personal Data Protection Act, 2023 (the "DPDP Act").
@@ -91,8 +91,8 @@ function Privacy() {
 
       <h2>7. Cookies and analytics</h2>
       <p>
-        We use only what the site needs to work, such as keeping you signed in. Microsoft Clarity, which records how
-        visitors use our pages (for example where they click), is switched off unless you choose "Allow" on the bar
+        We use only the cookies the site needs to work, such as keeping you signed in. Analytics cookies from Microsoft Clarity, which record how
+        visitors use our pages (for example where they click), are switched off unless you choose "Allow" on the bar
         that appears. It runs only on our public pages (home, sign-in, privacy and terms), never inside the studio
         console or on a dancer's private link. You can change your mind at any time:{" "}
         <button type="button" className="text-link" onClick={openConsentChoice}>

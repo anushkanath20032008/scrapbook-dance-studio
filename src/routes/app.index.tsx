@@ -197,6 +197,31 @@ function Overview() {
           </div>
         </div>
       )}
+      {snapshot && snapshot.charged_students > 0 && snapshot.active_students > snapshot.charged_students && (
+        <div className="console-banner" role="status">
+          <span>
+            <strong>
+              {snapshot.active_students - snapshot.charged_students} dancer
+              {snapshot.active_students - snapshot.charged_students === 1 ? "" : "s"}
+            </strong>{" "}
+            {snapshot.active_students - snapshot.charged_students === 1 ? "has" : "have"} no fee for{" "}
+            {formatMonthLong(period)} yet. A dancer needs a monthly fee first.
+          </span>
+          <span className="console-banner-actions">
+            <Link to="/app/students" className="setup-go">
+              Set fees
+            </Link>
+            <Button
+              variant="retro"
+              type="button"
+              disabled={generateMutation.isPending}
+              onClick={() => generateMutation.mutate()}
+            >
+              Create their fees
+            </Button>
+          </span>
+        </div>
+      )}
       {notice && (
         <p role="status" className="console-notice">
           ✓ {notice}

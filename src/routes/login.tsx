@@ -52,6 +52,16 @@ function Login() {
   const emailRef = useRef<HTMLInputElement>(null);
 
   // Someone who is already signed in goes straight to the console.
+  // The tab title follows the form, so a register tab does not read "Sign in".
+  useEffect(() => {
+    document.title =
+      mode === "forgot"
+        ? "Reset password | ChoreoStudio"
+        : mode === "register"
+          ? "Create account | ChoreoStudio"
+          : "Sign in | ChoreoStudio";
+  }, [mode]);
+
   useEffect(() => {
     if (session.status === "signed-in") void navigate({ to: "/app" });
   }, [session.status, navigate]);
@@ -297,6 +307,12 @@ function Login() {
                 </Button>
               </div>
             </form>
+            {registering && (
+              <p className="console-hint login-terms">
+                By creating an account you agree to our <a href="/terms">Terms</a> and{" "}
+                <a href="/privacy">Privacy Notice</a>.
+              </p>
+            )}
             {mode !== "forgot" && (
               <>
                 <p className="login-or">or</p>

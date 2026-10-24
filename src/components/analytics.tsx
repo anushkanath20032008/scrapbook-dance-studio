@@ -117,7 +117,7 @@ export function Analytics() {
   return (
     <div className="consent-bar" role="dialog" aria-label="Analytics choice">
       <p>
-        We use Microsoft Clarity to see where visitors click. It stays off unless you allow it.{" "}
+        We use cookies to see how visitors use this site. They stay off unless you allow them.{" "}
         <a href="/privacy">Privacy</a>
       </p>
       <div className="consent-actions">

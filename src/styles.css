@@ -299,7 +299,7 @@ button { cursor:pointer; }
 .size-option[aria-pressed="true"] { background:var(--blue); color:var(--paper); }
 .text-link { align-self:center; font-weight:800; font-size:14px; color:inherit; text-decoration:underline; text-underline-offset:3px; }
 .hero-actions { align-items:center; }
-.calc-section { padding-top:0; }
+.calc-section { padding-top:24px; padding-bottom:40px; }
 .range-num { width:110px; justify-self:start; }
 .offer-banner { margin:0 0 28px; padding:16px 18px; border:3px solid var(--ink); background:var(--marigold); box-shadow:5px 5px 0 var(--ink); }
 .offer-banner p { margin:6px 0 0; font-size:15px; line-height:1.5; }
@@ -523,32 +523,17 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .hero-sub { margin-top:20px; }
 .hero-type .size-picker { margin-top:18px; }
 
-/* A call to action that stays in view on every screen of the landing page. */
-.float-cta { position:fixed; right:18px; bottom:18px; z-index:55; display:inline-flex; flex-direction:column; align-items:center; gap:2px; padding:12px 22px; background:var(--secondary); color:var(--ink); border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); font-weight:800; font-size:16px; text-decoration:none; line-height:1.2; }
-.float-cta small { font-weight:600; font-size:11px; letter-spacing:.02em; }
-.float-cta small:empty { display:none; }
-.float-cta:hover { translate:-1px -1px; box-shadow:5px 5px 0 var(--ink); }
-.float-cta:active { translate:2px 2px; box-shadow:2px 2px 0 var(--ink); }
-body:has(.consent-bar) .float-cta { bottom:132px; }
 @media (max-width:640px) {
   /* On a phone the nav already shows the button on the first screen; the floating one appears once you scroll. */
-  .float-cta { display:none; left:14px; right:14px; bottom:14px; padding:12px 16px; }
-  .float-cta[data-scrolled="true"] { display:inline-flex; }
-  body:has(.consent-bar) .float-cta { bottom:104px; }
   .consent-bar { left:8px; right:8px; bottom:8px; padding:10px 12px; gap:10px; font-size:13px; line-height:1.4; box-shadow:3px 3px 0 var(--ink); }
   .consent-bar p { flex:1 1 100%; }
   .consent-actions { width:100%; }
   .consent-actions button { flex:1; padding:8px 10px; box-shadow:2px 2px 0 var(--ink); }
 }
-@media (prefers-reduced-motion: reduce) { .float-cta:hover, .float-cta:active { translate:none; } }
 
 /* Consent bar and floating button never sit on top of each other: side by side on wide screens, and the button
    waits until the visitor has answered on narrow ones. */
 @media (min-width:901px) {
   .consent-bar { left:18px; right:auto; margin:0; max-width:440px; }
-  body:has(.consent-bar) .float-cta { bottom:18px; }
-}
-@media (max-width:900px) {
-  body:has(.consent-bar) .float-cta { display:none !important; }
 }
 .console-banner-actions { display:inline-flex; align-items:center; gap:14px; flex-wrap:wrap; }

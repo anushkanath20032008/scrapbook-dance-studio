@@ -73,6 +73,17 @@ function BlogPost() {
               ))}
             </>
           )}
+          {post.related?.length ? (
+            <>
+              <h2>Keep reading</h2>
+              <ul>
+                {post.related.map((slug) => {
+                  const other = getPost(slug);
+                  return other ? <li key={slug}><a href={`/blog/${slug}`}>{other.title}</a></li> : null;
+                })}
+              </ul>
+            </>
+          ) : null}
           {post.sources && (
             <>
               <h2>Sources</h2>

@@ -34,6 +34,17 @@ export const previewReminders = createServerFn({ method: "GET" })
     (await import("@/lib/reminders.server")).previewReminders(context, data),
   );
 
+export const getAutomation = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => (await import("@/lib/reminders.server")).getAutomation(context));
+
+export const setAutomation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ on: z.boolean() })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/reminders.server")).setAutomation(context, data),
+  );
+
 export const getMessagingStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => (await import("@/lib/reminders.server")).getMessagingStatus());

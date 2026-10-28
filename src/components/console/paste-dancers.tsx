@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { useRefreshMoney, useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { bulkAddDancers } from "@/lib/bulk-dancers.functions";
+import { getImportCapabilities, readDancersFromPhoto } from "@/lib/photo-import.functions";
 import { addableDancers, parseDancerList, suggestFeeRupees } from "@/lib/bulk-dancers";
 import { listFeePlans } from "@/lib/fees.functions";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
@@ -43,6 +44,28 @@ export function usePasteResult() {
   ] as const;
 }
 
+/** Shrinks a photo to at most 1800 px on its long side and returns JPEG base64, so a phone photo fits the limit. */
+async function photoToBase64(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 0.85).split(",")[1] ?? "";
+}
+
+/** Photo rows as pasted-list lines, so they go through the same checks and the same review as typed ones. */
+function linesFromPhoto(rows: { name: string; phone: string | null; feePaise: number | null }[]): string {
+  return rows
+    .map((row) =>
+      [row.name, row.phone ?? "", row.feePaise === null ? "" : String(row.feePaise / 100)]
+        .filter((cell) => cell !== "")
+        .join(", "),
+    )
+    .join("\n");
+}
+
 const EXAMPLE = "Asha Rao, 98765 43210\nBela Shah, 91234 56789, 1800\nChirag Nair, 99887 76655";
 
 /** The studio's due day this month, or today once it has gone, so the first reminders do not read as long overdue. */
@@ -70,6 +93,11 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const addFn = useServerFn(bulkAddDancers);
+  const capsFn = useServerFn(getImportCapabilities);
+  const readPhotoFn = useServerFn(readDancersFromPhoto);
+  const caps = useQuery({ queryKey: ["import-capabilities"], queryFn: () => capsFn() });
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [reading, setReading] = useState(false);
   const listPlansFn = useServerFn(listFeePlans);
   const loadProfile = useServerFn(getProfile);
   const saveProfileFn = useServerFn(saveProfile);
@@ -143,6 +171,24 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
     },
     onError: (e) => setError(messageOf(e)),
   });
+
+  async function onPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setError("");
+    setReading(true);
+    try {
+      const image = await photoToBase64(file);
+      const read = await readPhotoFn({ data: { image, mediaType: "image/jpeg" } });
+      if (read.rows.length === 0) setError("No dancers could be read from that page. Try a clearer photo.");
+      else setText((current) => [current.trim(), linesFromPhoto(read.rows)].filter(Boolean).join("\n"));
+    } catch (e) {
+      setError(messageOf(e));
+    } finally {
+      setReading(false);
+    }
+  }
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -221,6 +267,30 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
           fee after a name if it differs.
         </span>
       </label>
+
+      {caps.data?.photo && (
+        <div className="console-field">
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={onPhoto}
+          />
+          <Button
+            variant="retroPaper"
+            type="button"
+            disabled={reading}
+            onClick={() => fileInput.current?.click()}
+          >
+            {reading ? "Reading the page…" : "Read from a photo of your register"}
+          </Button>
+          <span className="console-hint">
+            The photo is only used to read the page and is not kept. You check every row before anything is saved.
+          </span>
+        </div>
+      )}
 
       {askStudioName && (
         <label className="form-label console-field">

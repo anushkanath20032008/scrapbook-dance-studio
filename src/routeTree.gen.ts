@@ -25,6 +25,7 @@ import { Route as AppBatchesRouteImport } from './routes/app.batches'
 import { Route as AppBillingRouteImport } from './routes/app.billing'
 import { Route as AppClassRouteImport } from './routes/app.class'
 import { Route as AppInsightsRouteImport } from './routes/app.insights'
+import { Route as AppMakeupsRouteImport } from './routes/app.makeups'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMonthEndRouteImport } from './routes/app.month-end'
 import { Route as AppMyBatchesRouteImport } from './routes/app.my-batches'
@@ -39,6 +40,7 @@ import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/p
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
 import { Route as ApiWebhooksTelegramRouteImport } from './routes/api/webhooks/telegram'
+import { Route as ApiWebhooksWhatsappRouteImport } from './routes/api/webhooks/whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -120,6 +122,11 @@ const AppInsightsRoute = AppInsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMakeupsRoute = AppMakeupsRouteImport.update({
+  id: '/makeups',
+  path: '/makeups',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMessagesRoute = AppMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -190,6 +197,11 @@ const ApiWebhooksTelegramRoute = ApiWebhooksTelegramRouteImport.update({
   path: '/api/webhooks/telegram',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksWhatsappRoute = ApiWebhooksWhatsappRouteImport.update({
+  id: '/api/webhooks/whatsapp',
+  path: '/api/webhooks/whatsapp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -207,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/app/billing': typeof AppBillingRoute
   '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/makeups': typeof AppMakeupsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
@@ -222,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
   '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
+  '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,6 +252,7 @@ export interface FileRoutesByTo {
   '/app/billing': typeof AppBillingRoute
   '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/makeups': typeof AppMakeupsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
@@ -253,6 +268,7 @@ export interface FileRoutesByTo {
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
   '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
+  '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -271,6 +287,7 @@ export interface FileRoutesById {
   '/app/billing': typeof AppBillingRoute
   '/app/class': typeof AppClassRoute
   '/app/insights': typeof AppInsightsRoute
+  '/app/makeups': typeof AppMakeupsRoute
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
@@ -286,6 +303,7 @@ export interface FileRoutesById {
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
   '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
+  '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -305,6 +323,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/class'
     | '/app/insights'
+    | '/app/makeups'
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
@@ -320,6 +339,7 @@ export interface FileRouteTypes {
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
     | '/api/webhooks/telegram'
+    | '/api/webhooks/whatsapp'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -336,6 +356,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/class'
     | '/app/insights'
+    | '/app/makeups'
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
@@ -351,6 +372,7 @@ export interface FileRouteTypes {
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
     | '/api/webhooks/telegram'
+    | '/api/webhooks/whatsapp'
   id:
     | '__root__'
     | '/'
@@ -368,6 +390,7 @@ export interface FileRouteTypes {
     | '/app/billing'
     | '/app/class'
     | '/app/insights'
+    | '/app/makeups'
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
@@ -383,6 +406,7 @@ export interface FileRouteTypes {
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
     | '/api/webhooks/telegram'
+    | '/api/webhooks/whatsapp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -402,6 +426,7 @@ export interface RootRouteChildren {
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
   ApiWebhooksTelegramRoute: typeof ApiWebhooksTelegramRoute
+  ApiWebhooksWhatsappRoute: typeof ApiWebhooksWhatsappRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -518,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInsightsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/makeups': {
+      id: '/app/makeups'
+      path: '/makeups'
+      fullPath: '/app/makeups'
+      preLoaderRoute: typeof AppMakeupsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/messages': {
       id: '/app/messages'
       path: '/messages'
@@ -616,6 +648,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksTelegramRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/whatsapp': {
+      id: '/api/webhooks/whatsapp'
+      path: '/api/webhooks/whatsapp'
+      fullPath: '/api/webhooks/whatsapp'
+      preLoaderRoute: typeof ApiWebhooksWhatsappRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -625,6 +664,7 @@ interface AppRouteChildren {
   AppBillingRoute: typeof AppBillingRoute
   AppClassRoute: typeof AppClassRoute
   AppInsightsRoute: typeof AppInsightsRoute
+  AppMakeupsRoute: typeof AppMakeupsRoute
   AppMessagesRoute: typeof AppMessagesRoute
   AppMonthEndRoute: typeof AppMonthEndRoute
   AppMyBatchesRoute: typeof AppMyBatchesRoute
@@ -642,6 +682,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBillingRoute: AppBillingRoute,
   AppClassRoute: AppClassRoute,
   AppInsightsRoute: AppInsightsRoute,
+  AppMakeupsRoute: AppMakeupsRoute,
   AppMessagesRoute: AppMessagesRoute,
   AppMonthEndRoute: AppMonthEndRoute,
   AppMyBatchesRoute: AppMyBatchesRoute,
@@ -672,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
   ApiWebhooksTelegramRoute: ApiWebhooksTelegramRoute,
+  ApiWebhooksWhatsappRoute: ApiWebhooksWhatsappRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

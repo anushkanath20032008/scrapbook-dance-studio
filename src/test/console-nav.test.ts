@@ -40,10 +40,11 @@ describe("console nav groups", () => {
     expect(withMessages).toContain("Messages");
   });
 
-  it("Studio tabs are Batches, Fee plans, Team and Account", () => {
+  it("Studio tabs are Batches, Fee plans, Make-ups, Team and Account", () => {
     expect(groupTabs("studio", false).map((tab) => tab.label)).toEqual([
       "Batches",
       "Fee plans",
+      "Make-ups",
       "Team",
       "Account",
     ]);

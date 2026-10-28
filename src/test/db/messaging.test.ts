@@ -158,6 +158,10 @@ describe("reminders: queueing and claiming", () => {
     }
     await generate(owner, "2026-10-01");
     await queue(owner, "2026-10-01", "2026-10-10");
+    await db.admin(
+      "UPDATE public.studio_profiles SET plan = $2, billing_status = $3, whatsapp_automation = true WHERE user_id = $1",
+      [owner, "studio", "active"],
+    );
     return owner;
   }
   const claim = (limit: number, lease = 300) =>

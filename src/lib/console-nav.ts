@@ -22,6 +22,7 @@ const moneyTabs: ConsoleTab[] = [
 const studioTabs: ConsoleTab[] = [
   { to: "/app/batches", label: "Batches" },
   { to: "/app/plans", label: "Fee plans" },
+  { to: "/app/makeups", label: "Make-ups" },
   { to: "/app/team", label: "Team" },
   { to: "/account", label: "Account" },
 ];

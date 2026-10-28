@@ -169,6 +169,13 @@
       "when": 1791202300000,
       "tag": "0023_photo_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791202400000,
+      "tag": "0024_whatsapp_studio_plus",
+      "breakpoints": true
     }
   ]
 }

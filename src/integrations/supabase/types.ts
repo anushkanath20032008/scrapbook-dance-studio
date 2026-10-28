@@ -614,6 +614,8 @@ export type Database = {
           charge_id: string
           created_at: string
           dedupe_key: string
+          delivered_at: string | null
+          delivery_status: string | null
           guardian_id: string
           id: string
           kind: string
@@ -928,6 +930,18 @@ export type Database = {
           student_id: string
           student_name: string
         }[]
+      }
+      record_delivery_status: {
+        Args: { p_error?: string; p_message_id: string; p_status: string }
+        Returns: boolean
+      }
+      set_whatsapp_automation: {
+        Args: { p_on: boolean }
+        Returns: boolean
+      }
+      whatsapp_automation_status: {
+        Args: Record<PropertyKey, never>
+        Returns: { enabled: boolean; studio_plus: boolean }[]
       }
       claim_due_reminders: {
         Args: { p_lease_seconds?: number; p_limit: number }

@@ -33,6 +33,8 @@ const row = (over: Partial<ReminderRow> = {}): ReminderRow => ({
   lease_expires_at: null,
   provider_message_id: null,
   sent_at: null,
+  delivery_status: null,
+  delivered_at: null,
   last_error: null,
   created_at: now.toISOString(),
   payload: {

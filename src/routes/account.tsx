@@ -305,7 +305,9 @@ function Account() {
                                 <li key={f}>{f}</li>
                               ))}
                             </ul>
-                            {availability.data?.plans[plan.id] && (
+                            {plan.comingSoon ? (
+                              <span className="soon-tag">Coming soon</span>
+                            ) : availability.data?.plans[plan.id] && (
                               <Button
                                 variant={plan.id === "studio" ? "retro" : "retroPaper"}
                                 disabled={busy || checkoutPlan !== null}

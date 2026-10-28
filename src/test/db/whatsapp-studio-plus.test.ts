@@ -86,3 +86,19 @@ describe("Studio+ WhatsApp", () => {
     expect(await rejection(db.query({ user: owner }, "SELECT public.record_delivery_status('wamid.B', 'read')"))).toMatch(/permission denied/i);
   });
 });
+
+describe("Studio+ WhatsApp switch is server-managed", () => {
+  it("does not let an owner write the automation column directly", async () => {
+    const db = await createDb();
+    try {
+      const owner = await newStudio(db);
+      expect(
+        await rejection(
+          db.query({ user: owner }, "UPDATE public.studio_profiles SET whatsapp_automation = true WHERE user_id = $1", [owner]),
+        ),
+      ).toMatch(/permission denied/i);
+    } finally {
+      await db.close();
+    }
+  }, 60_000);
+});

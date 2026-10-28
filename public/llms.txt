@@ -1,0 +1,26 @@
+# ChoreoStudio
+
+> Fee tracking and WhatsApp reminders for dance studio owners in India. ChoreoStudio shows which dancers have paid, who is due and who is overdue, and opens a WhatsApp reminder with each dancer's amount filled in. The studio owner presses Send. First month free, no card needed.
+
+## Facts
+- Product: ChoreoStudio, a web app for owner-run dance studios. Website: https://choreostudio.live
+- Who it is for: dance studio owners. Dancers are adults and do not need an app or an account.
+- What it does: keeps fees, attendance and batches in one place; records payments by cash, UPI, bank transfer or other, with an optional reference; shows what is still owed after part payments; opens a WhatsApp reminder for each unpaid dancer.
+- What it does not do: it does not send messages automatically (automated WhatsApp messages are planned for Studio+ and are labelled "coming soon"), and it never holds or processes dancers' money. Dancers pay the studio directly.
+- Pricing (INR, per month, as of October 2026): first month free with every feature and no card. Regular Rs 249 for up to 50 dancers. Studio+ Rs 479 for more than 50 dancers. Cancel any time.
+- Data: records are stored in Mumbai. Only the studio can see them. A dancer sees only their own fees, through a private link the studio sends.
+- Contact: support@choreostudio.live
+
+## Pages
+- [Home, features, pricing and FAQ](https://choreostudio.live/)
+- [Blog: fee guides for dance studio owners](https://choreostudio.live/blog)
+- [Privacy notice](https://choreostudio.live/privacy)
+- [Terms of service](https://choreostudio.live/terms)
+
+## Guides
+- [How to track monthly dance class fees, step by step](https://choreostudio.live/blog/track-monthly-dance-class-fees)
+- [Cash, UPI and bank transfer: matching dance class fees at month end](https://choreostudio.live/blog/reconcile-cash-upi-bank-dance-class-fees)
+- [Dance class fee reminder messages you can copy and paste](https://choreostudio.live/blog/dance-class-fee-reminder-messages)
+- [What to do when a dancer pays late: write your rule once](https://choreostudio.live/blog/dance-class-late-payment-policy)
+- [A month-end checklist for dance studio owners](https://choreostudio.live/blog/month-end-checklist-dance-studio-owner)
+- [How to run a dance studio WhatsApp group without it taking over](https://choreostudio.live/blog/dance-studio-whatsapp-group-tips)

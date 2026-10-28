@@ -4,7 +4,7 @@ import { SITE, posts } from "@/content/blog";
 
 const title = "Dance studio fee guides | ChoreoStudio blog";
 const description =
-  "Practical guides for dance studio owners: tracking monthly fees, matching cash, UPI and bank payments, and fee reminder messages you can copy.";
+  "Practical guides for dance studio owners: tracking monthly fees, matching cash, UPI and bank payments, reminder messages, late-payment rules and a month-end checklist.";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({

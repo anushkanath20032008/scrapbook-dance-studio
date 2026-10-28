@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://choreostudio.live/</loc></url>
-  <url><loc>https://choreostudio.live/login</loc></url>
+  <url><loc>https://choreostudio.live/</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://choreostudio.live/privacy</loc></url>
   <url><loc>https://choreostudio.live/terms</loc></url>
-  <url><loc>https://choreostudio.live/blog</loc><lastmod>2026-10-24</lastmod></url>
+  <url><loc>https://choreostudio.live/blog</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://choreostudio.live/blog/track-monthly-dance-class-fees</loc><lastmod>2026-10-24</lastmod></url>
   <url><loc>https://choreostudio.live/blog/reconcile-cash-upi-bank-dance-class-fees</loc><lastmod>2026-10-24</lastmod></url>
   <url><loc>https://choreostudio.live/blog/dance-class-fee-reminder-messages</loc><lastmod>2026-10-24</lastmod></url>
+  <url><loc>https://choreostudio.live/blog/dance-class-late-payment-policy</loc><lastmod>2026-10-27</lastmod></url>
+  <url><loc>https://choreostudio.live/blog/month-end-checklist-dance-studio-owner</loc><lastmod>2026-10-27</lastmod></url>
+  <url><loc>https://choreostudio.live/blog/dance-studio-whatsapp-group-tips</loc><lastmod>2026-10-27</lastmod></url>
 </urlset>

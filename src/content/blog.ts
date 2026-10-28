@@ -19,6 +19,8 @@ export type Post = {
   blocks: Block[];
   faq?: { q: string; a: string }[];
   sources?: { label: string; url: string; note: string }[];
+  /** Slugs of other posts to link at the end. */
+  related?: string[];
 };
 
 export const SITE = "https://choreostudio.live";
@@ -31,6 +33,7 @@ const trackFees: Post = {
     "A month-by-month fee routine for dance studio owners: see who has paid, who is due, and copy reminder messages for dancers who are late.",
   date: "2026-10-24",
   readingMinutes: 7,
+  related: ["reconcile-cash-upi-bank-dance-class-fees", "dance-class-fee-reminder-messages", "month-end-checklist-dance-studio-owner"],
   blocks: [
     {
       t: "p",
@@ -195,6 +198,7 @@ const cashUpiBank: Post = {
     "Dancers pay by cash, UPI and bank transfer in the same month. Here is a simple way for a dance studio owner to match all three to what each dancer owes.",
   date: "2026-10-24",
   readingMinutes: 5,
+  related: ["track-monthly-dance-class-fees", "month-end-checklist-dance-studio-owner", "dance-class-fee-reminder-messages"],
   blocks: [
     {
       t: "p",
@@ -273,6 +277,7 @@ const reminderMessages: Post = {
     "Eight copy-and-paste WhatsApp messages for dance studio owners: before the due date, overdue, part payments, cash received and when a dancer says they have paid.",
   date: "2026-10-24",
   readingMinutes: 4,
+  related: ["dance-class-late-payment-policy", "dance-studio-whatsapp-group-tips", "track-monthly-dance-class-fees"],
   blocks: [
     {
       t: "p",
@@ -352,7 +357,258 @@ const reminderMessages: Post = {
   ],
 };
 
-export const posts: Post[] = [trackFees, cashUpiBank, reminderMessages];
+const latePayment: Post = {
+  slug: "dance-class-late-payment-policy",
+  title: "What to do when a dancer pays late: write your rule once",
+  metaTitle: "Late Fee Payments at a Dance Studio: Write the Rule | ChoreoStudio",
+  description:
+    "A short guide for dance studio owners on late fee payments: pick a due date, a grace period and one standard message, then apply it the same way every month.",
+  date: "2026-10-27",
+  readingMinutes: 5,
+  related: ["dance-class-fee-reminder-messages", "track-monthly-dance-class-fees", "month-end-checklist-dance-studio-owner"],
+  blocks: [
+    {
+      t: "p",
+      text: "A late payment is rarely a crisis. What hurts is deciding what to do about it again every month, one dancer at a time, while you are tired and the dancer is a friend. A written rule takes that decision away. You decide once, tell everyone once, and then follow it.",
+    },
+    {
+      t: "p",
+      text: "This guide is a set of suggestions, not a standard. Studios differ. Pick the parts that fit yours.",
+    },
+    { t: "h2", text: "The four parts of a fee rule" },
+    {
+      t: "ol",
+      items: [
+        "A due date. One date each month, the same for everyone. Many studios use the 1st or the 5th.",
+        "A grace period. A few days after the due date when no reminder goes out. It saves you the awkward message to someone who was going to pay tomorrow anyway.",
+        "A reminder step. What you send, when, and from which number. Use the same wording for everyone.",
+        "A next step. What happens if the fee is still open after the reminder: a call, a pause on joining new classes, or a conversation. Write down which one you will actually do.",
+      ],
+    },
+    { t: "h2", text: "Decide before you need it" },
+    {
+      t: "p",
+      text: "Write the rule when no one owes you anything. A rule written in the middle of a dispute reads as a punishment. A rule that was in the welcome message on day one reads as how the studio works.",
+    },
+    { t: "h2", text: "Late fees: be careful" },
+    {
+      t: "p",
+      text: "Some studios add a late fee. If you do, put the amount in writing before the dancer joins, keep it small and apply it to everyone. Check the rules that apply to your business before you add one, because we cannot tell you what is allowed for yours. Many owners choose not to charge one and use the reminder and the next step instead.",
+    },
+    { t: "h2", text: "Where to put the rule" },
+    {
+      t: "ul",
+      items: [
+        "In the message you send when a dancer joins.",
+        "Pinned in your studio's WhatsApp group, if you have one.",
+        "On a printed note at the front desk or door.",
+      ],
+    },
+    { t: "h2", text: "A short rule you can adapt" },
+    {
+      t: "msg",
+      label: "Fee rule",
+      text: "Studio fees are due on the 5th of each month. If your fee is still open on the 8th, we will send you one reminder. If it is still open a week after that, we will call to see if something is wrong. If you need more time, tell us before the due date and we will agree a date together.",
+    },
+    { t: "h2", text: "Handling the dancer who is always late" },
+    {
+      t: "p",
+      text: "If the same person is late every month, the rule is not the problem. Talk to them once, privately. Often the date does not fit their pay cycle, and moving their due date a few days solves it. Write the new date down so it is not a one-off favour.",
+    },
+    { t: "h2", text: "How ChoreoStudio helps" },
+    {
+      t: "p",
+      text: "ChoreoStudio lists who is due and who is overdue, with the number of days overdue. For each unpaid dancer it opens a WhatsApp reminder with the dancer's amount filled in, and you press Send. Nothing is sent automatically.",
+    },
+    {
+      t: "note",
+      text: "First month free, no card needed.",
+    },
+  ],
+  faq: [
+    {
+      q: "How long should a grace period be for dance class fees?",
+      a: "There is no standard. Many studios allow a few days after the due date before sending a reminder. Pick a number, write it down and use it for everyone.",
+    },
+    {
+      q: "Should a dance studio charge a late fee?",
+      a: "It is your choice. If you do, state the amount in writing before the dancer joins and apply it to everyone. Check the rules that apply to your business first. Many owners use a reminder and a conversation instead.",
+    },
+    {
+      q: "What should I do when a dancer pays late every month?",
+      a: "Talk to them once, privately. Often their due date does not match when they are paid, and agreeing a different date fixes it.",
+    },
+  ],
+};
+
+const monthEndChecklist: Post = {
+  slug: "month-end-checklist-dance-studio-owner",
+  title: "A month-end checklist for dance studio owners",
+  metaTitle: "Month-End Checklist for Dance Studio Owners | ChoreoStudio",
+  description:
+    "A one-page month-end checklist for a dance studio: count what came in, match cash, UPI and bank, chase the late ones, close the month and set up the next.",
+  date: "2026-10-27",
+  readingMinutes: 4,
+  related: ["reconcile-cash-upi-bank-dance-class-fees", "dance-class-late-payment-policy", "track-monthly-dance-class-fees"],
+  blocks: [
+    {
+      t: "p",
+      text: "This is a checklist you can print or copy into a notebook. It takes a studio owner through the last day or two of a month so that the next one starts clean. Tick as you go.",
+    },
+    { t: "h2", text: "1. Count what came in" },
+    {
+      t: "ul",
+      items: [
+        "List every dancer with the amount owed for the month.",
+        "Add up what has been received, and write the total next to the total owed.",
+        "Work out the share collected: received divided by owed.",
+      ],
+    },
+    { t: "h2", text: "2. Match how it was paid" },
+    {
+      t: "ul",
+      items: [
+        "Cash: check the cash notes against the cash you are holding.",
+        "UPI: match each credit to a dancer by amount, date and reference.",
+        "Bank transfer: do the same with your statement.",
+        "Write down anything you cannot match and ask that dancer by name.",
+      ],
+    },
+    { t: "h2", text: "3. Deal with part payments and extra amounts" },
+    {
+      t: "ul",
+      items: [
+        "For each part payment, write what is still owed.",
+        "For each extra amount, decide whether it is advance for next month or a mistake.",
+      ],
+    },
+    { t: "h2", text: "4. Chase the late ones" },
+    {
+      t: "ul",
+      items: [
+        "Sort the open fees by how long they have been open.",
+        "Send each one the same reminder you would send anyone. Copy the wording from your fee rule.",
+        "Note the date you reminded each dancer, so you do not message the same person twice in a day.",
+      ],
+    },
+    { t: "h2", text: "5. Close the month" },
+    {
+      t: "ul",
+      items: [
+        "Save a copy of the final list: collected, still owed, and who.",
+        "Carry the open amounts forward so they show next month.",
+      ],
+    },
+    { t: "h2", text: "6. Set up the next month" },
+    {
+      t: "ul",
+      items: [
+        "Check the dancer list: who joined, who left, who changed batch.",
+        "Check that each dancer's fee amount is right for the new month.",
+        "Send the heads-up message a few days before the due date.",
+      ],
+    },
+    { t: "h2", text: "How ChoreoStudio helps" },
+    {
+      t: "p",
+      text: "ChoreoStudio has a Month end page. It shows the share collected, how the money came in by method (cash, UPI, bank transfer, other), and the late dancers you can remind from there. You still check your own statements before you confirm a payment.",
+    },
+    {
+      t: "note",
+      text: "First month free, no card needed.",
+    },
+  ],
+  faq: [
+    {
+      q: "What should a dance studio owner do at the end of every month?",
+      a: "Count what came in against what was owed, match cash, UPI and bank payments to each dancer, deal with part and extra payments, remind the late ones, save the final list, and check the dancer list for the next month.",
+    },
+    {
+      q: "How do I work out the share of fees collected?",
+      a: "Divide the total received by the total owed for the month. For example, if ₹40,000 was owed and ₹34,000 came in, the share collected is 85 percent.",
+    },
+  ],
+};
+
+const whatsappGroup: Post = {
+  slug: "dance-studio-whatsapp-group-tips",
+  title: "How to run a dance studio WhatsApp group without it taking over",
+  metaTitle: "Dance Studio WhatsApp Group: Tips and Rules | ChoreoStudio",
+  description:
+    "Practical tips for a dance studio WhatsApp group: who should be in it, what to post, what to keep out, and when to message dancers privately about fees.",
+  date: "2026-10-27",
+  readingMinutes: 4,
+  related: ["dance-class-fee-reminder-messages", "dance-class-late-payment-policy", "track-monthly-dance-class-fees"],
+  blocks: [
+    {
+      t: "p",
+      text: "For most studios, WhatsApp is where the studio lives. Class timings, music, costume photos and fee questions all land in the same place. That is useful until the group is so noisy that dancers mute it and miss the one message that mattered.",
+    },
+    { t: "h2", text: "One group for each purpose" },
+    {
+      t: "p",
+      text: "Keep a group for announcements where only you and your instructors can post. Keep a separate group for chat if your dancers want one. Fees do not belong in either.",
+    },
+    { t: "h2", text: "What to post in the announcements group" },
+    {
+      t: "ul",
+      items: [
+        "Class changes and cancellations.",
+        "Event and show dates.",
+        "A short reminder that fees are due soon, with no names.",
+      ],
+    },
+    { t: "h2", text: "What to keep out" },
+    {
+      t: "ul",
+      items: [
+        "Who has and has not paid. Nobody should read their balance, or someone else's, in a group.",
+        "Long discussions. Move them to the chat group or to a call.",
+        "Forwarded messages that have nothing to do with the studio.",
+      ],
+    },
+    { t: "h2", text: "Fees go in private messages" },
+    {
+      t: "p",
+      text: "A group post saying \"some fees are still pending\" makes the dancers who paid feel accused and the dancers who did not feel exposed. Send each person their own amount and due date, one to one. It is more respectful and it gets more replies.",
+    },
+    {
+      t: "msg",
+      label: "Private reminder",
+      text: "Hi Chirag, a quick note from the studio: your fee of ₹2,000 for this month is due on 5 Oct. You can pay by UPI to [your UPI ID]. Thank you!",
+    },
+    { t: "h2", text: "Set a few rules on day one" },
+    {
+      t: "ol",
+      items: [
+        "Tell new dancers what the group is for, in the message you send when they join.",
+        "Say when you read messages, so nobody expects an answer at midnight.",
+        "Pin the studio's timings and the fee rule at the top.",
+      ],
+    },
+    { t: "h2", text: "How ChoreoStudio fits in" },
+    {
+      t: "p",
+      text: "ChoreoStudio does not post in your groups. For each unpaid dancer it opens a private WhatsApp message with the dancer's own amount filled in, and you press Send. That keeps fee talk out of the group without you typing each message.",
+    },
+    {
+      t: "note",
+      text: "First month free, no card needed.",
+    },
+  ],
+  faq: [
+    {
+      q: "Should fees be discussed in a dance studio WhatsApp group?",
+      a: "No. Send each dancer their own amount and due date in a private message. Use the group for announcements that apply to everyone.",
+    },
+    {
+      q: "How many WhatsApp groups does a dance studio need?",
+      a: "Two is usually enough: one for announcements where only you and your instructors post, and one for chat if your dancers want it.",
+    },
+  ],
+};
+
+export const posts: Post[] = [trackFees, cashUpiBank, reminderMessages, latePayment, monthEndChecklist, whatsappGroup];
 
 export const getPost = (slug: string) => posts.find((post) => post.slug === slug);
 

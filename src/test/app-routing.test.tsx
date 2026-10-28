@@ -14,4 +14,22 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+
+  it("still matches every address from the old menu (AE5)", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const paths = [
+      "/app/verify",
+      "/app/month-end",
+      "/app/billing",
+      "/app/insights",
+      "/app/messages",
+      "/app/plans",
+      "/app/batches",
+      "/app/team",
+    ];
+
+    for (const path of paths) {
+      expect(router.matchRoutes(path).at(-1)?.routeId, path).not.toBe(rootRouteId);
+    }
+  });
 });

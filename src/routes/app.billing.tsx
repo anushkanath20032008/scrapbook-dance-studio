@@ -72,7 +72,7 @@ function Billing() {
         <p className="console-empty">
           {students.data?.length === 0
             ? "No dancers yet. Add one on the Dancers page first."
-            : "Choose a dancer to see their charges and payments."}
+            : "Choose a dancer to see their fees and payments."}
         </p>
       )}
 
@@ -101,12 +101,12 @@ function Billing() {
           </div>
 
           <div className="console-list-head">
-            <h2>Charges</h2>
+            <h2>Fees</h2>
           </div>
           {charges.isPending && <p className="console-hint">Loading…</p>}
           {charges.data?.length === 0 && (
             <p className="console-empty">
-              No charges yet. Generate this month&apos;s charges from Overview.
+              No fees yet. Add this month&apos;s fees from Overview.
             </p>
           )}
           <ul className="console-list">
@@ -150,7 +150,7 @@ function Billing() {
                         setVoiding({
                           kind: "charge",
                           id: charge.charge_id,
-                          label: `the ${formatMonthLong(charge.period)} charge`,
+                          label: `the ${formatMonthLong(charge.period)} fee`,
                         })
                       }
                     >

@@ -14,6 +14,7 @@ import { formatDayWithYear } from "@/lib/format";
 import { accountPlanSummary } from "@/lib/account-plan";
 import { studioPlans, subscriptionNote, type StudioPlanId } from "@/lib/plans";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
+import { GroupTabs } from "@/components/console/group-tabs";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -158,6 +159,7 @@ function Account() {
     <main className="section account-page">
       <div className="wrap account-wrap">
         <a href="/app">← Back to your studio</a>
+        <GroupTabs group="studio" pathname="/account" />
         <h1 className="display">Studio account.</h1>
         <div className="window">
           <div className="window-bar">

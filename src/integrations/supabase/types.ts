@@ -449,6 +449,63 @@ export type Database = {
         }
         Relationships: []
       }
+      makeup_classes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          done_at: string | null
+          id: string
+          makeup_batch_id: string
+          makeup_on: string
+          missed_batch_id: string
+          missed_on: string
+          student_id: string
+          studio_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          id?: string
+          makeup_batch_id: string
+          makeup_on: string
+          missed_batch_id: string
+          missed_on: string
+          student_id: string
+          studio_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          done_at?: string | null
+          id?: string
+          makeup_batch_id?: string
+          makeup_on?: string
+          missed_batch_id?: string
+          missed_on?: string
+          student_id?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
+      photo_reads: {
+        Row: {
+          id: string
+          read_at: string
+          studio_id: string
+        }
+        Insert: {
+          id?: string
+          read_at?: string
+          studio_id: string
+        }
+        Update: {
+          id?: string
+          read_at?: string
+          studio_id?: string
+        }
+        Relationships: []
+      }
       payment_claims: {
         Row: {
           amount_paise: number
@@ -1032,6 +1089,37 @@ export type Database = {
       instructor_mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number
+      }
+      plan_makeup: {
+        Args: { p_batch: string; p_makeup_batch: string; p_makeup_on: string; p_missed_on: string; p_students: string[] }
+        Returns: number
+      }
+      list_makeups: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          done_at: string | null
+          id: string
+          makeup_batch_id: string
+          makeup_batch_name: string
+          makeup_on: string
+          missed_batch_id: string
+          missed_batch_name: string
+          missed_on: string
+          student_id: string
+          student_name: string
+        }[]
+      }
+      finish_makeup: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      take_photo_reads: {
+        Args: { p_pages: number }
+        Returns: number
+      }
+      credit_photo_read: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       create_member_invite: {
         Args: { p_code_hash: string; p_days: number; p_guardian: string; p_token_hash: string }

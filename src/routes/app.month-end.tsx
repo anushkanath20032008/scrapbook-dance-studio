@@ -53,7 +53,7 @@ function MonthEnd() {
       {report.isLoading && <p className="console-empty">Loading this month…</p>}
       {noCharges && (
         <p className="console-empty">
-          {formatMonthLong(period)} has no charges yet. Generate them from <Link to="/app">Overview</Link>.
+          {formatMonthLong(period)} has no fees yet. Add them from <Link to="/app">Overview</Link>.
         </p>
       )}
 

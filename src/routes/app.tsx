@@ -12,6 +12,8 @@ import { getConsoleContext } from "@/lib/console.functions";
 import { getMessagingStatus } from "@/lib/reminders.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
 import { getSetupCounts } from "@/lib/setup.functions";
+import { GroupTabs } from "@/components/console/group-tabs";
+import { consoleGroups, groupForPath } from "@/lib/console-nav";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -43,21 +45,6 @@ type NavTo =
   | "/app/class"
   | "/app/my-batches";
 
-// The things an owner does every week come first; the one-time set-up screens sit under their own label.
-const dailyItems: { to: NavTo; label: string; exact: boolean }[] = [
-  { to: "/app", label: "Overview", exact: true },
-  { to: "/app/students", label: "Dancers", exact: false },
-  { to: "/app/billing", label: "Billing", exact: false },
-  { to: "/app/verify", label: "To verify", exact: false },
-  { to: "/app/month-end", label: "Month end", exact: false },
-  { to: "/app/attendance", label: "Attendance", exact: false },
-  { to: "/app/insights", label: "Insights", exact: false },
-];
-const studioItems: { to: NavTo; label: string; exact: boolean }[] = [
-  { to: "/app/batches", label: "Batches", exact: false },
-  { to: "/app/plans", label: "Fee plans", exact: false },
-  { to: "/app/team", label: "Team", exact: false },
-];
 // An instructor sees only these two screens; the database refuses everything else even if a URL is typed in.
 const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
   { to: "/app/class", label: "Attendance", exact: false },
@@ -107,6 +94,7 @@ function ConsoleLayout() {
   });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : true;
   const toVerify = claims.data?.length ?? 0;
+  const activeGroup = groupForPath(pathname);
 
   useEffect(() => {
     if (session.status === "signed-out") void navigate({ to: "/login" });
@@ -193,29 +181,18 @@ function ConsoleLayout() {
               Set up your studio
             </NavLink>
           )}
-          <span className="console-nav-label">Manage</span>
-          {dailyItems.map((item) => (
+          {consoleGroups.map((group) => (
             <NavLink
-              key={item.to}
-              to={item.to}
-              exact={item.exact}
-              badge={item.to === "/app/verify" ? toVerify : 0}
+              key={group.id}
+              to={group.to as NavTo}
+              exact={group.exact}
+              active={activeGroup === group.id}
+              badge={group.id === "money" ? toVerify : 0}
               onPick={() => setMenuOpen(false)}
             >
-              {item.label}
+              {group.label}
             </NavLink>
           ))}
-          <span className="console-nav-label">Studio</span>
-          {studioItems.map((item) => (
-            <NavLink key={item.to} to={item.to} onPick={() => setMenuOpen(false)}>
-              {item.label}
-            </NavLink>
-          ))}
-          {messaging.data?.providerConfigured === true && (
-            <NavLink to="/app/messages" onPick={() => setMenuOpen(false)}>
-              Messages
-            </NavLink>
-          )}
           <div className="console-nav-foot">
             <section className="console-plan" aria-label="Your plan">
               <div className="console-plan-bar chrome-font">Your plan</div>
@@ -237,9 +214,6 @@ function ConsoleLayout() {
                 </dd>
               </dl>
             </section>
-            <Link to="/account" className="console-nav-item">
-              Account and plans
-            </Link>
             {context.data?.isPlatformOwner && (
               <Link to="/admin" className="console-nav-item">
                 Waitlist
@@ -254,7 +228,20 @@ function ConsoleLayout() {
         <main className="console-main">
           {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
           {/* Wait to learn the role, so an instructor never briefly opens an owner screen. */}
-          {context.isPending ? <span className="skeleton-block skeleton-card" /> : <Outlet />}
+          {context.isPending ? (
+            <span className="skeleton-block skeleton-card" />
+          ) : (
+            <>
+              {!isInstructor && (
+                <GroupTabs
+                  group={activeGroup}
+                  pathname={pathname}
+                  messagingConfigured={messaging.data?.providerConfigured === true}
+                />
+              )}
+              <Outlet />
+            </>
+          )}
         </main>
       </div>
     </div>
@@ -265,11 +252,13 @@ function NavLink({
   to,
   exact = false,
   badge = 0,
+  active,
   onPick,
   children,
 }: {
   to: NavTo;
   exact?: boolean;
+  active?: boolean;
   badge?: number;
   onPick: () => void;
   children: string;
@@ -279,7 +268,7 @@ function NavLink({
       to={to}
       activeOptions={{ exact }}
       activeProps={{ className: "active" }}
-      className="console-nav-item"
+      className={`console-nav-item${active ? " active" : ""}`}
       onClick={onPick}
     >
       {children}

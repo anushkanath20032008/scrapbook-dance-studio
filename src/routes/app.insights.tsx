@@ -60,7 +60,7 @@ function Insights() {
           {trend.isPending && <p className="console-hint">Loading…</p>}
           {trend.data && !hasMoney && (
             <p className="console-empty">
-              Nothing billed yet, so there is nothing to chart. Generate this month&apos;s charges on{" "}
+              Nothing billed yet, so there is nothing to chart. Add this month&apos;s fees on{" "}
               <Link to="/app">Overview</Link>.
             </p>
           )}

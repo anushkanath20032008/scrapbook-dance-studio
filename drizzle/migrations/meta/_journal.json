@@ -155,6 +155,20 @@
       "when": 1791202100000,
       "tag": "0021_instructors",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791202200000,
+      "tag": "0022_makeup_classes",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791202300000,
+      "tag": "0023_photo_reads",
+      "breakpoints": true
     }
   ]
 }

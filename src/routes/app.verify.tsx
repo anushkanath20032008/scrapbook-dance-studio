@@ -18,7 +18,7 @@ import { formatDay, paymentMethodLabel } from "@/lib/format";
 import { formatRupees, parseRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/verify")({
-  head: () => ({ meta: [{ title: "To verify | ChoreoStudio" }] }),
+  head: () => ({ meta: [{ title: "Payments to check | ChoreoStudio" }] }),
   component: Verify,
 });
 
@@ -47,7 +47,7 @@ function Verify() {
 
   return (
     <section>
-      <h1 className="display console-title">To verify</h1>
+      <h1 className="display console-title">Payments to check</h1>
       <p className="console-hint verify-intro">
         A dancer says they paid. Nothing changes until you confirm it. Check the reference number
         against your own bank or UPI statement.

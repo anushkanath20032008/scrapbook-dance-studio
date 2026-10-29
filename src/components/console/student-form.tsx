@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FormAlert } from "@/components/console/form-helpers";
 import { feeLabel, messageOf, type FieldErrors } from "@/components/console/form-utils";
-import { useRefreshStudents } from "@/components/console/console-data";
+import { useRefreshMoney, useRefreshStudents } from "@/components/console/console-data";
 import { addToBatch, type listBatches } from "@/lib/batches.functions";
 import { listGuardians, saveGuardian, saveStudent } from "@/lib/directory.functions";
 import { assignFeePlan, type listFeePlans } from "@/lib/fees.functions";
@@ -38,6 +38,7 @@ export function StudentForm({
   onDone: () => void;
 }) {
   const refresh = useRefreshStudents();
+  const refreshMoney = useRefreshMoney();
   const saveGuardianFn = useServerFn(saveGuardian);
   const saveStudentFn = useServerFn(saveStudent);
   const addToBatchFn = useServerFn(addToBatch);
@@ -95,6 +96,7 @@ export function StudentForm({
     },
     onSuccess: ({ warnings }, values) => {
       refresh();
+      refreshMoney();
       if (warnings.length === 0) {
         toast.success(initial ? `Saved ${values.name}.` : `Added ${values.name}.`);
         if (!initial && addAnother.current) {

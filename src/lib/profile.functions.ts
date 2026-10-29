@@ -7,6 +7,7 @@ const profileSchema = z.object({
   studioName: z.string().trim().min(2).max(120),
   phone: z.string().trim().regex(/^\+?[0-9\s-]{10,18}$/).or(z.literal("")),
   city: z.string().trim().max(100),
+  feeDueDay: z.number().int().min(1).max(31).optional(),
 });
 
 export const saveProfile = createServerFn({ method: "POST" })
@@ -27,6 +28,7 @@ export const saveProfile = createServerFn({ method: "POST" })
             studio_name: data.studioName,
             phone: data.phone || null,
             city: data.city,
+            ...(data.feeDueDay ? { fee_due_day: data.feeDueDay } : {}),
           })
           .eq("user_id", context.userId);
     if (error) {
@@ -40,7 +42,7 @@ export const getProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.from("studio_profiles")
-      .select("name, studio_name, phone, city, plan, billing_status")
+      .select("name, studio_name, phone, city, plan, billing_status, fee_due_day")
       .eq("user_id", context.userId).maybeSingle();
     if (error) throw new Error("Could not load your studio details.");
     return data;

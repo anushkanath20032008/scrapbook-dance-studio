@@ -93,7 +93,14 @@ export async function assignFeePlan(
       p_starts_on: input.startsOn,
     }),
   );
-  return { id };
+  // A fee that starts in an earlier month bills those months too, so a dancer who joined on 1 Sep is not shown as owing nothing.
+  const charged = unwrap(
+    await supabase.rpc("generate_student_charges", {
+      p_student: input.studentId,
+      p_from: input.startsOn,
+    }),
+  );
+  return { id, charged };
 }
 
 export async function listAssignments({ supabase }: StudioContext, input: { studentId: string }) {

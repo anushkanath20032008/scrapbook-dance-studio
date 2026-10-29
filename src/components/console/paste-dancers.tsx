@@ -45,10 +45,12 @@ export function usePasteResult() {
 
 const EXAMPLE = "Asha Rao, 98765 43210\nBela Shah, 91234 56789, 1800\nChirag Nair, 99887 76655";
 
-/** The 5th of this month, or today once the 5th has gone, so the first reminders do not read as long overdue. */
-function defaultDueDate(today: string): string {
-  const fifth = `${firstOfMonth(today).slice(0, 8)}05`;
-  return fifth >= today ? fifth : today;
+/** The studio's due day this month, or today once it has gone, so the first reminders do not read as long overdue. */
+function defaultDueDate(today: string, dueDay: number): string {
+  const month = firstOfMonth(today);
+  const last = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+  const day = `${month.slice(0, 8)}${String(Math.min(dueDay, last)).padStart(2, "0")}`;
+  return day >= today ? day : today;
 }
 
 /**
@@ -84,6 +86,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const [text, setText] = useState("");
   const [fee, setFee] = useState<string | null>(null);
   const [bill, setBill] = useState(true);
+  const [dueChoice, setDueChoice] = useState("");
   const [error, setError] = useState("");
 
   const feeText =
@@ -98,7 +101,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const good = addableDancers(rows);
   const fixes = rows.length - good.length;
   const needsFee = good.some((row) => row.feePaise === null) && defaultFeePaise === null;
-  const dueOn = defaultDueDate(today);
+  const dueOn = /^\d{4}-\d{2}-\d{2}$/.test(dueChoice) ? dueChoice : defaultDueDate(today, profile.data?.fee_due_day ?? 5);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -275,8 +278,19 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
 
       <label className="console-check">
         <input type="checkbox" checked={bill} onChange={(event) => setBill(event.target.checked)} />
-        Also create this month&apos;s fee for each, due {formatDay(dueOn)}
+        Also create this month&apos;s fee for each
       </label>
+      {bill && (
+        <label className="form-label">
+          Due date
+          <input
+            className="field"
+            type="date"
+            value={dueOn}
+            onChange={(event) => setDueChoice(event.target.value)}
+          />
+        </label>
+      )}
       <FormAlert message={error} />
       <div className="console-actions">
         <Button variant="retro" type="submit" disabled={mutation.isPending || good.length === 0}>

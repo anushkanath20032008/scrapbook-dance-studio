@@ -10,6 +10,8 @@ export const studioPlans: readonly {
   name: string;
   price: string;
   features: readonly string[];
+  /** Not ready to buy yet: shown with a "Coming soon" tag and no checkout. */
+  comingSoon?: boolean;
 }[] = [
   {
     id: "starter",
@@ -27,6 +29,7 @@ export const studioPlans: readonly {
     id: "studio",
     name: "Studio+",
     price: "₹479",
+    comingSoon: true,
     features: [
       "More than 50 dancers",
       "Everything in Regular",

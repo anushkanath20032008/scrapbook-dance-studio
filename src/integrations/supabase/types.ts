@@ -608,6 +608,7 @@ export type Database = {
           current_period_end: string | null
           dodo_customer_id: string | null
           dodo_subscription_id: string | null
+          fee_due_day: number
           name: string
           phone: string | null
           plan: string
@@ -622,6 +623,7 @@ export type Database = {
           current_period_end?: string | null
           dodo_customer_id?: string | null
           dodo_subscription_id?: string | null
+          fee_due_day?: number
           name?: string
           phone?: string | null
           plan?: string
@@ -636,6 +638,7 @@ export type Database = {
           current_period_end?: string | null
           dodo_customer_id?: string | null
           dodo_subscription_id?: string | null
+          fee_due_day?: number
           name?: string
           phone?: string | null
           plan?: string
@@ -837,6 +840,14 @@ export type Database = {
       generate_monthly_charges: {
         Args: { p_due_on?: string; p_period: string }
         Returns: number
+      }
+      generate_student_charges: {
+        Args: { p_from: string; p_student: string }
+        Returns: number
+      }
+      charge_due_date: {
+        Args: { p_day: number; p_period: string }
+        Returns: string
       }
       has_role: {
         Args: {

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { PasswordField } from "@/components/password-field";
+import { setRoleIntent } from "@/lib/role-intent";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -202,7 +203,10 @@ function Login() {
                   type="button"
                   aria-pressed={role === "owner"}
                   variant={role === "owner" ? "retro" : "retroPaper"}
-                  onClick={() => setRole("owner")}
+                  onClick={() => {
+                    setRole("owner");
+                    setRoleIntent("owner");
+                  }}
                 >
                   I run a studio
                 </Button>
@@ -210,7 +214,10 @@ function Login() {
                   type="button"
                   aria-pressed={role === "teacher"}
                   variant={role === "teacher" ? "retro" : "retroPaper"}
-                  onClick={() => setRole("teacher")}
+                  onClick={() => {
+                    setRole("teacher");
+                    setRoleIntent("teacher");
+                  }}
                 >
                   I am a dance teacher
                 </Button>

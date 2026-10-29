@@ -90,3 +90,12 @@ export const markInstructorAttendance = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).markInstructorAttendance(context, data),
   );
+
+// The studio the caller teaches at, or null. Lets the console ask a new dance teacher to join a studio
+// before it creates anything for them.
+export const getMyTeacherStudio = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const me = await (await import("@/lib/instructors.server")).getInstructorMe(context);
+    return me ? { studioName: me.studio_name } : null;
+  });

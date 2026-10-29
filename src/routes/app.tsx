@@ -15,6 +15,9 @@ import { getSetupCounts } from "@/lib/setup.functions";
 import { GroupTabs } from "@/components/console/group-tabs";
 import { consoleGroups, groupForPath } from "@/lib/console-nav";
 import { helpVideos } from "@/lib/help-videos";
+import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
+import { getMyTeacherStudio } from "@/lib/instructors.functions";
+import { getRoleIntent } from "@/lib/role-intent";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -66,10 +69,19 @@ function ConsoleLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
+  // Someone who chose "I am a dance teacher" is asked which studio they teach at before anything is created for them.
+  const [teacherIntent, setTeacherIntent] = useState(() => (typeof window === "undefined" ? false : getRoleIntent() === "teacher"));
+  const loadTeacherStudio = useServerFn(getMyTeacherStudio);
+  const teacherStudio = useQuery({
+    queryKey: ["teacher-studio"],
+    queryFn: () => loadTeacherStudio(),
+    enabled: session.status === "signed-in" && teacherIntent,
+  });
+  const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
   const context = useQuery({
     queryKey: ["console-context"],
     queryFn: () => loadContext(),
-    enabled: session.status === "signed-in",
+    enabled: session.status === "signed-in" && !mustJoin,
   });
 
   const isInstructor = context.data?.role === "instructor";
@@ -230,6 +242,9 @@ function ConsoleLayout() {
         </nav>
         )}
         <main className="console-main">
+          {teacherIntent && teacherStudio.data === null && (
+            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} />
+          )}
           {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
           {/* Wait to learn the role, so an instructor never briefly opens an owner screen. */}
           {context.isPending ? (

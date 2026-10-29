@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
+import { MonthCharts } from "@/components/console/month-charts";
 import { MonthTotals } from "@/components/console/month-totals";
 import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
@@ -137,6 +138,7 @@ function Overview() {
       {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
       {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
+      {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
 
       {unpaidRows.length > 0 && (
         <div className="console-banner" role="status">

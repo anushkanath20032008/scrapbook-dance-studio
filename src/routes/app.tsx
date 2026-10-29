@@ -206,7 +206,7 @@ function ConsoleLayout() {
             </Link>
             {context.data?.isPlatformOwner && (
               <Link to="/admin" className="console-nav-item">
-                Waitlist
+                Studio enquiries
               </Link>
             )}
             <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>

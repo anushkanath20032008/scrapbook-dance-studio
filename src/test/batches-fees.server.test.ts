@@ -78,7 +78,10 @@ describe("batch server functions", () => {
     );
     await listBatches({ supabase: client, userId: user }, { includeArchived: false, limit: 100 });
     const members = calls.find((call) => call.table === "batch_members");
-    expect(stepsOf(members!, "is")).toEqual([["left_on", null]]);
+    expect(stepsOf(members!, "is")).toEqual([
+      ["left_on", null],
+      ["students.archived_at", null],
+    ]);
   });
 
   it("takes the studio from the signed-in user when creating a batch", async () => {

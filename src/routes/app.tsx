@@ -164,7 +164,7 @@ function ConsoleLayout() {
       </header>
       <div className="console-body">
         {isInstructor ? (
-        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Instructor navigation">
+        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
           {instructorItems.map((item) => (
             <NavLink key={item.to} to={item.to} onPick={() => setMenuOpen(false)}>
               {item.label}

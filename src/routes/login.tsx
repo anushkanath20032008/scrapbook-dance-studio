@@ -47,6 +47,8 @@ function Login() {
   const session = useOwnerSession();
   const search = Route.useSearch();
   const [mode, setMode] = useState<Mode>(search.mode ?? "sign-in");
+  // Who is signing in: a studio owner, or a dance teacher who was invited by one.
+  const [role, setRole] = useState<"owner" | "teacher">(search.join ? "teacher" : "owner");
   const joinCode = search.join;
   const landingPath = joinCode ? `/join?code=${joinCode}` : "/app";
   const goToLanding = () =>
@@ -195,6 +197,33 @@ function Login() {
           </div>
           <div className="window-inner">
             {mode !== "forgot" && (
+              <div className="login-tabs" role="group" aria-label="I am a">
+                <Button
+                  type="button"
+                  aria-pressed={role === "owner"}
+                  variant={role === "owner" ? "retro" : "retroPaper"}
+                  onClick={() => setRole("owner")}
+                >
+                  I run a studio
+                </Button>
+                <Button
+                  type="button"
+                  aria-pressed={role === "teacher"}
+                  variant={role === "teacher" ? "retro" : "retroPaper"}
+                  onClick={() => setRole("teacher")}
+                >
+                  I am a dance teacher
+                </Button>
+              </div>
+            )}
+            {mode !== "forgot" && role === "teacher" && (
+              <p className="console-hint login-lede">
+                {search.join
+                  ? "Sign in or register, and your studio invite is accepted next."
+                  : "Your studio owner sends you an invite link or code. Sign in or register, then open the link, or enter the code at choreostudio.live/join."}
+              </p>
+            )}
+            {mode !== "forgot" && (
               <div className="login-tabs" role="tablist" aria-label="Sign in or register">
                 <Button
                   type="button"
@@ -216,7 +245,7 @@ function Login() {
                 </Button>
               </div>
             )}
-            {registering && (
+            {registering && role === "owner" && (
               <p className="console-hint login-lede">Free for your first month. No card needed.</p>
             )}
             {mode === "forgot" && (

@@ -72,12 +72,12 @@ function Team() {
     <section>
       <h1 className="display console-title">Team</h1>
       <p className="console-hint">
-        An instructor can see your batches and the names of the dancers on them, and mark attendance.
+        A dance teacher can see your batches and the names of the dancers on them, and mark attendance.
         They cannot see phone numbers, fees, payments or your account.
       </p>
 
       <div className="window">
-        <div className="window-bar chrome-font">Invite an instructor</div>
+        <div className="window-bar chrome-font">Invite a dance teacher</div>
         <form className="window-inner console-form" onSubmit={submit} noValidate>
           <Field label="Their email" hint="Leave empty to get a link you can send on WhatsApp.">
             <input
@@ -109,7 +109,7 @@ function Team() {
 
       {invite && (
         <div className="window" role="status">
-          <div className="window-bar chrome-font">Send this to {invite.email ?? "your instructor"}</div>
+          <div className="window-bar chrome-font">Send this to {invite.email ?? "your dance teacher"}</div>
           <div className="window-inner console-form">
             <p>
               They open the link, sign in or create an account{invite.email ? ` with ${invite.email}` : ""}, and
@@ -132,7 +132,7 @@ function Team() {
         <h2 className="display">Your team</h2>
       </div>
       {team.isError && <p role="alert">Could not load your team. Please refresh.</p>}
-      {team.data?.length === 0 && <p className="console-empty">No instructors yet.</p>}
+      {team.data?.length === 0 && <p className="console-empty">No dance teachers yet.</p>}
       <ul className="console-list">
         {team.data?.map((person) => {
           const accepted = person.accepted_at !== null;
@@ -151,7 +151,7 @@ function Team() {
               </div>
               <div className="console-row-actions">
                 <span className="status-pill" data-tone={accepted ? "good" : expired ? "idle" : "warn"}>
-                  {accepted ? "Instructor" : expired ? "Expired" : "Waiting"}
+                  {accepted ? "Dance teacher" : expired ? "Expired" : "Waiting"}
                 </span>
                 <Button
                   variant="retroPaper"
@@ -161,7 +161,7 @@ function Team() {
                   onClick={() => {
                     if (
                       !accepted ||
-                      window.confirm(`Remove ${person.email ?? "this instructor"}? They will lose access straight away.`)
+                      window.confirm(`Remove ${person.email ?? "this dance teacher"}? They will lose access straight away.`)
                     )
                       remove.mutate(person.id);
                   }}

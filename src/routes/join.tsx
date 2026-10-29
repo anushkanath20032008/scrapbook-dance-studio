@@ -76,7 +76,7 @@ function Join() {
             <p>Loading…</p>
           ) : session.status === "signed-out" ? (
             <>
-              <h1 className="display">Join as an instructor.</h1>
+              <h1 className="display">Join as a dance teacher.</h1>
               <p>Sign in or create an account first. Use the email your studio invited, if they gave one.</p>
               <div className="attend-bar">
                 <Link
@@ -97,7 +97,7 @@ function Join() {
             </>
           ) : (
             <form className="console-form" onSubmit={submit} noValidate>
-              <h1 className="display">Join as an instructor.</h1>
+              <h1 className="display">Join as a dance teacher.</h1>
               <p>Signed in as {session.email}.</p>
               {!linkCode && (
                 <label className="form-label console-field">
@@ -116,7 +116,7 @@ function Join() {
               </Button>
               <FormAlert message={error} />
               <p className="console-hint">
-                An instructor sees batches, dancer names and attendance. Nothing about fees or phone
+                A dance teacher sees batches, dancer names and attendance. Nothing about fees or phone
                 numbers.
               </p>
             </form>

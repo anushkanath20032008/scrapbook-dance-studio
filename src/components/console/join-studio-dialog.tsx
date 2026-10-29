@@ -63,7 +63,7 @@ export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
               onLeave();
             }}
           >
-            I run a studio instead
+            I own a dance studio instead
           </Button>
         </div>
       </form>

@@ -208,7 +208,7 @@ function Login() {
                     setRoleIntent("owner");
                   }}
                 >
-                  I run a studio
+                  I own a dance studio
                 </Button>
                 <Button
                   type="button"
@@ -219,7 +219,7 @@ function Login() {
                     setRoleIntent("teacher");
                   }}
                 >
-                  I am a dance teacher
+                  I teach at a dance studio
                 </Button>
               </div>
             )}

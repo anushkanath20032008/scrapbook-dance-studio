@@ -560,3 +560,20 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .month-pie { display:grid; gap:8px; }
 .month-legend { list-style:none; margin:0; padding:0; display:grid; gap:4px; font-size:14px; }
 .month-dot { display:inline-block; width:12px; height:12px; margin-right:8px; border:2px solid var(--ink); }
+
+/* Console type matches the home page: Space Grotesk for menus, tabs and buttons. */
+.console-nav-item, .group-tab, .retro-button, .console-banner { font-family:"Space Grotesk",Arial,sans-serif; }
+.console-nav-item, .group-tab { font-weight:600; letter-spacing:.01em; }
+.console-nav-item { font-size:15px; }
+/* Anything you can click moves when you point at it; plain boxes and text do not. */
+.retro-button, .group-tab, .console-nav-item, .setup-go, .text-link, .console-day, .mark-button { transition:transform .12s, box-shadow .12s, background-color .12s; }
+.retro-button:hover:not(:disabled), .group-tab:hover, .console-day:hover, .mark-button:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }
+.console-nav-item:hover:not(.active) { background:var(--marigold); border-color:var(--ink); transform:translateX(3px); }
+.setup-go:hover, .text-link:hover { text-decoration:underline; text-underline-offset:4px; }
+.retro-button:disabled { cursor:not-allowed; opacity:.55; }
+/* Coming soon: a marigold badge that pulses, so it reads as "on its way" rather than a stray white bar. */
+.soon-tag { background:var(--marigold); box-shadow:2px 2px 0 var(--ink); animation:soon-pulse 1.6s ease-in-out infinite; }
+@keyframes soon-pulse { 0%,100% { transform:scale(1); box-shadow:2px 2px 0 var(--ink); } 50% { transform:scale(1.07); box-shadow:3px 3px 0 var(--ink); } }
+@media (prefers-reduced-motion:reduce) { .soon-tag { animation:none; } .retro-button:hover:not(:disabled), .group-tab:hover, .console-nav-item:hover:not(.active) { transform:none; } }
+.help-video { display:inline-block; margin:0 0 14px; padding:7px 12px; border:2px solid var(--ink); background:var(--marigold); color:var(--ink); font-family:"Space Grotesk",Arial,sans-serif; font-weight:600; text-decoration:none; box-shadow:3px 3px 0 var(--ink); }
+.help-video:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }

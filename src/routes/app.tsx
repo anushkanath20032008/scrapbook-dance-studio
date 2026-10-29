@@ -14,6 +14,7 @@ import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
 import { getSetupCounts } from "@/lib/setup.functions";
 import { GroupTabs } from "@/components/console/group-tabs";
 import { consoleGroups, groupForPath } from "@/lib/console-nav";
+import { helpVideos } from "@/lib/help-videos";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -190,6 +191,7 @@ function ConsoleLayout() {
               exact={group.exact}
               active={activeGroup === group.id}
               badge={group.id === "money" ? toVerify : 0}
+              hint={group.hint}
               onPick={() => setMenuOpen(false)}
             >
               {group.label}
@@ -241,6 +243,11 @@ function ConsoleLayout() {
                   messagingConfigured={messaging.data?.providerConfigured === true}
                 />
               )}
+              {!isInstructor && helpVideos[activeGroup] !== "" && (
+                <a className="help-video" href={helpVideos[activeGroup]} target="_blank" rel="noreferrer" title="A short video showing how this section works">
+                  ▶ Watch how this works
+                </a>
+              )}
               <Outlet />
             </>
           )}
@@ -254,6 +261,7 @@ function NavLink({
   to,
   exact = false,
   badge = 0,
+  hint,
   active,
   onPick,
   children,
@@ -262,12 +270,14 @@ function NavLink({
   exact?: boolean;
   active?: boolean;
   badge?: number;
+  hint?: string;
   onPick: () => void;
   children: string;
 }) {
   return (
     <Link
       to={to}
+      title={hint}
       activeOptions={{ exact }}
       activeProps={{ className: "active" }}
       className={`console-nav-item${active ? " active" : ""}`}

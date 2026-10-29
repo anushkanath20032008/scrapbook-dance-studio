@@ -25,9 +25,9 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
   const trend = useQuery({ queryKey: ["monthly-trend"], queryFn: () => trendFn() });
 
   const slices = [
-    { name: "Collected", paise: snapshot.collected_paise, color: "#1f7a4d" },
-    { name: "Not yet due", paise: snapshot.not_yet_due_paise, color: "#2e5bd8" },
-    { name: "Overdue", paise: snapshot.overdue_paise, color: "#c0392b" },
+    { name: "Collected", paise: snapshot.collected_paise, color: "#273FA3" },
+    { name: "Not yet due", paise: snapshot.not_yet_due_paise, color: "#F0C24C" },
+    { name: "Overdue", paise: snapshot.overdue_paise, color: "#E7AAA9" },
   ].filter((slice) => slice.paise > 0);
   const total = slices.reduce((sum, slice) => sum + slice.paise, 0);
   if (total === 0) return null;
@@ -53,7 +53,7 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
           >
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
-                <Pie data={slices} dataKey="paise" nameKey="name" innerRadius={50} outerRadius={85} stroke="none">
+                <Pie data={slices} dataKey="paise" nameKey="name" innerRadius={50} outerRadius={85} stroke="#1A1A1A" strokeWidth={2}>
                   {slices.map((slice) => (
                     <Cell key={slice.name} fill={slice.color} />
                   ))}
@@ -87,8 +87,8 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
                   <XAxis dataKey="month" />
                   <YAxis tickFormatter={(value: number) => `₹${value.toLocaleString("en-IN")}`} width={70} />
                   <Tooltip formatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                  <Bar dataKey="Billed" fill="#2e5bd8" />
-                  <Bar dataKey="Collected" fill="#1f7a4d" />
+                  <Bar dataKey="Billed" fill="#273FA3" stroke="#1A1A1A" strokeWidth={2} />
+                  <Bar dataKey="Collected" fill="#F0C24C" stroke="#1A1A1A" strokeWidth={2} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

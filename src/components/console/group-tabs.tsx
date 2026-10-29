@@ -15,7 +15,7 @@ export function GroupTabs({
   const tabs = groupTabs(group, messagingConfigured);
   if (tabs.length === 0) return null;
   const current = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  const label = group === "money" ? "Money pages" : "Studio pages";
+  const label = group === "money" ? "Payment pages" : "Studio pages";
   return (
     <nav className="group-tabs" aria-label={label}>
       <ul>
@@ -25,6 +25,7 @@ export function GroupTabs({
             <li key={tab.to}>
               <Link
                 to={tab.to}
+                title={tab.hint}
                 className="group-tab"
                 aria-current={active ? "page" : undefined}
                 data-active={active ? "true" : undefined}

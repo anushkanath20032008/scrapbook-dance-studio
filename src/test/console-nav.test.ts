@@ -12,7 +12,7 @@ describe("console nav groups", () => {
     expect(consoleGroups.map((group) => group.label)).toEqual([
       "Overview",
       "Dancers",
-      "Money",
+      "Payments",
       "Attendance",
       "Studio",
     ]);
@@ -33,7 +33,7 @@ describe("console nav groups", () => {
     expect(groupForPath("/account")).toBe("studio");
   });
 
-  it("Money tabs drop Messages when messaging is not configured", () => {
+  it("Payments tabs drop Messages when messaging is not configured", () => {
     const without = groupTabs("money", false).map((tab) => tab.label);
     expect(without).toEqual(["Billing", "Payments to check", "Month end", "Insights"]);
     const withMessages = groupTabs("money", true).map((tab) => tab.label);

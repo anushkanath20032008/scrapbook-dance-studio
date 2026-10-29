@@ -16,12 +16,13 @@ export async function listBatches(
   const open = unwrap(
     await supabase
       .from("batch_members")
-      .select("batch_id")
+      .select("batch_id, students!inner(archived_at)")
       .in(
         "batch_id",
         batches.map((batch) => batch.id),
       )
-      .is("left_on", null),
+      .is("left_on", null)
+      .is("students.archived_at", null),
   );
   const counts = new Map<string, number>();
   for (const member of open) counts.set(member.batch_id, (counts.get(member.batch_id) ?? 0) + 1);
@@ -143,13 +144,16 @@ export async function getRoster(
     await supabase
       .from("students")
       .select("id, name")
+      .is("archived_at", null)
       .in(
         "id",
         members.map((member) => member.student_id),
       ),
   );
   const names = new Map(students.map((student) => [student.id, student.name]));
+  // An archived dancer is no longer on the roster, so attendance and counts skip them.
   return members
+    .filter((member) => names.has(member.student_id))
     .map((member) => ({ ...member, student_name: names.get(member.student_id) ?? "" }))
     .sort((a, b) => a.student_name.localeCompare(b.student_name));
 }

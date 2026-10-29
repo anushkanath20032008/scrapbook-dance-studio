@@ -551,3 +551,7 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .group-tabs ul { display:flex; flex-wrap:nowrap; gap:8px; margin:0; padding:0 0 4px; list-style:none; width:max-content; min-width:100%; }
 .group-tab { display:block; white-space:nowrap; padding:8px 12px; border:2px solid var(--ink); background:var(--paper, #fff); color:var(--ink); text-decoration:none; font-weight:800; font-size:14px; }
 .group-tab[aria-current="page"] { background:var(--marigold); box-shadow:3px 3px 0 var(--ink); }
+
+/* Nav links: lighter, tighter type so the bar reads as polished rather than heavy. */
+.nav-links a { font-family:"Space Grotesk",Arial,sans-serif; font-size:15px; font-weight:500; letter-spacing:.01em; }
+.nav-links a.nav-cta { font-weight:600; letter-spacing:.02em; }

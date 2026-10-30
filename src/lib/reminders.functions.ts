@@ -37,3 +37,10 @@ export const previewReminders = createServerFn({ method: "GET" })
 export const getMessagingStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async () => (await import("@/lib/reminders.server")).getMessagingStatus());
+
+export const dismissReminder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ id: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/reminders.server")).dismissReminder(context, data),
+  );

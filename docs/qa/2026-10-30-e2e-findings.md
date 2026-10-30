@@ -12,7 +12,10 @@ function behind it, fix what is small, and record the lesson so the next pass st
 ## Verified correct
 Overview totals reconcile (billed 20,500 - collected 8,700 = overdue 11,800); month-end "How it was paid" equals Collected (cash 4,200 + UPI 4,500); fee due day and days-overdue; set-up checklist counts; plan dancer counts; batch counts.
 
-## Open
+## Fixed after the pass (PR: arrears, +GST, no-fee count, dismiss)
+- Open items 1-4 below are fixed: Overview shows earlier-month arrears (`earlier_arrears`), pricing cards say "+ GST", the no-fee count only includes dancers whose fee plan covers the month (`dancers_awaiting_fee`), and a queued reminder can be dismissed (`dismiss_reminder`). Migrations 0021-0023, applied to production.
+
+## Open (as found)
 1. **Earlier-month arrears are invisible on Overview.** Overview is scoped to one month. Bhagavath owes Sept 5,000 + Oct 5,000 but October shows 5,000, and the reminder asks for 5,000. Add an "Earlier months: X" line and include arrears in reminders.
 2. Prices on the site and checkout are ex-tax: checkout adds 18% GST (249 -> 293.82). Say "+ GST" on the pricing cards.
 3. September view says "3 dancers have no fee for September 2026" for dancers who joined later; it should only count dancers who had joined by then.

@@ -1,8 +1,8 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { getMessagingStatus, listReminders } from "@/lib/reminders.functions";
+import { dismissReminder, getMessagingStatus, listReminders } from "@/lib/reminders.functions";
 import { formatRupees } from "@/lib/money";
 
 export const Route = createFileRoute("/app/messages")({
@@ -38,6 +38,12 @@ function Messages() {
   const reminders = useQuery({
     queryKey: ["reminders", status],
     queryFn: () => listFn({ data: status ? { status } : {} }),
+  });
+  const queryClient = useQueryClient();
+  const dismissFn = useServerFn(dismissReminder);
+  const dismiss = useMutation({
+    mutationFn: (id: string) => dismissFn({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reminders"] }),
   });
   const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => statusFn() });
 
@@ -97,6 +103,16 @@ function Messages() {
                   <span className="console-field-error">{reminder.last_error}</span>
                 )}
               </div>
+              {reminder.status === "queued" && (
+                <button
+                  type="button"
+                  className="setup-go"
+                  disabled={dismiss.isPending}
+                  onClick={() => dismiss.mutate(reminder.id)}
+                >
+                  Dismiss
+                </button>
+              )}
               <span className="status-pill" data-tone={tone(reminder.status)}>
                 {reminder.status === "queued" && messaging.data && !messaging.data.providerConfigured
                   ? "not sent"

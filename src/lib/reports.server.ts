@@ -17,13 +17,18 @@ const emptySnapshot = {
 /** The Home screen's data for one month: the money totals and who still owes, from the database's report functions. */
 export async function getHomeReport({ supabase }: StudioContext, input: { period: string }) {
   const period = firstOfMonth(input.period);
-  const [snapshotResult, unpaidResult] = await Promise.all([
+  const [snapshotResult, unpaidResult, arrearsResult, awaitingResult] = await Promise.all([
     supabase.rpc("studio_snapshot", { p_period: period }),
     supabase.rpc("unpaid_students", { p_period: period }),
+    supabase.rpc("earlier_arrears", { p_period: period }),
+    supabase.rpc("dancers_awaiting_fee", { p_period: period }),
   ]);
   const snapshots = unwrap(snapshotResult);
   const unpaid = unwrap(unpaidResult);
-  return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid };
+  // Money still owed from months before this one, per dancer: Overview is one month, so say so out loud.
+  const arrears = unwrap(arrearsResult);
+  const awaitingFee = unwrap(awaitingResult);
+  return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid, arrears, awaitingFee };
 }
 
 /** Billed, collected and missing for each of the last six months, oldest first, from the database. */

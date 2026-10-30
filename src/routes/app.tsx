@@ -15,6 +15,7 @@ import { getSetupCounts } from "@/lib/setup.functions";
 import { GroupTabs } from "@/components/console/group-tabs";
 import { consoleGroups, groupForPath } from "@/lib/console-nav";
 import { helpVideos } from "@/lib/help-videos";
+import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
 import { getMyTeacherStudio } from "@/lib/instructors.functions";
 import { getRoleIntent } from "@/lib/role-intent";
@@ -67,6 +68,7 @@ function ConsoleLayout() {
   const navigate = useNavigate();
   const session = useOwnerSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
   // Someone who chose "I am a dance teacher" is asked which studio they teach at before anything is created for them.
@@ -86,6 +88,11 @@ function ConsoleLayout() {
 
   const isInstructor = context.data?.role === "instructor";
   const isOwner = context.data?.role === "owner";
+  const tourRole = isInstructor ? "teacher" : isOwner ? "owner" : null;
+  // The tour opens by itself once, the first time someone reaches the console.
+  useEffect(() => {
+    if (tourRole && !tourSeen(tourRole)) setTourOpen(true);
+  }, [tourRole]);
 
   // Small, shared queries: the same keys the screens use, so they are fetched once and reused.
   // Only an owner has anything to load here.
@@ -179,11 +186,14 @@ function ConsoleLayout() {
         {isInstructor ? (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
           {instructorItems.map((item) => (
-            <NavLink key={item.to} to={item.to} onPick={() => setMenuOpen(false)}>
+            <NavLink key={item.to} to={item.to} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
               {item.label}
             </NavLink>
           ))}
           <div className="console-nav-foot">
+            <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
+              Take the tour
+            </Button>
             <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
               Sign out
             </Button>
@@ -202,6 +212,7 @@ function ConsoleLayout() {
               to={group.to as NavTo}
               exact={group.exact}
               active={activeGroup === group.id}
+              tour={group.id}
               badge={group.id === "money" ? toVerify : 0}
               hint={group.hint}
               onPick={() => setMenuOpen(false)}
@@ -235,12 +246,16 @@ function ConsoleLayout() {
                 Waitlist
               </Link>
             )}
+            <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
+              Take the tour
+            </Button>
             <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
               Sign out
             </Button>
           </div>
         </nav>
         )}
+        {tourOpen && tourRole && <GuidedTour role={tourRole} onClose={() => setTourOpen(false)} />}
         <main className="console-main">
           {teacherIntent && teacherStudio.data === null && (
             <JoinStudioDialog onLeave={() => setTeacherIntent(false)} />
@@ -277,6 +292,7 @@ function NavLink({
   exact = false,
   badge = 0,
   hint,
+  tour,
   active,
   onPick,
   children,
@@ -286,6 +302,7 @@ function NavLink({
   active?: boolean;
   badge?: number;
   hint?: string;
+  tour?: string;
   onPick: () => void;
   children: string;
 }) {
@@ -293,6 +310,7 @@ function NavLink({
     <Link
       to={to}
       title={hint}
+      data-tour={tour}
       activeOptions={{ exact }}
       activeProps={{ className: "active" }}
       className={`console-nav-item${active ? " active" : ""}`}

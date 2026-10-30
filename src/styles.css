@@ -577,3 +577,12 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 @media (prefers-reduced-motion:reduce) { .soon-tag { animation:none; } .retro-button:hover:not(:disabled), .group-tab:hover, .console-nav-item:hover:not(.active) { transform:none; } }
 .help-video { display:inline-block; margin:0 0 14px; padding:7px 12px; border:2px solid var(--ink); background:var(--marigold); color:var(--ink); font-family:"Space Grotesk",Arial,sans-serif; font-weight:600; text-decoration:none; box-shadow:3px 3px 0 var(--ink); }
 .help-video:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--ink); }
+
+/* Guided tour: a card in the corner and an outline on the menu item it is explaining. */
+.tour-card { position:fixed; right:20px; bottom:20px; z-index:60; width:min(360px,calc(100vw - 32px)); padding:18px; background:var(--paper); border:3px solid var(--ink); box-shadow:6px 6px 0 var(--ink); }
+.tour-card p { margin:0 0 12px; }
+.tour-step { font-size:20px; color:var(--blue); }
+.tour-title { font-size:28px; margin:0 0 8px; color:var(--blue); }
+.tour-highlight { outline:4px solid var(--marigold); outline-offset:3px; background:var(--marigold); animation:tour-pulse 1.2s ease-in-out infinite; position:relative; z-index:55; }
+@keyframes tour-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(240,194,76,.8); } 50% { box-shadow:0 0 0 10px rgba(240,194,76,0); } }
+@media (prefers-reduced-motion:reduce) { .tour-highlight { animation:none; } }

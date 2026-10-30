@@ -28,3 +28,6 @@ Overview totals reconcile (billed 20,500 - collected 8,700 = overdue 11,800); mo
 - A rule applied in one query (archived dancers hidden) must be applied everywhere the same set is read: list, count, roster, SQL functions. Search for every reader when adding a filter.
 - A displayed total needs its scope in the label. "Missing in all" on a one-month view reads as everything owed.
 - Currency shown on the site is a hint; the payment provider's checkout is the source of truth for the final amount and tax.
+
+## Dodo live switch (30 Oct)
+Live API key, webhook secret, mode and live product ids set in Vercel production; redeployed to pick them up. Live webhook: https://www.choreostudio.live/api/webhooks/dodo. Products: Regular pdt_0Nqq3dimNcgV5LaVJwhrI, Studio+ pdt_0Nqq3dembDDjqSJi64GvX.

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requestCountry } from "@/lib/country.functions";
 
 const planSchema = z.enum(["starter", "growth", "studio"]);
 
@@ -15,6 +16,7 @@ export const createSubscriptionCheckout = createServerFn({ method: "POST" })
       supabase: context.supabase,
       userId: context.userId,
       requestOrigin: new URL(getRequest().url).origin,
+      country: requestCountry(getRequest()),
     });
   });
 

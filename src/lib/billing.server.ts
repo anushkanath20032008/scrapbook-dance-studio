@@ -2,9 +2,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import DodoPayments from "dodopayments";
 import type { Database } from "@/integrations/supabase/types";
 import { studioPlans, type StudioPlanId } from "@/lib/plans";
+import { bandFor, type PriceBand } from "@/lib/ppp";
 
 // Product IDs and the API key stay in server-only environment variables.
-function productIdFor(plan: StudioPlanId) {
+// A band with its own product (e.g. DODO_PAYMENTS_STARTER_PRODUCT_ID_B, priced in dollars) is used for studios in
+// that band; without one the plan's main product is used.
+function productIdFor(plan: StudioPlanId, band: PriceBand = "IN") {
+  if (band !== "IN" && plan !== "growth") {
+    const suffix = plan === "starter" ? "STARTER" : "STUDIO";
+    const own = process.env[`DODO_PAYMENTS_${suffix}_PRODUCT_ID_${band}`]?.trim();
+    if (own) return own;
+  }
   const ids: Record<StudioPlanId, string | undefined> = {
     starter: process.env["DODO_PAYMENTS_STARTER_PRODUCT_ID"],
     growth: process.env["DODO_PAYMENTS_GROWTH_PRODUCT_ID"],
@@ -18,6 +26,8 @@ type CheckoutContext = {
   userId: string;
   // Origin of the incoming request, used when PUBLIC_APP_URL is unset.
   requestOrigin: string;
+  // The country the request came from, which sets the price band.
+  country?: string | null;
 };
 
 function dodoClient() {
@@ -57,7 +67,7 @@ export async function openBillingPortal(context: CheckoutContext) {
 
 // The checkout logic behind createSubscriptionCheckout, for an already-authenticated studio owner.
 export async function startSubscriptionCheckout(plan: StudioPlanId, context: CheckoutContext) {
-  const productId = productIdFor(plan);
+  const productId = productIdFor(plan, bandFor(context.country));
   if (!productId || !process.env["DODO_PAYMENTS_API_KEY"]) {
     const planName = studioPlans.find((p) => p.id === plan)?.name ?? "selected";
     throw new Error(

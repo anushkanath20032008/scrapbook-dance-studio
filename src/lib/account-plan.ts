@@ -1,4 +1,5 @@
 import { studioPlans } from "./plans";
+import { priceInBand, type PriceBand } from "./ppp";
 
 export type AccountPlanInput = {
   plan: string;
@@ -7,6 +8,8 @@ export type AccountPlanInput = {
   studentLimit: number | null;
   studentCount: number;
   now: Date;
+  /** Price band of the studio's country; rupees when omitted. */
+  band?: PriceBand;
 };
 
 export type AccountPlanSummary = {
@@ -22,9 +25,9 @@ export type AccountPlanSummary = {
 
 const dancers = (n: number) => `${n} dancer${n === 1 ? "" : "s"}`;
 
-function planLabel(plan: string): string {
+function planLabel(plan: string, band: PriceBand = "IN"): string {
   const sold = studioPlans.find((p) => p.id === plan);
-  if (sold) return `${sold.name}, ${sold.price} a month`;
+  if (sold) return `${sold.name}, ${priceInBand(sold.id, band) ?? sold.price} a month`;
   return plan === "growth" ? "Growth" : "No paid plan";
 }
 
@@ -63,7 +66,7 @@ export function accountPlanSummary(input: AccountPlanInput): AccountPlanSummary 
   if (billingStatus === "past_due" || billingStatus === "on_hold") {
     return {
       ...base,
-      headline: planLabel(plan),
+      headline: planLabel(plan, input.band),
       detail:
         "Your last payment did not go through. Open Manage billing to fix it. Your dancers and records are safe.",
     };
@@ -71,9 +74,9 @@ export function accountPlanSummary(input: AccountPlanInput): AccountPlanSummary 
   if (billingStatus === "cancelled") {
     return {
       ...base,
-      headline: planLabel(plan),
+      headline: planLabel(plan, input.band),
       detail: "Cancelled. Your plan stays until the end of the period you paid for.",
     };
   }
-  return { ...base, headline: planLabel(plan), detail: `Active. You have ${count}. ${limitNote}` };
+  return { ...base, headline: planLabel(plan, input.band), detail: `Active. You have ${count}. ${limitNote}` };
 }

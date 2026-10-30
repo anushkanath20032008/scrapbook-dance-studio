@@ -13,6 +13,8 @@ import { getConsoleContext } from "@/lib/console.functions";
 import { formatDayWithYear } from "@/lib/format";
 import { accountPlanSummary } from "@/lib/account-plan";
 import { studioPlans, subscriptionNote, type StudioPlanId } from "@/lib/plans";
+import { priceInBand } from "@/lib/ppp";
+import { PriceCountryPicker, usePriceCountry } from "@/lib/use-price-country";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
 import { GroupTabs } from "@/components/console/group-tabs";
 
@@ -142,6 +144,7 @@ function Account() {
     }
   }
 
+  const { country: priceCountry, band: priceBand, setCountry: setPriceCountry } = usePriceCountry();
   const summary = context.data
     ? accountPlanSummary({
         plan: context.data.plan,
@@ -150,6 +153,7 @@ function Account() {
         studentLimit: context.data.studentLimit,
         studentCount: context.data.studentCount,
         now: new Date(),
+        band: priceBand,
       })
     : null;
   const canBuy = availability.data?.checkout === true;
@@ -294,12 +298,13 @@ function Account() {
                           free month and everything you have added are not affected.
                         </p>
                       )}
+                      <PriceCountryPicker country={priceCountry} onChange={setPriceCountry} />
                       <div className="pricing-grid">
                         {studioPlans.map((plan) => (
                           <article className="pricing-card" key={plan.id}>
                             <h3>{plan.name}</h3>
                             <p className="pricing-price">
-                              {plan.price}
+                              {priceInBand(plan.id, priceBand) ?? plan.price}
                               <span>/month</span>
                             </p>
                             <ul>

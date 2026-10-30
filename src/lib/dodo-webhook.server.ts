@@ -32,6 +32,16 @@ export function productPlansFromEnv(
     const id = env[name]?.trim();
     if (id) plans[id] = plan;
   }
+  // Per-band products (priced in dollars) grant the same plan as the main product.
+  for (const band of ["A", "B", "C", "D"]) {
+    for (const [name, plan] of [
+      [`DODO_PAYMENTS_STARTER_PRODUCT_ID_${band}`, "starter"],
+      [`DODO_PAYMENTS_STUDIO_PRODUCT_ID_${band}`, "studio"],
+    ] as const) {
+      const id = env[name]?.trim();
+      if (id) plans[id] = plan;
+    }
+  }
   return plans;
 }
 

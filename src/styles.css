@@ -583,6 +583,7 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .tour-card p { margin:0 0 12px; }
 .tour-step { font-size:20px; color:var(--blue); }
 .tour-title { font-size:28px; margin:0 0 8px; color:var(--blue); }
-.tour-highlight { outline:4px solid var(--marigold); outline-offset:3px; background:var(--marigold); animation:tour-pulse 1.2s ease-in-out infinite; position:relative; z-index:55; }
-@keyframes tour-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(240,194,76,.8); } 50% { box-shadow:0 0 0 10px rgba(240,194,76,0); } }
-@media (prefers-reduced-motion:reduce) { .tour-highlight { animation:none; } }
+
+/* The spotlight: a box over the part being explained; its huge shadow dims everything else. */
+.tour-spotlight { position:fixed; z-index:58; pointer-events:none; border:3px solid var(--marigold); box-shadow:0 0 0 9999px rgba(26,26,26,.62); transition:top .25s, left .25s, width .25s, height .25s; }
+.tour-dim { position:fixed; inset:0; z-index:58; pointer-events:none; background:rgba(26,26,26,.62); }

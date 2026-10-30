@@ -97,6 +97,7 @@ function Dancers() {
       <h1 className="display console-title">Dancers</h1>
       <div className="console-toolbar">
         <Button
+          data-tour="add-dancer"
           variant="retro"
           type="button"
           disabled={!ready || atLimit}

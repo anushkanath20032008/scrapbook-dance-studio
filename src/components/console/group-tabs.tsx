@@ -17,7 +17,7 @@ export function GroupTabs({
   const current = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   const label = group === "money" ? "Payment pages" : "Studio pages";
   return (
-    <nav className="group-tabs" aria-label={label}>
+    <nav className="group-tabs" aria-label={label} data-tour="tabs">
       <ul>
         {tabs.map((tab) => {
           const active = current === tab.to || current.startsWith(`${tab.to}/`);

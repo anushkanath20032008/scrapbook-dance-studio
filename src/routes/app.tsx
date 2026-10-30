@@ -255,7 +255,13 @@ function ConsoleLayout() {
           </div>
         </nav>
         )}
-        {tourOpen && tourRole && <GuidedTour role={tourRole} onClose={() => setTourOpen(false)} />}
+        {tourOpen && tourRole && (
+          <GuidedTour
+            role={tourRole}
+            onClose={() => setTourOpen(false)}
+            onNavigate={(to) => void navigate({ to: to as NavTo })}
+          />
+        )}
         <main className="console-main">
           {teacherIntent && teacherStudio.data === null && (
             <JoinStudioDialog onLeave={() => setTeacherIntent(false)} />

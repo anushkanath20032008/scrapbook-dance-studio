@@ -6,7 +6,7 @@ type Snapshot = Awaited<ReturnType<typeof getHomeReport>>["snapshot"];
 /** The month in numbers. Overdue is the headline: it is the money the owner can chase today. */
 export function MonthTotals({ snapshot }: { snapshot: Snapshot }) {
   return (
-    <div className="totals">
+    <div className="totals" data-tour="totals">
       <div className="totals-headline" data-tone={snapshot.overdue_paise > 0 ? "warn" : "good"}>
         <span className="totals-label">Overdue</span>
         <strong>{formatRupees(snapshot.overdue_paise)}</strong>

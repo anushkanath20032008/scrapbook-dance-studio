@@ -41,7 +41,7 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
   const hasTrend = (trend.data ?? []).some((row) => row.billed_paise > 0);
 
   return (
-    <div className="month-charts">
+    <div className="month-charts" data-tour="charts">
       <div className="window">
         <div className="window-bar chrome-font">This month: {unpaidPercent}% unpaid</div>
         <div className="window-inner month-pie">

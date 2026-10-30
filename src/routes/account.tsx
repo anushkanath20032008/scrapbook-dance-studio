@@ -302,7 +302,10 @@ function Account() {
                       <div className="pricing-grid">
                         {studioPlans.map((plan) => (
                           <article className="pricing-card" key={plan.id}>
-                            <h3>{plan.name}</h3>
+                            <h3>
+                              {plan.name}
+                              {plan.comingSoon && <span className="soon-tag plan-soon">Coming soon</span>}
+                            </h3>
                             <p className="pricing-price">
                               {priceInBand(plan.id, priceBand) ?? plan.price}
                               <span>/month</span>
@@ -312,9 +315,7 @@ function Account() {
                                 <li key={f}>{f}</li>
                               ))}
                             </ul>
-                            {plan.comingSoon ? (
-                              <span className="soon-tag">Coming soon</span>
-                            ) : availability.data?.plans[plan.id] && (
+                            {plan.comingSoon ? null : availability.data?.plans[plan.id] && (
                               <Button
                                 variant={plan.id === "studio" ? "retro" : "retroPaper"}
                                 disabled={busy || checkoutPlan !== null}

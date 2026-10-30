@@ -590,3 +590,6 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 
 .price-country { display:block; margin:0 0 1rem; font-family:var(--font-body,inherit); }
 .price-country select { margin-left:.4rem; padding:.3rem .5rem; border:2px solid var(--ink,#1A1A1A); background:var(--paper,#F7E8DC); font:inherit; }
+
+/* Coming soon beside a plan name: blue on paper stands out on the marigold card. */
+.soon-tag.plan-soon { margin-left:10px; vertical-align:middle; background:var(--blue,#273FA3); color:var(--paper,#F7E8DC); border-color:var(--ink); }

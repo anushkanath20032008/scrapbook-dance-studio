@@ -301,7 +301,7 @@ function Account() {
                             <h3>{plan.name}</h3>
                             <p className="pricing-price">
                               {plan.price}
-                              <span>/month + GST</span>
+                              <span>/month</span>
                             </p>
                             {approximatePrice(rupeesIn(plan.price), visitorCountry) && (
                               <p className="pricing-footnote">

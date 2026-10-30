@@ -17,6 +17,13 @@ const filters: { value: Status | ""; label: string }[] = [
   { value: "sent", label: "Sent" },
   { value: "failed", label: "Failed" },
 ];
+const emptyText: Record<Status | "", string> = {
+  "": "No messages yet.",
+  queued: "Nothing is waiting to send.",
+  sending: "Nothing is sending right now.",
+  sent: "Nothing has been sent by the app yet.",
+  failed: "Nothing has failed. Good news.",
+};
 const tone = (status: string) =>
   status === "sent" ? "good" : status === "failed" ? "warn" : "idle";
 
@@ -73,7 +80,7 @@ function Messages() {
       {reminders.isError && <p role="alert">Could not load your messages. Please refresh.</p>}
       {reminders.data?.length === 0 && (
         <p className="console-empty">
-          Nothing queued yet.{" "}
+          {emptyText[status]}{" "}
           <Link to="/app" className="setup-go">
             Go to Overview
           </Link>

@@ -169,6 +169,13 @@
       "when": 1791291000000,
       "tag": "0023_dismiss_reminder",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1791292000000,
+      "tag": "0024_awaiting_fee_no_plan",
+      "breakpoints": true
     }
   ]
 }

@@ -33,7 +33,7 @@ export const studioPlans: readonly {
     features: [
       "More than 50 dancers",
       "Everything in Regular",
-      "Automated WhatsApp messages from your own WhatsApp Business account (coming soon)",
+      "Automated WhatsApp messages from your own WhatsApp Business account",
       "Priority support",
     ],
   },

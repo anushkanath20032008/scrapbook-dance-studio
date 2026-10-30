@@ -21,7 +21,7 @@ describe("international pricing", () => {
   });
 
   it("quotes an approximate local price, nothing for India", () => {
-    expect(approximatePrice(249, "US")).toBe("about $3");
+    expect(approximatePrice(249, "US")).toBe("about $2.50");
     expect(approximatePrice(479, "GB")).toBe("about £4");
     expect(approximatePrice(249, "IN")).toBeNull();
     expect(approximatePrice(249, null)).toBeNull();

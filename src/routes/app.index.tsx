@@ -87,6 +87,9 @@ function Overview() {
 
   const snapshot = report.data?.snapshot;
   const unpaidRows = report.data?.unpaid ?? [];
+  const arrears = report.data?.arrears ?? [];
+  const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
+  const awaitingFee = report.data?.awaitingFee ?? 0;
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
@@ -140,6 +143,15 @@ function Overview() {
       {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
       {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
 
+      {arrears.length > 0 && (
+        <p className="console-banner" role="status">
+          <span>
+            <strong>{formatRupees(arrearsTotal)}</strong> is still unpaid from earlier months across{" "}
+            {arrears.length} dancer{arrears.length === 1 ? "" : "s"}. This month&apos;s list below does
+            not include it: open a dancer&apos;s billing to see and record it.
+          </span>
+        </p>
+      )}
       {unpaidRows.length > 0 && (
         <div className="console-banner" role="status">
           <span>
@@ -199,15 +211,14 @@ function Overview() {
           </div>
         </div>
       )}
-      {snapshot && snapshot.charged_students > 0 && snapshot.active_students > snapshot.charged_students && (
+      {snapshot && snapshot.charged_students > 0 && awaitingFee > 0 && (
         <div className="console-banner" role="status">
           <span>
             <strong>
-              {snapshot.active_students - snapshot.charged_students} dancer
-              {snapshot.active_students - snapshot.charged_students === 1 ? "" : "s"}
+              {awaitingFee} dancer{awaitingFee === 1 ? "" : "s"}
             </strong>{" "}
-            {snapshot.active_students - snapshot.charged_students === 1 ? "has" : "have"} no fee for{" "}
-            {formatMonthLong(period)} yet. A dancer needs a monthly fee first.
+            {awaitingFee === 1 ? "has" : "have"} no fee for {formatMonthLong(period)} yet. A dancer
+            needs a monthly fee first.
           </span>
           <span className="console-banner-actions">
             <Link to="/app/students" className="setup-go">

@@ -243,7 +243,7 @@ function ConsoleLayout() {
             </section>
             {context.data?.isPlatformOwner && (
               <Link to="/admin" className="console-nav-item">
-                Waitlist
+                Studio enquiries
               </Link>
             )}
             <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>

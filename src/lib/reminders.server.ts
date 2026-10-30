@@ -63,3 +63,10 @@ export async function listReminders(
   if (input.status) query = query.eq("status", input.status);
   return unwrap(await query);
 }
+
+/** Clears one of the studio's own queued reminders (marked cancelled, never deleted). */
+export async function dismissReminder({ supabase }: StudioContext, input: { id: string }) {
+  const dismissed = unwrap(await supabase.rpc("dismiss_reminder", { p_id: input.id }));
+  if (!dismissed) throw new Error("That reminder is no longer waiting to send.");
+  return { dismissed: true };
+}

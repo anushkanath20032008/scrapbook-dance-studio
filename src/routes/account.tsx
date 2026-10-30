@@ -13,10 +13,9 @@ import { getConsoleContext } from "@/lib/console.functions";
 import { formatDayWithYear } from "@/lib/format";
 import { accountPlanSummary } from "@/lib/account-plan";
 import { studioPlans, subscriptionNote, type StudioPlanId } from "@/lib/plans";
-import { priceInBand } from "@/lib/ppp";
-import { PriceCountryPicker, usePriceCountry } from "@/lib/use-price-country";
+import { approximatePrice, rupeesIn } from "@/lib/pricing";
+import { useVisitorCountry } from "@/hooks/use-visitor-country";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
-import { GroupTabs } from "@/components/console/group-tabs";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -30,6 +29,7 @@ export const Route = createFileRoute("/account")({
 });
 
 function Account() {
+  const visitorCountry = useVisitorCountry();
   const navigate = useNavigate();
   const [user, setUser] = useState<{ email?: string } | null>(null);
   const [ready, setReady] = useState(false);
@@ -144,7 +144,6 @@ function Account() {
     }
   }
 
-  const { country: priceCountry, band: priceBand, setCountry: setPriceCountry } = usePriceCountry();
   const summary = context.data
     ? accountPlanSummary({
         plan: context.data.plan,
@@ -153,7 +152,6 @@ function Account() {
         studentLimit: context.data.studentLimit,
         studentCount: context.data.studentCount,
         now: new Date(),
-        band: priceBand,
       })
     : null;
   const canBuy = availability.data?.checkout === true;
@@ -163,7 +161,6 @@ function Account() {
     <main className="section account-page">
       <div className="wrap account-wrap">
         <a href="/app">← Back to your studio</a>
-        <GroupTabs group="studio" pathname="/account" />
         <h1 className="display">Studio account.</h1>
         <div className="window">
           <div className="window-bar">
@@ -298,7 +295,6 @@ function Account() {
                           free month and everything you have added are not affected.
                         </p>
                       )}
-                      <PriceCountryPicker country={priceCountry} onChange={setPriceCountry} />
                       <div className="pricing-grid">
                         {studioPlans.map((plan) => (
                           <article className="pricing-card" key={plan.id}>
@@ -307,9 +303,16 @@ function Account() {
                               {plan.comingSoon && <span className="soon-tag plan-soon">Coming soon</span>}
                             </h3>
                             <p className="pricing-price">
-                              {priceInBand(plan.id, priceBand) ?? plan.price}
+                              {plan.price}
                               <span>/month</span>
                             </p>
+                            {approximatePrice(rupeesIn(plan.price), visitorCountry) && (
+                              <p className="pricing-footnote">
+                                {approximatePrice(rupeesIn(plan.price), visitorCountry)} a month.
+                                You pay in your own currency at checkout, and the exact price is
+                                shown there.
+                              </p>
+                            )}
                             <ul>
                               {plan.features.map((f) => (
                                 <li key={f}>{f}</li>

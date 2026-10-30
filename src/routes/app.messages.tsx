@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { messageOf } from "@/components/console/form-utils";
 import {
   getAutomation,
+  dismissReminder,
   getMessagingStatus,
   listReminders,
   setAutomation,
@@ -24,6 +25,13 @@ const filters: { value: Status | ""; label: string }[] = [
   { value: "sent", label: "Sent" },
   { value: "failed", label: "Failed" },
 ];
+const emptyText: Record<Status | "", string> = {
+  "": "No messages yet.",
+  queued: "Nothing is waiting to send.",
+  sending: "Nothing is sending right now.",
+  sent: "Nothing has been sent by the app yet.",
+  failed: "Nothing has failed. Good news.",
+};
 const tone = (status: string) =>
   status === "sent" || status === "delivered" || status === "read"
     ? "good"
@@ -53,6 +61,11 @@ function Messages() {
   const reminders = useQuery({
     queryKey: ["reminders", status],
     queryFn: () => listFn({ data: status ? { status } : {} }),
+  });
+  const dismissFn = useServerFn(dismissReminder);
+  const dismiss = useMutation({
+    mutationFn: (id: string) => dismissFn({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reminders"] }),
   });
   const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => statusFn() });
   const automation = useQuery({ queryKey: ["whatsapp-automation"], queryFn: () => autoFn() });
@@ -121,7 +134,7 @@ function Messages() {
       {reminders.isError && <p role="alert">Could not load your messages. Please refresh.</p>}
       {reminders.data?.length === 0 && (
         <p className="console-empty">
-          Nothing queued yet.{" "}
+          {emptyText[status]}{" "}
           <Link to="/app" className="setup-go">
             Go to Overview
           </Link>
@@ -153,6 +166,16 @@ function Messages() {
                   <span className="console-field-error">{reminder.last_error}</span>
                 )}
               </div>
+              {reminder.status === "queued" && (
+                <button
+                  type="button"
+                  className="setup-go"
+                  disabled={dismiss.isPending}
+                  onClick={() => dismiss.mutate(reminder.id)}
+                >
+                  Dismiss
+                </button>
+              )}
               <span className="status-pill" data-tone={tone(reminder.delivery_status ?? reminder.status)}>
                 {reminder.status === "queued" && messaging.data && !messaging.data.providerConfigured
                   ? "not sent"

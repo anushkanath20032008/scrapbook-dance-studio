@@ -152,29 +152,57 @@
     {
       "idx": 21,
       "version": "7",
-      "when": 1791202100000,
-      "tag": "0021_instructors",
+      "when": 1791288400000,
+      "tag": "0021_batch_day_skip_archived",
       "breakpoints": true
     },
     {
       "idx": 22,
       "version": "7",
-      "when": 1791202200000,
-      "tag": "0022_makeup_classes",
+      "when": 1791290000000,
+      "tag": "0022_arrears_and_awaiting_fee",
       "breakpoints": true
     },
     {
       "idx": 23,
       "version": "7",
-      "when": 1791202300000,
-      "tag": "0023_photo_reads",
+      "when": 1791291000000,
+      "tag": "0023_dismiss_reminder",
       "breakpoints": true
     },
     {
       "idx": 24,
       "version": "7",
-      "when": 1791202400000,
-      "tag": "0024_whatsapp_studio_plus",
+      "when": 1791292000000,
+      "tag": "0024_awaiting_fee_no_plan",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791292100000,
+      "tag": "0025_instructors",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1791292200000,
+      "tag": "0026_makeup_classes",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1791292300000,
+      "tag": "0027_photo_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1791292400000,
+      "tag": "0028_whatsapp_studio_plus",
       "breakpoints": true
     }
   ]

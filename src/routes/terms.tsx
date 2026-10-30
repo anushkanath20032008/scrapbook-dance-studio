@@ -47,7 +47,7 @@ function Terms() {
       <ul>
         <li>Your first 30 days from sign-up are free, with all features and no card needed.</li>
         <li>After that, the plan you choose applies. Regular is for up to 50 active dancers. Studio+ is for more. These limits are enforced by the Service. Existing records are never deleted because of a limit, but you cannot add or restore a dancer beyond it.</li>
-        <li>Prices are shown in Indian rupees on our website. Taxes such as GST are added where they apply. We may change prices for new customers at any time, and for existing subscribers by giving at least 30 days' notice before the next renewal.</li>
+        <li>Prices are set in Indian rupees. If you pay from another country, our payment provider shows the price in your local currency at checkout, converted at the exchange rate of the day. A currency-conversion fee may apply. The price shown includes any taxes that apply. We may change prices for new customers at any time, and for existing subscribers by giving at least 30 days' notice before the next renewal.</li>
       </ul>
 
       <h2>5. Paying for a plan</h2>

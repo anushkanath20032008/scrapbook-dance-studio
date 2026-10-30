@@ -149,5 +149,5 @@ This plan covers all five parts together because they share one release and one 
 
 - Existing reminder queue and senders: `src/lib/reminders.server.ts`, `src/lib/whatsapp.server.ts`, `docs/plans/2026-10-17-2305-feat-whatsapp-reminders-plan.md`.
 - Existing paste import: `src/components/console/paste-dancers.tsx`, `src/lib/bulk-dancers.server.ts`.
-- Teacher login already built on `feat/instructor-role`: `drizzle/migrations/0021_instructors.sql`, `src/routes/app.team.tsx`, `src/routes/app.class.tsx`, `src/routes/join.tsx`.
+- Teacher login already built on `feat/instructor-role`: `drizzle/migrations/0025_instructors.sql`, `src/routes/app.team.tsx`, `src/routes/app.class.tsx`, `src/routes/join.tsx`.
 - Fee due day and back-dated fees: `drizzle/migrations/0020_fee_due_day.sql`.

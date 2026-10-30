@@ -1267,6 +1267,22 @@ export type Database = {
           paid_students: number
         }[]
       }
+      dismiss_reminder: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      earlier_arrears: {
+        Args: { p_period: string; p_today?: string }
+        Returns: {
+          months: number
+          outstanding_paise: number
+          student_id: string
+        }[]
+      }
+      dancers_awaiting_fee: {
+        Args: { p_period: string }
+        Returns: number
+      }
       unpaid_students: {
         Args: { p_period: string; p_today?: string }
         Returns: {

@@ -57,9 +57,27 @@ describe("startSubscriptionCheckout", () => {
     expect(dodo.create).toHaveBeenCalledWith({
       product_cart: [{ product_id: "pdt_growth", quantity: 1 }],
       return_url: "https://www.choreostudio.live/account?billing=success",
+      feature_flags: { allow_currency_selection: true, allow_tax_id: true },
       metadata: { user_id: "user-1", plan: "growth", studio_name: "Ghungroo Studio" },
     });
     expect(dodo.options).toEqual([{ bearerToken: "test-key", environment: "test_mode" }]);
+  });
+
+  it("pre-selects a local currency from the visitor's country, but never for India or unknown countries", async () => {
+    const withCountry = (country: string | null) =>
+      startSubscriptionCheckout("starter", { ...ownerContext(newStudio), country });
+    await withCountry("GB");
+    await withCountry("DE");
+    await withCountry("BR");
+    await withCountry("IN");
+    await withCountry(null);
+    expect(dodo.create.mock.calls.map(([body]) => body.billing_currency)).toEqual([
+      "GBP",
+      "EUR",
+      "USD",
+      undefined,
+      undefined,
+    ]);
   });
 
   it("maps each plan to its own product", async () => {

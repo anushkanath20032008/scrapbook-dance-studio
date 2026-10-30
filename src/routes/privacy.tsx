@@ -35,6 +35,7 @@ function Privacy() {
         <li><strong>Dancer records entered by a studio.</strong> Dancer name and phone number, fees and charges, payments, attendance, class batches, and whether the dancer asked not to be messaged. Why: so the studio can track fees and classes and prepare reminders.</li>
         <li><strong>Payment notes from dancers.</strong> If a dancer tells a studio they have paid, we keep the amount, the date, the method, an optional reference number and an optional screenshot, so the studio can check it. Screenshots can show a name, UPI ID or phone number, so please send one only if you are comfortable.</li>
         <li><strong>Telegram (only if your studio switches it on).</strong> The Telegram chat identifier of a dancer who joined the bot, and what they type to it, such as "paid".</li>
+        <li><strong>Your country (from your network address).</strong> When you view prices or start checkout, our host tells us which country your connection appears to be in, so we can show prices near your own currency. We do not store it or link it to you.</li>
         <li><strong>Technical records.</strong> Basic logs kept by our hosting and database providers for security and fixing faults.</li>
         <li><strong>Website analytics (only if you allow it).</strong> See section 7.</li>
       </ul>

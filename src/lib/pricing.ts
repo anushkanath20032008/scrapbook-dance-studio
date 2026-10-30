@@ -3,7 +3,7 @@
 // abroad is an approximation to set expectations; the exact amount (plus any tax) is on Dodo's checkout page.
 
 /** Rupees per one unit of each currency. Approximate and for display only, never for charging. */
-const inrPerUnit = { USD: 88, EUR: 102, GBP: 118, AED: 24, AUD: 58, CAD: 64, SGD: 68 } as const;
+const inrPerUnit = { USD: 95, EUR: 102, GBP: 118, AED: 24, AUD: 58, CAD: 64, SGD: 68 } as const;
 export type DisplayCurrency = keyof typeof inrPerUnit;
 
 const eurozone = "AT BE CY DE EE ES FI FR GR HR IE IT LT LU LV MT NL PT SI SK".split(" ");

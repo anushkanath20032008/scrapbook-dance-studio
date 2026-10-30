@@ -31,3 +31,4 @@ Overview totals reconcile (billed 20,500 - collected 8,700 = overdue 11,800); mo
 
 ## Dodo live switch (30 Oct)
 Live API key, webhook secret, mode and live product ids set in Vercel production; redeployed to pick them up. Live webhook: https://www.choreostudio.live/api/webhooks/dodo. Products: Regular pdt_0Nqq3dimNcgV5LaVJwhrI, Studio+ pdt_0Nqq3dembDDjqSJi64GvX.
+Redeployed again after correcting the product id and mode variables.

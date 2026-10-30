@@ -5,7 +5,7 @@ import { fakeSupabase } from "./fake-supabase";
 const user = "11111111-1111-4111-8111-111111111111";
 
 describe("getHomeReport", () => {
-  it("asks both report functions for the first day of the month", async () => {
+  it("asks every report function for the first day of the month", async () => {
     const { client, calls } = fakeSupabase((call) =>
       call.fn === "studio_snapshot" ? { data: [{ billed_paise: 450000 }] } : { data: [] },
     );
@@ -17,6 +17,8 @@ describe("getHomeReport", () => {
     expect(calls.map((call) => [call.fn, call.args])).toEqual([
       ["studio_snapshot", [{ p_period: "2026-10-01" }]],
       ["unpaid_students", [{ p_period: "2026-10-01" }]],
+      ["earlier_arrears", [{ p_period: "2026-10-01" }]],
+      ["dancers_awaiting_fee", [{ p_period: "2026-10-01" }]],
     ]);
     expect(report.snapshot).toMatchObject({ billed_paise: 450000 });
   });

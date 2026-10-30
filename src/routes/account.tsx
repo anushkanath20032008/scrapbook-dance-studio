@@ -13,6 +13,8 @@ import { getConsoleContext } from "@/lib/console.functions";
 import { formatDayWithYear } from "@/lib/format";
 import { accountPlanSummary } from "@/lib/account-plan";
 import { studioPlans, subscriptionNote, type StudioPlanId } from "@/lib/plans";
+import { approximatePrice, rupeesIn } from "@/lib/pricing";
+import { useVisitorCountry } from "@/hooks/use-visitor-country";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
 
 export const Route = createFileRoute("/account")({
@@ -27,6 +29,7 @@ export const Route = createFileRoute("/account")({
 });
 
 function Account() {
+  const visitorCountry = useVisitorCountry();
   const navigate = useNavigate();
   const [user, setUser] = useState<{ email?: string } | null>(null);
   const [ready, setReady] = useState(false);
@@ -300,6 +303,13 @@ function Account() {
                               {plan.price}
                               <span>/month</span>
                             </p>
+                            {approximatePrice(rupeesIn(plan.price), visitorCountry) && (
+                              <p className="pricing-footnote">
+                                {approximatePrice(rupeesIn(plan.price), visitorCountry)} a month.
+                                You pay in your own currency at checkout, and the exact price is
+                                shown there.
+                              </p>
+                            )}
                             <ul>
                               {plan.features.map((f) => (
                                 <li key={f}>{f}</li>

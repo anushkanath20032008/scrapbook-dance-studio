@@ -4,6 +4,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { studioPlans, subscriptionNote } from "@/lib/plans";
+import { approximatePrice, rupeesIn } from "@/lib/pricing";
+import { useVisitorCountry } from "@/hooks/use-visitor-country";
 import { useScrollReveal } from "@/lib/scroll-reveal";
 
 export const Route = createFileRoute("/")({
@@ -33,6 +35,7 @@ function Student({ name, batch, amount, status }: { name:string; batch:string; a
 }
 function Home() {
   const owner = useOwnerSession();
+  const visitorCountry = useVisitorCountry();
   const signedIn = owner.status === "signed-in";
   const ctaHref = signedIn ? "/app" : "/login?mode=register";
   const ctaLabel = signedIn ? "Open your console" : "Start free trial";
@@ -82,7 +85,7 @@ function Home() {
         { icon:"▦",title:"Batches",desc:"Set up batches and rosters and see how full each one is." },
         { icon:"✔",title:"Payment claims",desc:"Dancers tell you they've paid from a private link. You confirm it against your bank or UPI statement." },
       ].map(x=><div className="desktop-icon" key={x.title}><span className="pixel-image" aria-hidden="true">{x.icon}</span><h3>{x.title}</h3><p>{x.desc}</p></div>)}</div></div></section>
-      <section className="section public-pricing" id="pricing"><div className="wrap"><h2 className="display">Plans for your studio.</h2><p className="section-intro">Free for your first month, with every feature. Then ₹249 a month. Studio+ at ₹479, for studios with more than 50 dancers and automated WhatsApp messages, is coming soon.</p><div className="offer-banner"><strong>Early-studio offer: free setup and a price locked for a year.</strong><p>The first 10 studios get help setting up their dancer list, a direct line to the founder, and today's price for 12 months. In return: one 15-minute feedback call a month.</p></div><div className="pricing-grid">{studioPlans.map((plan,i)=><article className="pricing-card" key={plan.id}><span className="chrome-font">plan_0{i+1}.exe</span><h3>{plan.name}</h3><p className="pricing-price">{plan.price}<span>/month</span></p><ul>{plan.features.map(f=>{ const soon = f.endsWith(" (coming soon)"); return <li key={f}>{soon ? f.replace(" (coming soon)","") : f}{soon && <> <span className="soon-tag">Coming soon</span></>}</li>; })}</ul>{plan.comingSoon ? <span className="soon-tag">Coming soon</span> : <Button asChild variant="retroPaper"><a href={ctaHref}>{ctaLabel}</a></Button>}</article>)}</div><p className="pricing-footnote">{subscriptionNote}</p></div></section>
+      <section className="section public-pricing" id="pricing"><div className="wrap"><h2 className="display">Plans for your studio.</h2><p className="section-intro">Free for your first month, with every feature. Then ₹249 a month. Studio+ at ₹479, for studios with more than 50 dancers and automated WhatsApp messages, is coming soon.</p><div className="offer-banner"><strong>Early-studio offer: free setup and a price locked for a year.</strong><p>The first 10 studios get help setting up their dancer list, a direct line to the founder, and today's price for 12 months. In return: one 15-minute feedback call a month.</p></div><div className="pricing-grid">{studioPlans.map((plan,i)=><article className="pricing-card" key={plan.id}><span className="chrome-font">plan_0{i+1}.exe</span><h3>{plan.name}</h3><p className="pricing-price">{plan.price}<span>/month</span></p>{approximatePrice(rupeesIn(plan.price),visitorCountry)&&<p className="pricing-footnote">{approximatePrice(rupeesIn(plan.price),visitorCountry)} a month. You pay in your own currency at checkout, and the exact price is shown there.</p>}<ul>{plan.features.map(f=>{ const soon = f.endsWith(" (coming soon)"); return <li key={f}>{soon ? f.replace(" (coming soon)","") : f}{soon && <> <span className="soon-tag">Coming soon</span></>}</li>; })}</ul>{plan.comingSoon ? <span className="soon-tag">Coming soon</span> : <Button asChild variant="retroPaper"><a href={ctaHref}>{ctaLabel}</a></Button>}</article>)}</div><p className="pricing-footnote">{subscriptionNote}</p></div></section>
       <section className="section faq" id="faq"><div className="wrap"><h2 className="display">Questions owners ask.</h2><div className="faq-list">{[
         ["Do my dancers need to install an app?","No. Your reminder opens in your own WhatsApp. If you want dancers to tell you when they have paid, send them a private link from the app. It opens in their browser, with no app and no account. They pay you directly, and you confirm it."],
         ["How do I get my dancers in?","You add dancers one at a time in guided setup, which takes a few minutes. With a long list, ask us and we'll add them with you on a call (free for the first 10 studios)."],

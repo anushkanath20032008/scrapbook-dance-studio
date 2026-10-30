@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import DodoPayments from "dodopayments";
 import type { Database } from "@/integrations/supabase/types";
 import { studioPlans, type StudioPlanId } from "@/lib/plans";
+import { currencyForCountry } from "@/lib/pricing";
 
 // Product IDs and the API key stay in server-only environment variables.
 function productIdFor(plan: StudioPlanId) {
@@ -18,6 +19,8 @@ type CheckoutContext = {
   userId: string;
   // Origin of the incoming request, used when PUBLIC_APP_URL is unset.
   requestOrigin: string;
+  // The visitor's country from the CDN, used only to pre-select a familiar currency at checkout.
+  country?: string | null;
 };
 
 function dodoClient() {
@@ -80,12 +83,17 @@ export async function startSubscriptionCheckout(plan: StudioPlanId, context: Che
   }
 
   const client = dodoClient();
+  const billingCurrency = currencyForCountry(context.country ?? null);
   const baseUrl = (process.env["PUBLIC_APP_URL"] || context.requestOrigin).replace(/\/+$/, "");
   let checkoutUrl: string | null | undefined;
   try {
     const session = await client.checkoutSessions.create({
       product_cart: [{ product_id: productId, quantity: 1 }],
       return_url: `${baseUrl}/account?billing=success`,
+      // Adaptive Currency converts the rupee price by the customer's billing country. A guess from the visitor's
+      // network only pre-selects the currency; the customer can switch it, and billing country sets tax.
+      ...(billingCurrency ? { billing_currency: billingCurrency } : {}),
+      feature_flags: { allow_currency_selection: true, allow_tax_id: true },
       metadata: {
         user_id: context.userId,
         plan,

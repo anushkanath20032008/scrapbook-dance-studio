@@ -68,7 +68,22 @@ function ConsoleLayout() {
   const navigate = useNavigate();
   const session = useOwnerSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  // On a wide screen the menu is open until the hamburger folds it away; on a phone it is closed until opened.
+  const [folded, setFolded] = useState(false);
+  const [wide, setWide] = useState(true);
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 761px)");
+    const sync = () => setWide(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+  const navExpanded = wide ? !folded : menuOpen;
   const [tourOpen, setTourOpen] = useState(false);
+  // The tour points at menu items, so the menu must be showing while it runs.
+  useEffect(() => {
+    if (tourOpen) setFolded(false);
+  }, [tourOpen]);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
   // Someone who chose "I am a dance teacher" is asked which studio they teach at before anything is created for them.
@@ -173,16 +188,16 @@ function ConsoleLayout() {
         <button
           type="button"
           className="console-menu-button"
-          aria-label="Open navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={navExpanded ? "Close navigation" : "Open navigation"}
+          aria-expanded={navExpanded}
+          onClick={() => (wide ? setFolded((value) => !value) : setMenuOpen((open) => !open))}
         >
           ☰
         </button>
         <a className="brand" href="/" aria-label="ChoreoStudio home"><img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24"/>ChoreoStudio</a>
         <span className="console-studio">{context.data?.studioName || session.email}</span>
       </header>
-      <div className="console-body">
+      <div className={`console-body${folded ? " folded" : ""}`}>
         {isInstructor ? (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
           {instructorItems.map((item) => (

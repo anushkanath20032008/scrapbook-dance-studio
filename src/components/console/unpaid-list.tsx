@@ -41,9 +41,7 @@ export function UnpaidList({
             <Link to="/app/billing" search={{ student: row.student_id }} className="row-link">
               <strong>{row.student_name}</strong>
             </Link>
-            <span className="console-hint">
-              {row.phone ?? "No phone number yet"}
-            </span>
+            {!row.phone && <span className="console-hint">No phone number yet</span>}
           </div>
           <div className="unpaid-owed">
             <strong>{formatRupees(row.outstanding_paise)}</strong>

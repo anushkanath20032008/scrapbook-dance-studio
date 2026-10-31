@@ -172,8 +172,8 @@ function Dancers() {
               <div>
                 <strong>{student.name}</strong>
                 <span className="console-hint">
-                  {student.guardian?.phone ?? "No phone number yet"}
-                  {student.archived_at ? " · archived" : ""}
+                  {student.guardian?.phone ? "" : "No phone number yet"}
+                  {student.archived_at ? (student.guardian?.phone ? "archived" : " · archived") : ""}
                 </span>
                 <span className="console-hint">
                   {student.batches.length > 0

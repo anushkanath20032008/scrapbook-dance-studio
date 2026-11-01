@@ -263,3 +263,58 @@ export async function getFamilyView(admin: Db, token: string) {
 
   return { ...empty, students: perStudent, balance_paise: balance };
 }
+
+/**
+ * The private link for each dancer's guardian, made once and reused, so a reminder can carry it. A guardian
+ * who already has a reminder link keeps it; anyone else gets a new one. Returns studentId -> url.
+ */
+export async function reminderLinksForStudents(
+  { supabase, userId }: StudioContext,
+  input: { studentIds: string[] },
+  baseUrl: string,
+) {
+  const base = baseUrl.replace(/\/+$/, "");
+  const students = unwrap(
+    await supabase.from("students").select("id, guardian_id").in("id", input.studentIds),
+  ).flatMap((s) => (s.guardian_id ? [{ id: s.id, guardian_id: s.guardian_id }] : []));
+  const guardianIds = [...new Set(students.map((s) => s.guardian_id))];
+  if (guardianIds.length === 0) return {} as Record<string, string>;
+
+  const existing = unwrap(
+    await supabase
+      .from("family_links")
+      .select("guardian_id, reminder_token")
+      .in("guardian_id", guardianIds)
+      .is("revoked_at", null)
+      .not("reminder_token", "is", null),
+  );
+  const tokenByGuardian = new Map<string, string>();
+  for (const row of existing)
+    if (row.reminder_token && !tokenByGuardian.has(row.guardian_id))
+      tokenByGuardian.set(row.guardian_id, row.reminder_token);
+
+  for (const guardianId of guardianIds) {
+    if (tokenByGuardian.has(guardianId)) continue;
+    const token = newToken();
+    unwrap(
+      await supabase
+        .from("family_links")
+        .insert({
+          studio_id: userId,
+          guardian_id: guardianId,
+          token_hash: hashToken(token),
+          reminder_token: token,
+        })
+        .select("id")
+        .single(),
+    );
+    tokenByGuardian.set(guardianId, token);
+  }
+
+  const urls: Record<string, string> = {};
+  for (const student of students) {
+    const token = tokenByGuardian.get(student.guardian_id);
+    if (token) urls[student.id] = `${base}/family/${token}`;
+  }
+  return urls;
+}

@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
+import { getReminderLinks } from "@/lib/family.functions";
 import { formatRupees } from "@/lib/money";
 import { reminderText, whatsappLink, type ReminderRow } from "@/lib/manual-reminders";
 
-type Row = ReminderRow & { days_overdue?: number | null; status?: string };
+type Row = ReminderRow & { student_id?: string; days_overdue?: number | null; status?: string };
 
 /**
  * Walks the owner through the unpaid dancers one at a time: each tap opens that dancer's WhatsApp chat with the
@@ -25,13 +27,34 @@ export function WhatsAppBatchDialog({
   reminded: Set<string>;
   onOpened: (chargeId: string) => void;
 }) {
+  const fetchLinks = useServerFn(getReminderLinks);
+  const [payLinks, setPayLinks] = useState<Record<string, string>>({});
+  // Each dancer's private "I paid" link is made once and goes into the message.
+  useEffect(() => {
+    if (!open) return;
+    const studentIds = rows.flatMap((row) => (row.student_id ? [row.student_id] : [])).slice(0, 200);
+    if (studentIds.length === 0) return;
+    let cancelled = false;
+    fetchLinks({ data: { studentIds } })
+      .then((links) => {
+        if (!cancelled) setPayLinks(links);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, rows]);
+  const payLinkFor = (row: Row) => (row.student_id ? (payLinks[row.student_id] ?? null) : null);
+
   const { usable, noPhone } = useMemo(() => {
-    const withLink = rows.map((row) => ({ row, link: whatsappLink(row, studioName) }));
+    const withLink = rows.map((row) => ({ row, link: whatsappLink(row, studioName, payLinkFor(row)) }));
     return {
       usable: withLink.filter((item): item is { row: Row; link: string } => item.link !== null),
       noPhone: withLink.filter((item) => item.link === null).map((item) => item.row),
     };
-  }, [rows, studioName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, studioName, payLinks]);
   const remaining = usable.filter((item) => !reminded.has(item.row.charge_id));
   const next = remaining[0];
   const openLink = useRef<HTMLAnchorElement>(null);
@@ -60,7 +83,7 @@ export function WhatsAppBatchDialog({
               </span>
             </div>
           </div>
-          <blockquote className="reminder-preview">{reminderText(next.row, studioName)}</blockquote>
+          <blockquote className="reminder-preview">{reminderText(next.row, studioName, undefined, payLinkFor(next.row))}</blockquote>
           <div className="console-form-actions">
             <Button asChild variant="retro">
               <a

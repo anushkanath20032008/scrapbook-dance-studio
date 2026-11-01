@@ -15,15 +15,21 @@ export function reminderText(
   row: Pick<ReminderRow, "student_name" | "outstanding_paise" | "due_on">,
   studioName = "",
   today: string = todayInIndia(),
+  payLink: string | null = null,
 ): string {
   const from = studioName.trim() ? ` from ${studioName.trim()}` : "";
   // A fee that is not late yet "is due"; one past its date "was due".
+  const tail = payLink ? `\n\nPaid already? Tell us here: ${payLink}` : "";
   const verb = row.due_on < today ? "was due on" : "is due on";
-  return `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} ${verb} ${formatDay(row.due_on)}. Thank you!`;
+  return `Hi ${row.student_name}, a reminder${from}: your fee of ${formatRupees(row.outstanding_paise)} ${verb} ${formatDay(row.due_on)}. Thank you!${tail}`;
 }
 
 /** A wa.me link with the reminder filled in, or null when the number cannot be used. */
-export function whatsappLink(row: ReminderRow, studioName = ""): string | null {
+export function whatsappLink(
+  row: ReminderRow,
+  studioName = "",
+  payLink: string | null = null,
+): string | null {
   const digits = (row.phone ?? "").replace(/\D/g, "");
   const international =
     digits.length === 10
@@ -34,7 +40,7 @@ export function whatsappLink(row: ReminderRow, studioName = ""): string | null {
           ? digits
           : null;
   if (!international) return null;
-  return `https://wa.me/${international}?text=${encodeURIComponent(reminderText(row, studioName))}`;
+  return `https://wa.me/${international}?text=${encodeURIComponent(reminderText(row, studioName, todayInIndia(), payLink))}`;
 }
 
 const KEY = "choreo-manual-reminders";

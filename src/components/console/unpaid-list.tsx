@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { formatDay } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
+import { getReminderLinks } from "@/lib/family.functions";
 import { whatsappLink } from "@/lib/manual-reminders";
 import type { getHomeReport } from "@/lib/reports.functions";
 
@@ -31,6 +33,24 @@ export function UnpaidList({
   onOpened: (chargeId: string) => void;
   showQueue: boolean;
 }) {
+  const fetchLinks = useServerFn(getReminderLinks);
+  // Open the chat at once (so the browser allows it), then point it at the message with the dancer's link.
+  async function openWhatsApp(row: Unpaid) {
+    const plain = whatsappLink(row, studioName);
+    if (!plain) return;
+    const tab = window.open("about:blank", "_blank");
+    let target = plain;
+    try {
+      const links = await fetchLinks({ data: { studentIds: [row.student_id] } });
+      target = whatsappLink(row, studioName, links[row.student_id] ?? null) ?? plain;
+    } catch {
+      // Without the link the plain reminder still opens.
+    }
+    if (tab) tab.location.href = target;
+    else window.location.href = target;
+    onOpened(row.charge_id);
+  }
+
   if (rows.length === 0)
     return <p className="console-empty">✓ Everyone has paid for this month. Nothing to chase.</p>;
   return (
@@ -69,14 +89,9 @@ export function UnpaidList({
             )}
             {whatsappLink(row, studioName) && (
               <Button asChild variant="retroPaper">
-                <a
-                  href={whatsappLink(row, studioName) ?? undefined}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => onOpened(row.charge_id)}
-                >
+                <button type="button" onClick={() => void openWhatsApp(row)}>
                   {reminded.has(row.charge_id) ? "WhatsApp again" : "WhatsApp"}
-                </a>
+                </button>
               </Button>
             )}
           </div>

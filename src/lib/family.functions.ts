@@ -33,3 +33,12 @@ export const getFamilyView = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     return (await import("@/lib/family.server")).getFamilyView(supabaseAdmin, data.token);
   });
+
+/** The private pay-claim link for each dancer, made on first use, so reminders can carry it. */
+export const getReminderLinks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ studentIds: z.array(uuid).min(1).max(200) })))
+  .handler(async ({ data, context }) => {
+    const baseUrl = process.env["PUBLIC_APP_URL"] || new URL(getRequest().url).origin;
+    return (await import("@/lib/family.server")).reminderLinksForStudents(context, data, baseUrl);
+  });

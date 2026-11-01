@@ -209,6 +209,7 @@ export type Database = {
           guardian_id: string
           id: string
           revoked_at: string | null
+          reminder_token: string | null
           studio_id: string
           token_hash: string
         }
@@ -217,6 +218,7 @@ export type Database = {
           guardian_id: string
           id?: string
           revoked_at?: string | null
+          reminder_token?: string | null
           studio_id: string
           token_hash: string
         }
@@ -225,6 +227,7 @@ export type Database = {
           guardian_id?: string
           id?: string
           revoked_at?: string | null
+          reminder_token?: string | null
           studio_id?: string
           token_hash?: string
         }

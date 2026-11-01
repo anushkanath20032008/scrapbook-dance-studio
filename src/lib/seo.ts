@@ -1,6 +1,6 @@
 import { homeFaq } from "@/lib/home-faq";
 
-export const SITE_URL = "https://choreostudio.live";
+export const SITE_URL = "https://www.choreostudio.live";
 export const ONE_LINER = "Fee tracking and WhatsApp reminders for dance studio owners.";
 
 /**

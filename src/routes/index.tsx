@@ -15,12 +15,12 @@ export const Route = createFileRoute("/")({
     { property: "og:title", content: "ChoreoStudio | Less chasing. More dancing." },
     { property: "og:description", content: "See who has paid, who is due and who is overdue at your dance studio. Remind each dancer on WhatsApp with the amount filled in. First month free, no card." },
     { property: "og:type", content: "website" },
-    { property: "og:url", content: "https://choreostudio.live/" },
-    { property: "og:image", content: "https://choreostudio.live/og.png" },
+    { property: "og:url", content: "https://www.choreostudio.live/" },
+    { property: "og:image", content: "https://www.choreostudio.live/og.png" },
     { property: "og:image:alt", content: "ChoreoStudio: Less chasing. More dancing." },
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:image", content: "https://choreostudio.live/og.png" },
-  ], links: [{ rel: "canonical", href: "https://choreostudio.live/" }], scripts: [{ type: "application/ld+json", children: JSON.stringify(homeSchema()) }] }), component: Home,
+    { name: "twitter:image", content: "https://www.choreostudio.live/og.png" },
+  ], links: [{ rel: "canonical", href: "https://www.choreostudio.live/" }], scripts: [{ type: "application/ld+json", children: JSON.stringify(homeSchema()) }] }), component: Home,
 });
 
 const money = (n:number) => "₹" + Math.round(n).toLocaleString("en-IN");

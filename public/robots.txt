@@ -7,4 +7,4 @@ Disallow: /family/
 Disallow: /reset-password
 Disallow: /api/
 
-Sitemap: https://choreostudio.live/sitemap.xml
+Sitemap: https://www.choreostudio.live/sitemap.xml

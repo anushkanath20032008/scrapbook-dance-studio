@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BlogShell } from "@/components/blog-page";
 import { SITE, posts } from "@/content/blog";
 
-const title = "Dance studio fee guides | ChoreoStudio blog";
+const title = "Blog for dance studio owners | ChoreoStudio";
 const description =
-  "Practical guides for dance studio owners: tracking monthly fees, matching cash, UPI and bank payments, reminder messages, late-payment rules and a month-end checklist.";
+  "Practical guides for dance studio owners in India: running the studio, pricing classes, GST and keeping adult dancers coming back.";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({

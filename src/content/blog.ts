@@ -23,592 +23,789 @@ export type Post = {
   related?: string[];
 };
 
-export const SITE = "https://choreostudio.live";
+export const SITE = "https://www.choreostudio.live";
 
-const trackFees: Post = {
-  slug: "track-monthly-dance-class-fees",
-  title: "How to track monthly dance class fees, step by step",
-  metaTitle: "Track Dance Class Fees Each Month: A Routine | ChoreoStudio",
+const runStudio: Post = {
+  slug: "how-to-run-a-dance-studio-in-india",
+  title: "How to run a dance studio in India",
+  metaTitle: "How to Run a Dance Studio in India | ChoreoStudio",
   description:
-    "A month-by-month fee routine for dance studio owners: see who has paid, who is due, and copy reminder messages for dancers who are late.",
-  date: "2026-10-24",
-  readingMinutes: 7,
-  related: ["reconcile-cash-upi-bank-dance-class-fees", "dance-class-fee-reminder-messages", "month-end-checklist-dance-studio-owner"],
+    "Most dance studios in India are started by a dancer, not a business person. Here are the five things to get in order as you grow: dancers, fees, attendance, batches and enquiries.",
+  date: "2026-10-31",
+  readingMinutes: 8,
+  related: ["how-to-price-dance-classes-in-india", "how-to-get-your-first-dancers", "how-to-pay-dance-instructors", "gst-on-dance-classes-in-india"],
   blocks: [
     {
       t: "p",
-      text: "It is month end. Your notebook says Anand paid. A WhatsApp chat says Bela sent it last week. Your bank statement has a UPI credit with no name on it. You teach, you manage the studio, and now you are the accountant too.",
+      text: "Most studio owners start because they love to dance and teach, and the studio grows from a few students into a few batches. For a while that works on memory and goodwill. Then a second instructor joins, a weekend batch fills up, payments start arriving through three different UPI apps, and the WhatsApp group becomes the place where everything happens at once.",
     },
     {
       t: "p",
-      text: "This post gives you a routine you can start this month: what to do on which day, three messages to copy, and how to be sure a payment is real before you mark it paid. It is written for owner-run dance studios where dancers pay monthly by UPI, cash or bank transfer.",
+      text: "Nothing is wrong with your teaching at that point. What is missing is the business side, which nobody taught you and which you never had time to build. This guide covers the five things worth getting in order, roughly in the order they start to hurt.",
     },
-    { t: "h2", text: "Why monthly fees slip" },
+    { t: "h2", text: "A studio is a small business that sells a skill" },
     {
       t: "p",
-      text: "Most late fees are not dancers refusing to pay. They are dancers who forgot, and an owner who was not sure who owed what. When the answer lives in three places (a notebook, a sheet and a chat), nobody checks until the month is almost over.",
+      text: "What you sell is scheduled access to a space, a good teacher and a group of people who keep each other motivated. Your income is the number of paying dancers multiplied by the fee, and your costs are mostly fixed: rent, instructor pay, electricity, sound and your own time. Because the costs do not change much from month to month, the dancers who stay and pay on time are what decide whether the studio is comfortable or stressful.",
     },
     {
       t: "p",
-      text: "One software vendor's guide to running a dance studio in India makes the same point: the problem often starts with nobody tracking who owes what. Treat that as one vendor's view, not a study. It matches what many owners describe, so it is a good place to start fixing.",
+      text: "That is why the five systems below are about keeping dancers and money straight. None of them needs special software to start. They need a decision about where the truth lives and the habit of using it.",
     },
-    { t: "h2", text: "A monthly fee routine you can copy" },
+    { t: "h2", text: "1. One list of every dancer" },
     {
       t: "p",
-      text: "This is our own suggested routine, not a rule from a source. Change the days to fit how your studio works.",
+      text: "Start with a single list that holds, for each dancer, their name, phone number, batch, monthly fee, the month they joined and how they usually pay. One row per person, kept in one place. When the same dancer appears in a notebook, a spreadsheet and a chat group with slightly different spellings, you will eventually charge someone twice or forget someone entirely.",
     },
-    { t: "h3", text: "Day 1: set the amounts" },
     {
       t: "p",
-      text: "Write down, for each dancer, which batch they are in, the amount for the month and the due date. Decide your part-payment rule now. Some studios allow two instalments; one vendor guide for Karnataka dance schools lists instalments as a common option. If you allow it, write down the split so nobody has to guess later.",
+      text: "Dancers at most studios are adults, so you talk to the dancer directly. Keep their number on the list and keep the list private. It should not live only on your phone, because the day your phone breaks is the day you need it.",
     },
-    { t: "h3", text: "Days 1 to 5: keep one list with three states" },
+    { t: "h2", text: "2. Fees, with one due date and three states" },
     {
       t: "p",
-      text: "Every dancer is in exactly one of three states: paid, due, or overdue. Keep one list. Sort it so overdue is on top. If you cannot tell the state of a dancer in five seconds, the list is not working yet.",
+      text: "Fees are the system that decides whether you can pay the rent. Give every dancer the same due date each month, or at least a due date you wrote down, and mark each dancer as paid, due or overdue. That is the whole model. It sounds too simple, but most fee confusion comes from having a fourth state in your head, which is something like 'I think they paid, but I am not sure'.",
     },
-    { t: "h3", text: "Day 5: first reminder" },
     {
       t: "p",
-      text: "Message everyone who is not marked paid. Keep it short, polite and specific: the month, the amount and how to pay. One school-fee guide suggests reminders a few days before the due date, on the due date, a couple of days after and about a week after. That guide is for schools and its own timings are not fully consistent, so use it as a starting point and adjust.",
+      text: "Record every payment against the person it belongs to, with the date and how it arrived: cash, UPI or bank transfer. If a dancer pays part of the fee, write down how much is still owed rather than rounding it away. And when someone says they have paid by UPI, check your bank or UPI statement before you mark it. A screenshot is easy to send and easy to get wrong, and the statement is the only thing you can trust.",
     },
-    { t: "h3", text: "Days 10 to 15: second reminder" },
     {
       t: "p",
-      text: "For dancers still overdue, send a second message. Same calm tone, a clear date. If someone has a problem, this is where they will tell you.",
+      text: "Talk about money in private. A reminder about someone's fee does not belong in the class group, where everyone reads it. A short personal message with their own amount and due date is more polite and gets a faster answer.",
     },
-    { t: "h3", text: "Month end: close the month" },
-    {
-      t: "ol",
-      items: [
-        "Count how many dancers are paid and how many are not.",
-        "Add up what is still owed.",
-        "For each name still open, write one decision: wait, call, part-payment, or pause the class.",
-        "Check that the amount you recorded as received matches your bank or UPI statement and your cash notes.",
-      ],
-    },
-    { t: "h2", text: "Three reminder messages to copy" },
+    { t: "h2", text: "3. Attendance as an early warning" },
     {
       t: "p",
-      text: "Friendly, plain, firm. Change the names and amounts. Sample messages below use made-up names. We wrote all three for this post.",
+      text: "Attendance is more than a register. A dancer who stops coming usually stops paying a few weeks later, so the register tells you about next month's income before the money does. A simple rule helps: when someone misses three classes in a row, send them a friendly message. You are not chasing them, you are asking if everything is alright and if they need a different batch.",
     },
     {
-      t: "msg",
-      label: "Before the due date",
-      text: "Hi Bela, a quick heads-up: your fee of ₹2,500 for this month is due on 5 Oct. You can pay by UPI to [your UPI ID]. Thank you!",
+      t: "p",
+      text: "Many dancers leave quietly because life got busy and nobody asked. One message at the right moment keeps some of them. We cannot tell you the exact number, because it differs from studio to studio, but you will learn your own after a few months of noting who you contacted and who came back.",
+    },
+    { t: "h2", text: "4. Batches and capacity" },
+    {
+      t: "p",
+      text: "Write each batch down with its day, time, level, instructor and a maximum size based on what your floor can comfortably hold. Then you can answer, without thinking, which batches are full and which have space. Full batches are where you consider a waiting list or a second slot. Half-empty batches are where you ask whether the time or the level is wrong.",
     },
     {
-      t: "msg",
-      label: "A few days after",
-      text: "Hi Bela, a reminder from your studio: your fee of ₹2,500 was due on 5 Oct and is still open. If anything is off, just reply and we will sort it out. Thank you!",
+      t: "p",
+      text: "Capacity is also where money is lost without anyone noticing. A batch that holds twenty dancers but has twelve is leaving the same rent and the same instructor cost spread across fewer fees.",
+    },
+    { t: "h2", text: "5. Enquiries and trial classes" },
+    {
+      t: "p",
+      text: "Every enquiry that arrives through Instagram, a phone call, a WhatsApp message or a walk-in is a possible dancer. Most studios lose some of them simply because the message got buried. Keep a short list with the name, the date they asked, what they asked about and when you will follow up.",
     },
     {
-      t: "msg",
-      label: "A week or more overdue",
-      text: "Hi Bela, your fee of ₹2,500 from 5 Oct is still open. Could you pay it by [date]? If that is difficult, reply and we can work out a plan. Thank you!",
+      t: "p",
+      text: "Decide your trial class rule once: free, paid or credited against the first month. Then say it the same way every time, so nobody has to negotiate it and you do not have to remember what you told whom.",
     },
-    { t: "h3", text: "Tips that keep the tone right" },
+    { t: "h2", text: "Five numbers to look at once a month" },
     {
       t: "ul",
       items: [
-        "Use the dancer's first name.",
-        "State the amount and the date. Vague messages get vague replies.",
-        "Ask for one action, such as paying by a date or replying.",
-        "Do not remind someone who has already paid.",
-        "Thank them at the end.",
+        "How many dancers were enrolled this month",
+        "How much you billed",
+        "How much you collected",
+        "How much is still owed, and how late it is",
+        "How many dancers left, and how many joined",
       ],
     },
-    { t: "h2", text: "When a dancer says \"I've paid\"" },
     {
       t: "p",
-      text: "Treat it as a claim until you have seen it in your own bank or UPI statement. Match the amount and the date, then mark it paid. For cash, write it down the same day with the date and the amount. If a dancer pays part of the fee, record what came in and what is left. Do not mark the month paid until the full amount is in.",
+      text: "These five numbers, compared with last month, tell you whether the studio is growing, standing still or leaking. You do not need a dashboard for this. You need ten minutes at the end of the month and the habit of writing the numbers down.",
     },
-    { t: "h2", text: "What to do about months that stay unpaid" },
+    { t: "h2", text: "Do you need software?" },
     {
       t: "p",
-      text: "Decide your rule once, write it down and keep to it. As one example, a 2014 Dance Teacher column from a studio in Ontario describes charging a fee after 30 days overdue and possibly removing a dancer from class after 60 days. The owner also noted that making exceptions sends mixed messages to dancers who always pay on time. That studio taught young dancers in another country, so use it only as an example of having a clear rule. This is not legal advice. Check your own rules with someone you trust.",
-    },
-    { t: "h2", text: "A notebook, a sheet, or ChoreoStudio" },
-    {
-      t: "p",
-      text: "All three can work. A notebook is free and fine for a handful of dancers. A spreadsheet adds sorting and totals, but you still have to keep it and the chat in step. ChoreoStudio keeps one list: it shows who has paid, who is due and who is overdue. For each dancer who has not paid, it opens your own WhatsApp with that dancer's amount filled in, and you press Send. When a dancer says they have paid, you check your bank and confirm it. ChoreoStudio never holds your dancers' money.",
-    },
-    { t: "h2", text: "A month-end checklist" },
-    {
-      t: "ol",
-      items: [
-        "Amounts and due dates set for every dancer.",
-        "One list, three states: paid, due, overdue.",
-        "First reminder sent on day 5.",
-        "Second reminder sent for anyone still overdue.",
-        "Every \"I've paid\" checked against your statement.",
-        "Cash written down the same day.",
-        "Part payments recorded as part payments.",
-        "One decision written next to every name still open.",
-      ],
+      text: "Not at first. A notebook and a spreadsheet are enough for a single batch and one person taking payments. They start to strain once you have three or more batches, an instructor who also collects money, or dancers paying across several UPI apps. At that point it is worth choosing a tool that does fees and attendance well, and ignoring the ones that try to do everything.",
     },
     {
       t: "note",
-      text: "ChoreoStudio is free for your first month, no card needed. Start free trial: choreostudio.live/login?mode=register",
+      text: "If you want to try one built for owner-run dance studios, ChoreoStudio tracks fees and attendance and opens a WhatsApp reminder with each dancer's own amount filled in, which you send yourself. The first month is free and no card is needed.",
+    },
+    { t: "h2", text: "Where to start" },
+    {
+      t: "p",
+      text: "Do not try to set up all five this week. Start with fees, because they affect the rent. Then build the dancer list and attendance, then batches, then enquiries, and finally the monthly numbers. One system a month is plenty.",
+    },
+    {
+      t: "p",
+      text: "If you do only one thing today, take a sheet of paper or a spreadsheet and write every dancer's name with three columns: owed, paid and pending. That single page will show you more about your studio than you probably expect.",
     },
   ],
   faq: [
     {
-      q: "How do I track monthly fees for a dance class?",
-      a: "Keep one list where every dancer is paid, due or overdue. Set the amount and due date on day 1, send a reminder around day 5, send a second to anyone still overdue, and close the month by matching what you recorded to your bank or UPI statement.",
+      q: "What systems does a dance studio need?",
+      a: "Five are worth having: one list of dancers, a fee record with a due date, attendance, a list of batches with their capacity, and a simple record of enquiries and trial classes. Add a monthly look at five numbers: enrolled, billed, collected, still owed, and dancers who left.",
     },
     {
-      q: "What should I say in a fee reminder to dancers?",
-      a: "Use the first name, state the month and amount, ask for one action and thank them. A friendly heads-up before the due date, a plain reminder a few days after, and a firmer message with a date after a week or more.",
+      q: "How should a small dance studio collect fees?",
+      a: "Pick one due date, tell every dancer their amount, record each payment against the dancer when it arrives, and check UPI claims against your bank statement. Send reminders privately, not in the class group.",
     },
     {
-      q: "Should I trust a dancer who says they have paid?",
-      a: "Treat it as a claim until you see the amount in your own bank or UPI statement, then mark it paid. Write cash down the same day.",
+      q: "Do I need software to run a dance studio?",
+      a: "Not for one batch. A notebook and a spreadsheet work until you have several batches, more than one person taking payments, or dancers paying through different channels.",
+    },
+  ],
+};
+
+const priceClasses: Post = {
+  slug: "how-to-price-dance-classes-in-india",
+  title: "How to price dance classes in India",
+  metaTitle: "How to Price Dance Classes in India | ChoreoStudio",
+  description:
+    "Copying the studio down the road is how many owners end up under-charging. Work out your monthly costs, your realistic number of dancers and the fee that covers both.",
+  date: "2026-10-31",
+  readingMinutes: 7,
+  related: ["how-to-run-a-dance-studio-in-india", "gst-on-dance-classes-in-india", "why-adult-dancers-quit-dance-classes"],
+  blocks: [
+    {
+      t: "p",
+      text: "Many owners set their fee by asking what the studio down the road charges, and then charging a little less to attract dancers. It feels safe, but the neighbour may have cheaper rent, an owner who teaches every batch, or a bigger room. Their number tells you what the market will tolerate, not what your studio needs to stay open.",
+    },
+    {
+      t: "p",
+      text: "A better way is to work out your own number in three steps and then compare it with the market. The figures below are made up to show the method. They are not a suggested price, because rent, city and class type change everything.",
+    },
+    { t: "h2", text: "Step 1: add up what the studio costs each month" },
+    {
+      t: "p",
+      text: "Write down every cost that repeats: rent, instructor pay, electricity, cleaning, music and sound equipment upkeep, internet, any software, marketing, and a portion of the larger costs you pay yearly, such as flooring repairs or mirrors, divided by twelve. Then add the pay you want for yourself, because a studio that only covers its costs is not yet a livelihood.",
+    },
+    {
+      t: "p",
+      text: "Suppose the total comes to ₹60,000 a month, including a modest amount for you. That is the amount your fees need to cover.",
+    },
+    { t: "h2", text: "Step 2: be honest about how many dancers you will really have" },
+    {
+      t: "p",
+      text: "Multiply the number of batches by the size each batch can hold, and you get the best case. Then be realistic. Batches are rarely full all month, dancers miss months, and new ones take time to arrive. A helpful habit is to use the number of dancers you had on an ordinary month, not the best one.",
+    },
+    {
+      t: "p",
+      text: "Say you have six batches that could hold 10 dancers each, so 60 at the very most, and on an ordinary month you have 40 paying.",
+    },
+    { t: "h2", text: "Step 3: divide, then test what happens when it goes wrong" },
+    {
+      t: "p",
+      text: "Break-even is the monthly cost divided by the dancers you expect: ₹60,000 divided by 40 is ₹1,500 per dancer. Anything above that is the room you have left for slow months, repairs and growth.",
+    },
+    {
+      t: "p",
+      text: "Now test it. If you charge ₹2,000 and 40 dancers pay, you collect ₹80,000 and have ₹20,000 left over. If only 28 pay in a quiet month, you collect ₹56,000, which is below your ₹60,000 costs. The same fee that looked comfortable at 40 dancers loses money at 28. Looking at the bad month before you commit to a fee is the most useful part of this exercise.",
+    },
+    { t: "h2", text: "Ways to structure the fee" },
+    {
+      t: "ul",
+      items: [
+        "A fixed monthly fee for a set number of classes. It is the easiest to explain and gives you predictable income, but dancers who miss classes may feel they are paying for nothing.",
+        "A pack of classes, such as eight or twelve, valid for a set time. It suits dancers with unpredictable schedules, but you need to track how many are left and when the pack expires.",
+        "A drop-in price for a single class. Keep it higher than the per-class cost inside a pack, so the pack or monthly fee is clearly the better value.",
+        "A discount for paying a quarter at once. It improves your cash flow, but only offer it if you are comfortable holding a few months of someone's fee in case they leave.",
+      ],
+    },
+    { t: "h2", text: "Write the rules next to the price" },
+    {
+      t: "p",
+      text: "A price on its own invites arguments. Write down, and tell every new dancer, what happens when someone misses a class, when the studio is closed for a holiday, when someone joins in the middle of the month, and when a payment is late. Settling these once saves you dozens of small awkward conversations. If you want to be generous, decide in advance how, for example one make-up class per month, so it is a rule and not a favour.",
+    },
+    { t: "h2", text: "When and how to raise your fees" },
+    {
+      t: "p",
+      text: "Costs go up, so fees eventually have to as well. Give your dancers at least a month's notice, say plainly why, and apply the new fee to new dancers first. Dancers are generally more understanding of a clear, early message than of a surprise on the day the fee is due.",
+    },
+    {
+      t: "note",
+      text: "Whichever fee you choose, keep a record of what each dancer owes and what they have paid each month. A simple list with owed, paid and pending columns is enough to start.",
+    },
+  ],
+  faq: [
+    {
+      q: "How do I decide what to charge for dance classes?",
+      a: "Add up your monthly costs including your own pay, estimate how many dancers you will have in an ordinary month, and divide. That is your break-even fee per dancer. Then check it against what nearby studios charge and adjust.",
+    },
+    {
+      q: "Is a monthly fee or a class pack better for a dance studio?",
+      a: "A monthly fee is simpler and gives steadier income. A class pack suits dancers with irregular schedules but needs expiry and balance tracking. Many studios offer both, with the monthly fee as the better value.",
+    },
+    {
+      q: "How much notice should I give before raising fees?",
+      a: "At least a month. Explain the reason briefly and start with new dancers.",
+    },
+  ],
+};
+
+const gstClasses: Post = {
+  slug: "gst-on-dance-classes-in-india",
+  title: "GST on dance classes in India",
+  metaTitle: "GST on Dance Classes in India | ChoreoStudio",
+  description:
+    "Dance classes run as a business are generally taxable at 18% GST, with registration needed once yearly turnover crosses a threshold. Here is how it works, with a worked example.",
+  date: "2026-10-31",
+  readingMinutes: 6,
+  related: ["how-to-price-dance-classes-in-india", "how-to-run-a-dance-studio-in-india"],
+  blocks: [
+    {
+      t: "note",
+      text: "This is general information, not tax or legal advice. GST rules and thresholds change, so confirm the current position with a chartered accountant or on the official GST portal before you act.",
+    },
+    {
+      t: "p",
+      text: "GST is one of the questions studio owners ask last and worry about most. Many wonder whether dance classes are exempt because they are cultural or educational, and whether a small studio has to register at all. The short answer from the commentary we read is that dance classes run as a commercial service are generally taxable, and registration depends on how much the studio earns in a year.",
+    },
+    { t: "h2", text: "Are dance classes taxable?" },
+    {
+      t: "p",
+      text: "The exemptions for education in GST law are aimed mainly at recognised schools and similar institutions. Tax professionals who have written about dance workshops and dance classes generally conclude that a studio teaching dance as a business does not fall under those exemptions, whether the style is classical, Western or fitness-based. The usual rate applied to coaching and training services of this kind is 18%.",
+    },
+    {
+      t: "p",
+      text: "Some of the writing on this is a few years old and comes from consultants rather than from a ruling about your specific studio. If your situation is unusual, for example you teach inside a school or a trust, ask your accountant which treatment applies.",
+    },
+    { t: "h2", text: "When does a studio have to register?" },
+    {
+      t: "p",
+      text: "For services, registration is generally required once your total turnover in a financial year goes above ₹20 lakh, with a lower limit in some special category states. Turnover means all your taxable income, so it includes workshops, special events and any other classes you teach through the same registration, not only the monthly fees from regular batches.",
+    },
+    {
+      t: "p",
+      text: "A studio below the threshold does not have to register, but it can choose to. Some do so because corporate clients or other businesses want tax invoices, or because they want to claim credit for GST paid on their own purchases.",
+    },
+    { t: "h2", text: "A worked example: a fee that includes GST" },
+    {
+      t: "p",
+      text: "Suppose you are registered and you advertise a fee of ₹2,000 that includes 18% GST. The tax is not added on top. It is already inside the ₹2,000, so you only keep part of it.",
+    },
+    {
+      t: "ul",
+      items: [
+        "Fee the dancer pays: ₹2,000",
+        "Value before tax: ₹2,000 divided by 1.18, which is about ₹1,695",
+        "GST included: about ₹305, which you pay to the government",
+      ],
+    },
+    {
+      t: "p",
+      text: "If you had planned your costs around keeping the full ₹2,000, registration would leave you about ₹305 per dancer short. This is why it matters to decide whether your published fee includes tax before you cross the threshold, and to factor it into your pricing.",
+    },
+    { t: "h2", text: "What registration involves day to day" },
+    {
+      t: "ul",
+      items: [
+        "Giving each dancer a proper invoice that shows the tax",
+        "Keeping a clear record of every payment, whether cash, UPI or bank transfer",
+        "Filing GST returns on time, usually monthly or quarterly depending on your choice and turnover",
+        "Paying the tax you collected, less any credit you are entitled to",
+      ],
+    },
+    {
+      t: "p",
+      text: "The record keeping is where studios struggle. If you cannot say how much you received in a month and who paid it, filing a return becomes guesswork. Whether or not you are registered yet, keep a clean record of payments from the start. It makes the day you cross the threshold much easier.",
+    },
+    { t: "h2", text: "Questions to take to your accountant" },
+    {
+      t: "ul",
+      items: [
+        "Does my studio's turnover, counted across all my classes and workshops, cross the threshold this year or the next?",
+        "Should my published fee include or exclude GST once I am registered?",
+        "Do the workshops I run, or the classes I teach inside other institutions, change the answer?",
+        "Is voluntary registration worth it for us?",
+      ],
     },
   ],
   sources: [
     {
-      label: "StudioPartner: how to run a dance studio in India",
-      url: "https://studiopartner.app/blog/how-to-run-a-dance-studio-in-india",
-      note: "A software vendor's blog, 12 June 2026. Used for the point that tracking who owes what is where problems start.",
+      label: "CAclubindia: GST on dance classes and workshops",
+      url: "https://www.caclubindia.com/articles/gst-on-dance-classes-workshops-50442.asp",
+      note: "A tax professional's view that dance classes and workshops are not covered by the education exemptions.",
     },
     {
-      label: "CoFee: smart fee collection tips for dance schools in Karnataka",
-      url: "https://www.cofee.life/blog/smart-fee-collection-tips-for-dance-schools-in-karnataka/",
-      note: "A software vendor's blog, 20 November 2025. Used for instalments as a common option.",
+      label: "Taxclue: Is GST registration required for a dance academy?",
+      url: "https://taxclue.in/blog/is-gst-registration-required-for-a-dance-academy",
+      note: "A guide to registration for dance academies. Check its thresholds against current rules.",
+    },
+  ],
+  faq: [
+    {
+      q: "Is GST applicable on dance classes?",
+      a: "Tax professionals generally treat dance classes run as a business as taxable services, usually at 18%. Exemptions for education are aimed at recognised schools and similar institutions. Confirm with a chartered accountant for your case.",
     },
     {
-      label: "FastFee: school fee reminder WhatsApp format",
-      url: "https://fastfee.in/blog/school-fee-reminder-whatsapp-format",
-      note: "A software vendor's blog about schools, 13 June 2026. Used for reminder timing as a starting point.",
+      q: "Does a small dance studio need GST registration?",
+      a: "Registration for services is generally needed once yearly turnover goes above ₹20 lakh, lower in some special category states. Below that you can still register voluntarily.",
     },
     {
-      label: "Dance Teacher: dealing with overdue payments",
-      url: "https://dance-teacher.com/ask-the-experts-dealing-with-overdue-payments/",
-      note: "A magazine column by Joanne Chapman, 1 March 2014, about a studio in Ontario, Canada.",
+      q: "Is the 18% GST added on top of my class fee?",
+      a: "It depends on how you price. If your published fee is inclusive of GST, the tax is a part of it. At ₹2,000 inclusive of 18%, about ₹305 is GST.",
     },
   ],
 };
 
-const cashUpiBank: Post = {
-  slug: "reconcile-cash-upi-bank-dance-class-fees",
-  title: "Cash, UPI and bank transfer: matching dance class fees at month end",
-  metaTitle: "Match Cash, UPI and Bank Fees at Month End | ChoreoStudio",
+const adultsQuit: Post = {
+  slug: "why-adult-dancers-quit-dance-classes",
+  title: "Why adult dancers quit classes",
+  metaTitle: "Why Adult Dancers Quit Dance Classes | ChoreoStudio",
   description:
-    "Dancers pay by cash, UPI and bank transfer in the same month. Here is a simple way for a dance studio owner to match all three to what each dancer owes.",
-  date: "2026-10-24",
+    "Adults rarely quit dance because they stopped liking it. They quit because of schedules, feeling lost in class, or nobody noticing they stopped coming. Here is what studios can do.",
+  date: "2026-10-31",
+  readingMinutes: 6,
+  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india"],
+  blocks: [
+    {
+      t: "p",
+      text: "Anyone who has run a studio for a year has seen the pattern. A new dancer arrives full of energy, comes regularly for three or four weeks, then misses a class, then another, and one day you realise you have not seen them for a month. Nobody argued with anyone and nobody complained. They just drifted away.",
+    },
+    {
+      t: "p",
+      text: "This is a list of the reasons we think are most common, based on how owners describe it rather than on a study, and a few things that cost very little to try. Treat it as a set of ideas to test in your own studio.",
+    },
+    { t: "h2", text: "Why adults leave" },
+    { t: "h3", text: "Their schedule changed" },
+    {
+      t: "p",
+      text: "Work deadlines, travel, family events and exams move around, and a fixed weekly slot is the first thing to give way. When a dancer misses two classes because of work, the third one starts to feel like catching up on something they have already lost.",
+    },
+    { t: "h3", text: "They felt lost in the class" },
+    {
+      t: "p",
+      text: "A beginner placed with people who already know the routine feels behind every week, and adults do not like feeling behind in public. Some of them never say so. They just stop coming.",
+    },
+    { t: "h3", text: "They stopped seeing progress" },
+    {
+      t: "p",
+      text: "The first few weeks are exciting because everything is new. After that, improvement feels slow, and without a clear sign that they are getting better, motivation fades.",
+    },
+    { t: "h3", text: "Nobody knew them" },
+    {
+      t: "p",
+      text: "A dancer who has made one friend in class has a reason to come back, even on a tired evening. A dancer who arrives, dances and leaves without speaking to anyone has no one to notice that they are gone.",
+    },
+    { t: "h3", text: "The money conversation was awkward" },
+    {
+      t: "p",
+      text: "Being chased in a group message, or by more than one person, is unpleasant enough that some dancers would rather leave than deal with it. A single, private and polite reminder keeps the money question from turning into a reason to quit.",
+    },
+    { t: "h2", text: "What studios can do about it" },
+    { t: "h3", text: "Make the first three classes easy" },
+    {
+      t: "p",
+      text: "Introduce every new dancer to the group in the first class, pair them with someone friendly, and check in with them after the third class. The aim is that nobody spends their first weeks feeling invisible.",
+    },
+    { t: "h3", text: "Be clear about levels" },
+    {
+      t: "p",
+      text: "Say plainly who each batch is for, and let people move up or down without embarrassment. A beginner who is happy in the right batch is worth more than a beginner who struggles in the wrong one.",
+    },
+    { t: "h3", text: "Give people a visible finish line" },
+    {
+      t: "p",
+      text: "A short routine taught over a month, which the batch performs for each other at the end, gives dancers something to look forward to and something to be proud of. It does not need a stage or an audience.",
+    },
+    { t: "h3", text: "Notice absences early" },
+    {
+      t: "p",
+      text: "When a dancer misses three classes in a row, send a message. Something like this works:",
+    },
+    {
+      t: "msg",
+      label: "After three missed classes",
+      text: "Hi [name], we have missed you in class the last few weeks. Is everything alright? If your schedule has changed, tell me and we can look at a different batch. No pressure, just checking in.",
+    },
+    {
+      t: "p",
+      text: "The message asks about the dancer and not about the fee. Many people answer it, and some of them come back.",
+    },
+    { t: "h3", text: "Make pausing easier than quitting" },
+    {
+      t: "p",
+      text: "Offer a way to pause for a month, for travel or a busy period, without losing their place. It is much easier to come back from a pause than to rejoin after quitting.",
+    },
+    { t: "h3", text: "Ask why they left" },
+    {
+      t: "p",
+      text: "When someone does leave, send one short question: what could we have done better? You will not always get an answer, but the ones you do get tell you something no register or spreadsheet can.",
+    },
+    { t: "h2", text: "A small habit to start with" },
+    {
+      t: "p",
+      text: "Keep a list of dancers you have not seen in three weeks and message each of them this week. It takes about ten minutes, and it costs nothing. Write down who replied and who came back, and in a month you will know how much it is worth to your studio.",
+    },
+    {
+      t: "note",
+      text: "If you track attendance and fees in one place, it is easier to spot who has stopped coming. ChoreoStudio keeps attendance and fees together for owner-run dance studios, and the first month is free with no card needed.",
+    },
+  ],
+  faq: [
+    {
+      q: "Why do adults quit dance classes?",
+      a: "Common reasons are schedule changes, feeling behind the rest of the class, not seeing progress, not knowing anyone, and awkward conversations about money. Most do not complain; they simply stop coming.",
+    },
+    {
+      q: "How can a dance studio keep adult dancers coming?",
+      a: "Make the first three classes welcoming, be clear about levels, give dancers a short routine to work towards, message anyone who misses three classes in a row, and offer a way to pause.",
+    },
+    {
+      q: "What should I say to a dancer who has stopped coming?",
+      a: "Ask how they are and offer a different batch if their schedule has changed. Do not mention fees in that first message.",
+    },
+  ],
+};
+
+const firstDancers: Post = {
+  slug: "how-to-get-your-first-dancers",
+  title: "How to get your first 30 dancers",
+  metaTitle: "How to Get Your First 30 Dancers | ChoreoStudio",
+  description:
+    "A new dance studio in India does not need a big marketing budget. It needs a clear offer, a trial class, and a way to follow up with everyone who asks.",
+  date: "2026-10-31",
+  readingMinutes: 6,
+  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "why-adult-dancers-quit-dance-classes"],
+  blocks: [
+    {
+      t: "p",
+      text: "The first thirty dancers are the hardest, and almost nobody gets them through advertising. They come from people who already trust you, people who saw you teach, and people who heard from a friend that your class is worth a try. The work in the early months is to make it easy for those people to find you and easy for them to say yes.",
+    },
+    { t: "h2", text: "Decide who the class is for" },
+    {
+      t: "p",
+      text: "A studio that says it teaches everyone usually attracts no one in particular. Pick one group to start with, such as working adults who want a weekend class, or beginners who have never danced, or women who want a class close to home. Then describe the class in their words: the day, the time, the style, the level, and what a first class will feel like.",
+    },
+    {
+      t: "p",
+      text: "The more specific the description, the easier it is for the right person to think this is for me. A vague post gets a like and a quick scroll. A post that says Saturday 8 am, beginner Bollywood, no experience needed, gets a message from someone who is already thinking about it.",
+    },
+    { t: "h2", text: "Start with the people who already know you" },
+    {
+      t: "ul",
+      items: [
+        "Friends, relatives and colleagues who have seen you dance or teach. Ask them directly, and ask them to bring a friend.",
+        "Your own social accounts. Post the class details with a short video of a real class, not only a poster.",
+        "Housing societies, offices and community groups in your area, where a weekend class can fill quickly through a single message to the right group.",
+        "Other local studios and instructors who teach a different style and may send you people who ask for yours.",
+      ],
+    },
+    { t: "h2", text: "Make the first step small" },
+    {
+      t: "p",
+      text: "Most people hesitate for the same reasons: they are not sure they will like it, they worry they will be the only beginner, and they do not want to commit money to something they have not tried. A trial class answers all three. Decide your rule once, whether it is free, a small fee or a fee that counts towards the first month, and say it the same way every time.",
+    },
+    {
+      t: "p",
+      text: "Give trial dancers a warm first class. Introduce them to the group, put them next to someone friendly, and message them the next day. The follow-up is where many studios win or lose the dancer.",
+    },
+    { t: "h2", text: "Answer enquiries quickly and keep a list" },
+    {
+      t: "p",
+      text: "Someone who asks about a class on Instagram or WhatsApp is usually asking several studios at once. The one who replies first, with the day, time, fee and a clear next step, often gets the trial. Keep a simple list of every enquiry with the date, the person's name, what they asked about, and when you will follow up. A message that sits unread for three days has usually already lost the person.",
+    },
+    {
+      t: "p",
+      text: "When someone says they will think about it, ask if you can message them again on a specific date. Then do it. A short, friendly follow-up is not pushy, and many people simply needed a reminder.",
+    },
+    { t: "h2", text: "Ask for referrals at the right moment" },
+    {
+      t: "p",
+      text: "A dancer who has just enjoyed a good class is the best person to ask, and the right time is right then. Invite them to bring a friend to the next class for free, or to share one short video from class with their own message. People trust a friend's recommendation far more than a studio's own post.",
+    },
+    { t: "h2", text: "A realistic first month" },
+    {
+      t: "ol",
+      items: [
+        "Week 1: write down who the class is for and describe it in one clear message with day, time, level and fee.",
+        "Week 2: send it personally to thirty people who might know someone interested, and post it in two or three relevant local groups.",
+        "Week 3: run trial classes, follow up with each person the next day, and note who said yes, who said maybe and why.",
+        "Week 4: ask each new dancer to bring one friend, and adjust the time or description based on what people asked.",
+      ],
+    },
+    {
+      t: "p",
+      text: "Do not worry if the numbers are small at first. Ten dancers who keep coming and tell their friends are worth more than thirty who arrive once. Keep notes on where each dancer came from, and in two or three months you will know which of these routes is actually working for your studio.",
+    },
+  ],
+  faq: [
+    {
+      q: "How do I get students for a new dance studio?",
+      a: "Start with people who already know you, describe one class clearly for one group, offer a trial class, reply to enquiries quickly and ask happy dancers to bring a friend.",
+    },
+    {
+      q: "Should a trial dance class be free?",
+      a: "Either works. Free lowers the barrier, a small fee filters for people who will come, and a fee credited to the first month does both. Choose one and say it the same way every time.",
+    },
+    {
+      q: "How long does it take to build a full batch?",
+      a: "It differs a lot by area and style, so there is no reliable number. Track where each dancer came from and you will see how long it takes in your own studio.",
+    },
+  ],
+};
+
+const payInstructors: Post = {
+  slug: "how-to-pay-dance-instructors",
+  title: "How to hire and pay dance instructors",
+  metaTitle: "How to Hire and Pay Dance Instructors | ChoreoStudio",
+  description:
+    "Three common ways to pay a dance instructor, what each costs you, and what to agree in writing before the first class so there are no surprises later.",
+  date: "2026-10-31",
+  readingMinutes: 6,
+  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "dance-class-missed-classes-and-holiday-policy"],
+  blocks: [
+    {
+      t: "p",
+      text: "At some point you cannot teach every batch yourself, and the first instructor you bring in changes how the studio works. Money is the part that most often goes wrong, usually because the two of you assumed different things and never wrote them down. This post covers the common ways to pay an instructor and what to settle before the first class.",
+    },
+    { t: "h2", text: "Three ways to pay" },
+    { t: "h3", text: "A fixed amount per class" },
+    {
+      t: "p",
+      text: "You pay the instructor a set amount for every class they teach, whether ten dancers show up or four. It is simple to understand and easy to budget, and it protects the instructor from a quiet week. The risk is yours: if a batch is small, you still pay the full amount.",
+    },
+    { t: "h3", text: "A fixed monthly amount" },
+    {
+      t: "p",
+      text: "You agree a monthly amount for a set number of classes a week. It works for a regular instructor who teaches the same batches every week. Be clear about what happens when there are five weeks in a month, when the studio closes for a holiday, and when the instructor takes a day off.",
+    },
+    { t: "h3", text: "A share of the fees" },
+    {
+      t: "p",
+      text: "The instructor receives a percentage of what their batch pays. It lines up your interests, because both of you gain when the batch fills. It needs a clear record of who paid, because the instructor will want to see how their share was worked out, and a rule for dancers who pay late or only part of the fee.",
+    },
+    {
+      t: "p",
+      text: "Some studios combine these, such as a small fixed amount per class plus a share above a certain number of dancers. Whichever you choose, work out what it costs you at a good month and at a quiet month before you agree, as in the pricing example in our guide to pricing classes.",
+    },
+    { t: "h2", text: "What to agree before the first class" },
+    {
+      t: "ul",
+      items: [
+        "Which batches they teach, on which days and at what times.",
+        "How and when they are paid, and who records the classes taught.",
+        "What happens when a class is cancelled, by you, by them or because of a holiday.",
+        "Who finds a replacement when they are unwell, and how that is paid.",
+        "Whether they may teach elsewhere, and whether they may take your dancers to a competitor's class or a private class.",
+        "Who owns the choreography they create for your batches and showcase.",
+        "How either of you ends the arrangement, and how much notice is fair.",
+      ],
+    },
+    {
+      t: "p",
+      text: "Put it in a short written agreement that both of you sign, even if you are friends. A page is enough. The agreement is not a sign of distrust. It protects both of you from remembering the same conversation differently six months later. For anything involving tax or employment status, ask a chartered accountant or a lawyer, because the rules depend on how the arrangement is set up.",
+    },
+    { t: "h2", text: "How to choose an instructor" },
+    {
+      t: "p",
+      text: "A great dancer is not always a great teacher. Before you hire, ask the person to teach a trial class to your own dancers and watch how they explain a step, how they treat beginners, how they handle a mixed-level room and whether they arrive on time. Ask a couple of their former students how it was to learn from them. The dancers who will be in the room are the best judges of whether it works.",
+    },
+    { t: "h2", text: "Keeping instructors informed without sharing everything" },
+    {
+      t: "p",
+      text: "An instructor needs to know who is in their batch, who attended, and who has not been coming. They do not need to know how much each dancer pays or who is late with their fee. Decide what each instructor can see, and keep the money information with the owner.",
+    },
+    {
+      t: "p",
+      text: "Share the batch list and attendance with the instructor each week, and ask them to tell you when a dancer has stopped coming. They are often the first to notice.",
+    },
+  ],
+  faq: [
+    {
+      q: "How much should I pay a dance instructor?",
+      a: "There is no standard figure, because it depends on your city, the style and the instructor's experience. Work out what you can afford at a quiet month, then agree a per-class amount, a monthly amount or a share of fees.",
+    },
+    {
+      q: "Should I pay instructors per class or monthly?",
+      a: "Per class is simple and flexible. Monthly suits a regular instructor with fixed batches. A share of fees ties pay to how full the batch is. Agree what happens on holidays and cancelled classes whichever you choose.",
+    },
+    {
+      q: "Do I need a written agreement with an instructor?",
+      a: "It is a good idea. A one-page agreement covering pay, cancellations, replacements, choreography and notice prevents most disagreements. For tax or legal questions, ask a professional.",
+    },
+  ],
+};
+
+const missedClasses: Post = {
+  slug: "dance-class-missed-classes-and-holiday-policy",
+  title: "Missed classes and holidays: write the rules",
+  metaTitle: "Dance Class Missed Class and Holiday Policy | ChoreoStudio",
+  description:
+    "Dancers miss classes, studios close for holidays, and someone always joins mid-month. Settle the rules once so you are not negotiating every time.",
+  date: "2026-10-31",
   readingMinutes: 5,
-  related: ["track-monthly-dance-class-fees", "month-end-checklist-dance-studio-owner", "dance-class-fee-reminder-messages"],
+  related: ["how-to-price-dance-classes-in-india", "how-to-pay-dance-instructors", "why-adult-dancers-quit-dance-classes"],
   blocks: [
     {
       t: "p",
-      text: "In one month, a dance studio can be paid in cash at the door, by UPI to your phone and by bank transfer to your account. Each one leaves a trace in a different place. If you also keep a notebook and a chat, that is five places to check before you can say who has paid.",
+      text: "Every studio owner has had the same conversation more than once. A dancer says they were travelling and asks if they can skip the fee this month, or if they can attend a different batch to make up for it. You say yes because it feels unkind to say no, and then the next dancer asks the same thing, and soon your rules are whatever you agreed last.",
     },
     {
       t: "p",
-      text: "This is a short method for matching all of it at month end. It needs a pen and your statements. No tool is required, though a tool can keep the list for you.",
+      text: "The fix is not to be stricter. It is to decide the rules once, write them down, and tell every new dancer before their first class. People accept a clear rule far more easily than a decision made on the spot.",
     },
-    { t: "h2", text: "Start from what each dancer owes, not from what came in" },
+    { t: "h2", text: "The situations to decide in advance" },
+    { t: "h3", text: "A dancer misses a class" },
     {
       t: "p",
-      text: "The common mistake is to go through the bank statement and try to guess whose payment each line is. Turn it around. Start with the list of dancers and the amount each one owes this month. Then find the payment for each name. Anything left over on the statement is a mystery to solve second, not first.",
+      text: "Most studios treat the monthly fee as paying for a place in the batch, not for each class, so a missed class is not refunded. Then you choose how generous to be. You might allow one make-up class a month in another batch at the same level, if there is room, and ask the dancer to tell you the day before.",
     },
-    { t: "h2", text: "The method" },
-    {
-      t: "ol",
-      items: [
-        "List every dancer with the amount owed for the month.",
-        "Go through your cash notes. Tick off each dancer who paid cash, with the date and the amount.",
-        "Go through your UPI app. For each credit, match the sender and amount to a dancer. Write down the transaction reference.",
-        "Go through the bank statement the same way for transfers.",
-        "Put each payment against its dancer. If the amount is lower than owed, record it as a part payment and write what is left.",
-        "If the amount is higher than owed, decide whether it is advance for next month or a mistake, and write that down.",
-        "Anything on a statement you cannot match, ask the dancer by name. Do not guess.",
-      ],
-    },
-    { t: "h2", text: "Four things that go wrong" },
-    { t: "h3", text: "One payment covers two dancers" },
+    { t: "h3", text: "The studio closes for a holiday" },
     {
       t: "p",
-      text: "Friends and couples often pay together in one transfer. Record it as two payments against two names, and note that they came as one transfer.",
+      text: "Decide whether a closed week reduces the fee, is made up with an extra class later, or is already built into your yearly pricing. Tell dancers the holiday dates at the start of the month, not the week before.",
     },
-    { t: "h3", text: "The UPI name is not the dancer's name" },
+    { t: "h3", text: "Someone joins in the middle of the month" },
     {
       t: "p",
-      text: "Someone pays from a friend's phone or a shared account. Ask the dancer to message you the amount and the date, then match on those. The reference number is the safest key.",
+      text: "You can charge the full month, charge for the remaining weeks, or start the fee from the next month and let the first weeks count as a trial. The part-month option takes a small calculation, so decide the rule and an easy way to work it out, such as charging by the number of weeks left.",
     },
-    { t: "h3", text: "Cash that nobody wrote down" },
+    { t: "h3", text: "Someone needs a break" },
     {
       t: "p",
-      text: "Write cash down the same day, with the date and the amount. A month later nobody remembers.",
+      text: "Offering a pause of up to a month, for travel, illness or a busy period, keeps people connected to the studio. Decide how much notice you need and whether their place in the batch is held. A dancer who can pause is more likely to return than one who has to quit.",
     },
-    { t: "h3", text: "A dancer says paid, nothing arrived" },
+    { t: "h3", text: "A payment is late" },
     {
       t: "p",
-      text: "Ask for the reference number or a screenshot, then check your own statement. If it is not there, it is not paid yet. Say so kindly and give them the reference to check on their side.",
+      text: "Pick a date after which you send a reminder, and a date after which the dancer cannot attend until the fee is settled, if you want a hard line. Many owners prefer a friendly reminder first and a firm rule only for repeated lateness. Whatever you choose, make it the same for everyone.",
     },
-    { t: "h2", text: "How ChoreoStudio helps with this" },
+    { t: "h2", text: "A short policy you can adapt" },
+    {
+      t: "msg",
+      label: "Studio rules, one short message",
+      text: "Fees are due by the 5th for the month. A missed class is not refunded, but you may attend one make-up class a month in another batch at your level if there is room. Please tell us the day before. If we close for a holiday, we will tell you the dates at the start of the month. If you join mid-month, you pay for the weeks that remain. If you need a break, tell us a week before and we will hold your place for one month.",
+    },
     {
       t: "p",
-      text: "In ChoreoStudio you record each payment against a dancer with its method (cash, UPI, bank transfer or other) and an optional reference number. The app shows what is still owed after each payment. If you type an amount higher than what is owed, it asks before it records the extra as credit. When a dancer reports that they have paid, you check your bank or UPI statement and confirm it. ChoreoStudio only keeps the record. It never holds your dancers' money.",
+      text: "Change the numbers and wording to suit your studio, but keep it short. A message that fits on one screen is one that people actually read.",
+    },
+    { t: "h2", text: "Tell people at the start, and be consistent" },
+    {
+      t: "p",
+      text: "Send the rules to every new dancer when they join, and pin them in the announcement group. Then apply them the same way each time. If you decide to make an exception, make it clear that it is an exception, and keep a note of it, so that the next dancer who asks gets the same answer.",
     },
     {
       t: "note",
-      text: "First month free, no card needed. Start free trial: choreostudio.live/login?mode=register",
+      text: "Keeping an attendance record and a fee record in one place makes these rules easier to apply, because you can see who missed what and who has paid. ChoreoStudio tracks attendance and fees for owner-run dance studios, and the first month is free with no card needed.",
     },
   ],
   faq: [
     {
-      q: "How do I reconcile cash, UPI and bank payments for my dance classes?",
-      a: "Start from the list of dancers and what each owes. Match cash notes, then UPI credits, then bank transfers to each name using the amount, date and reference number. Record part payments as part payments. Ask about anything you cannot match.",
+      q: "Should a dance studio refund fees for missed classes?",
+      a: "Most studios do not, because the fee pays for a place in the batch. Many offer one make-up class a month if there is room. Write the rule down and tell dancers when they join.",
     },
     {
-      q: "What is the safest way to match a UPI payment to a dancer?",
-      a: "Use the transaction reference number plus the amount and date. The sender name on UPI is not always the dancer's.",
+      q: "How should I charge a dancer who joins mid-month?",
+      a: "Common options are the full month, the weeks that remain, or starting the fee next month. Pick one and apply it to everyone.",
+    },
+    {
+      q: "What should a dance studio do about holidays?",
+      a: "Decide whether the fee changes, whether you add a make-up class, or whether closures are already in your yearly pricing, and share the dates at the start of the month.",
     },
   ],
 };
 
-const reminderMessages: Post = {
-  slug: "dance-class-fee-reminder-messages",
-  title: "Dance class fee reminder messages you can copy and paste",
-  metaTitle: "Dance Class Fee Reminder Messages to Copy | ChoreoStudio",
+const showcase: Post = {
+  slug: "how-to-plan-a-dance-showcase",
+  title: "How to plan a dance showcase",
+  metaTitle: "How to Plan a Dance Showcase for Your Studio | ChoreoStudio",
   description:
-    "Eight copy-and-paste WhatsApp messages for dance studio owners: before the due date, overdue, part payments, cash received and when a dancer says they have paid.",
-  date: "2026-10-24",
-  readingMinutes: 4,
-  related: ["dance-class-late-payment-policy", "dance-studio-whatsapp-group-tips", "track-monthly-dance-class-fees"],
+    "A showcase gives dancers a goal and your studio a day to be proud of. Here is a timeline, a budget checklist and the mistakes that cost studios the most.",
+  date: "2026-10-31",
+  readingMinutes: 7,
+  related: ["how-to-run-a-dance-studio-in-india", "why-adult-dancers-quit-dance-classes", "how-to-get-your-first-dancers"],
   blocks: [
     {
       t: "p",
-      text: "Asking for money is the part of running a studio nobody enjoys. These messages are short, polite and specific. Copy one, change the name and the amount, and send it from your own WhatsApp. We wrote all of them for this page. The names and amounts are made up.",
+      text: "A showcase is the single most useful event a studio can run. It gives dancers something to work towards, gives their friends and family a reason to come, and gives you photos and videos that bring in the next batch. It is also easy to overspend on and easy to leave too late. This guide is a way to plan one without losing money or sleep.",
     },
-    { t: "h2", text: "Before the due date" },
+    { t: "h2", text: "Decide what kind of showcase it is" },
     {
-      t: "msg",
-      label: "Heads-up",
-      text: "Hi Anand, a quick heads-up: your fee of ₹1,800 for Hip-hop this month is due on 5 Oct. You can pay by UPI to [your UPI ID]. Thank you!",
+      t: "p",
+      text: "It does not have to be a ticketed evening in a large auditorium. A studio showcase can be an open class for friends and family, a performance in your own studio space, a small hall booked for two hours, or a combined event with another studio. Start with the smallest version that would make your dancers proud, and grow it in later years.",
     },
-    { t: "h2", text: "After the due date" },
-    {
-      t: "msg",
-      label: "Gentle reminder",
-      text: "Hi Bela, a reminder from your studio: your fee of ₹2,500 was due on 5 Oct and is still open. If anything is off, just reply and we will sort it out. Thank you!",
-    },
-    {
-      t: "msg",
-      label: "Second reminder with a date",
-      text: "Hi Naina, your fee of ₹1,600 from 5 Oct is still open. Could you pay it by 20 Oct? If that is difficult, reply and we can work out a plan. Thank you!",
-    },
-    { t: "h2", text: "When the amount is not exact" },
-    {
-      t: "msg",
-      label: "Part payment received",
-      text: "Hi Chirag, thank you for the ₹1,000. Your fee for this month is ₹2,100, so ₹1,100 is still open. Could you pay the rest by 15 Oct?",
-    },
-    {
-      t: "msg",
-      label: "Paid more than owed",
-      text: "Hi Bela, you sent ₹3,000 but this month's fee is ₹2,500. Would you like the extra ₹500 kept as credit for next month, or sent back?",
-    },
-    { t: "h2", text: "When money has come in" },
-    {
-      t: "msg",
-      label: "Payment confirmed",
-      text: "Hi Anand, we have received your ₹1,800 for this month. Thank you!",
-    },
-    {
-      t: "msg",
-      label: "Cash received",
-      text: "Hi Naina, thank you for the ₹1,600 in cash today. We have noted it for this month.",
-    },
-    {
-      t: "msg",
-      label: "Dancer says paid but nothing shows yet",
-      text: "Hi Chirag, thank you for letting us know. We cannot see the ₹2,100 in our account yet. Could you send the UPI reference number so we can match it? Thank you!",
-    },
-    { t: "h2", text: "Tips that keep the tone right" },
+    { t: "h2", text: "A timeline that works backwards from the date" },
     {
       t: "ul",
       items: [
-        "Use the dancer's first name.",
-        "State the amount and the date.",
-        "Ask for one action.",
-        "Offer to talk if something is wrong.",
-        "Do not send a reminder to someone who has already paid.",
-        "Send from your own number so it reads like it is from you.",
+        "Ten to twelve weeks before: choose the date and venue, announce it to your dancers and decide which batches will perform.",
+        "Eight weeks before: choose music and routines, and tell each batch what they will perform.",
+        "Six weeks before: confirm the venue booking in writing, and start collecting any costume or participation fees.",
+        "Four weeks before: finalise the running order and the costumes, and send parents or friends the invitation and the details.",
+        "Two weeks before: rehearse in the order you will perform, and check the sound system and music files.",
+        "The week of the event: confirm times with everyone, and have one printed running order and a backup copy of every track.",
       ],
     },
-    { t: "h2", text: "Sending them faster" },
+    { t: "h2", text: "Budget: list the costs before you promise anything" },
     {
       t: "p",
-      text: "If you would rather not retype amounts, ChoreoStudio opens your own WhatsApp with each unpaid dancer's amount already filled in. You review it and press Send. It does not send anything by itself.",
+      text: "Write down every cost you can think of, and then add a margin, because something will always cost more than you expect.",
     },
     {
-      t: "note",
-      text: "First month free, no card needed. Start free trial: choreostudio.live/login?mode=register",
+      t: "ul",
+      items: [
+        "Venue hire, including the time needed for set-up and rehearsal.",
+        "Sound and lighting, and someone to run them on the day.",
+        "Costumes, whether the studio buys them or dancers do.",
+        "Photographer or videographer, if you want proper photos.",
+        "Printing, such as invitations and the running order.",
+        "Refreshments or small thank-you gifts for instructors and helpers.",
+        "A reserve for the things you did not think of.",
+      ],
+    },
+    {
+      t: "p",
+      text: "Then decide how it is paid for: a participation fee, ticket sales, sponsors from local businesses, or the studio absorbing it as marketing. Be clear with dancers about what the fee covers before they commit.",
+    },
+    { t: "h2", text: "Running order and the day itself" },
+    {
+      t: "p",
+      text: "Put the youngest or newest dancers early, when the audience is fresh and the nerves are fewest, and keep a strong piece for the end. Leave a gap between batches for costume changes, and nominate one person to keep time. Plan to start a little late and finish a little late, and tell the venue so.",
+    },
+    {
+      t: "p",
+      text: "Ask a few dancers or helpers to take photos and short videos on the day, so you have material for weeks afterwards. Do not rely on a single person with a single phone.",
+    },
+    { t: "h2", text: "Mistakes to avoid" },
+    {
+      t: "ul",
+      items: [
+        "Booking the venue before you know the budget.",
+        "Collecting fees with no clear list of who has paid and for what.",
+        "Leaving music and sound checks to the last day.",
+        "Trying to include every batch in a single long programme.",
+        "Skipping a written confirmation with the venue about time, price and cancellation.",
+      ],
+    },
+    { t: "h2", text: "After the showcase" },
+    {
+      t: "p",
+      text: "Send a thank-you message to every dancer and helper within a day. Share the best photos and videos, with the dancers' permission, and ask people who enjoyed the event to bring a friend to a class next month. This is the moment when new dancers are most likely to say yes.",
     },
   ],
   faq: [
     {
-      q: "What should I write to remind a dancer about an unpaid fee?",
-      a: "Use their first name, the month, the amount and the date it was due, ask for one action, offer to talk if something is wrong, and thank them.",
+      q: "How far in advance should a studio plan a dance showcase?",
+      a: "Ten to twelve weeks gives time to book a venue, choose music and routines, and rehearse without rushing.",
+    },
+    {
+      q: "How do dance studios pay for a showcase?",
+      a: "Common ways are a participation fee, ticket sales, local sponsors, or the studio covering it as marketing. Tell dancers what any fee covers before they commit.",
+    },
+    {
+      q: "Does a dance showcase need a big venue?",
+      a: "No. An open class for friends and family or a performance in your own studio is a good start. Grow it in later years.",
     },
   ],
 };
 
-const latePayment: Post = {
-  slug: "dance-class-late-payment-policy",
-  title: "What to do when a dancer pays late: write your rule once",
-  metaTitle: "Late Fee Payments at a Dance Studio: Write the Rule | ChoreoStudio",
-  description:
-    "A short guide for dance studio owners on late fee payments: pick a due date, a grace period and one standard message, then apply it the same way every month.",
-  date: "2026-10-27",
-  readingMinutes: 5,
-  related: ["dance-class-fee-reminder-messages", "track-monthly-dance-class-fees", "month-end-checklist-dance-studio-owner"],
-  blocks: [
-    {
-      t: "p",
-      text: "A late payment is rarely a crisis. What hurts is deciding what to do about it again every month, one dancer at a time, while you are tired and the dancer is a friend. A written rule takes that decision away. You decide once, tell everyone once, and then follow it.",
-    },
-    {
-      t: "p",
-      text: "This guide is a set of suggestions, not a standard. Studios differ. Pick the parts that fit yours.",
-    },
-    { t: "h2", text: "The four parts of a fee rule" },
-    {
-      t: "ol",
-      items: [
-        "A due date. One date each month, the same for everyone. Many studios use the 1st or the 5th.",
-        "A grace period. A few days after the due date when no reminder goes out. It saves you the awkward message to someone who was going to pay tomorrow anyway.",
-        "A reminder step. What you send, when, and from which number. Use the same wording for everyone.",
-        "A next step. What happens if the fee is still open after the reminder: a call, a pause on joining new classes, or a conversation. Write down which one you will actually do.",
-      ],
-    },
-    { t: "h2", text: "Decide before you need it" },
-    {
-      t: "p",
-      text: "Write the rule when no one owes you anything. A rule written in the middle of a dispute reads as a punishment. A rule that was in the welcome message on day one reads as how the studio works.",
-    },
-    { t: "h2", text: "Late fees: be careful" },
-    {
-      t: "p",
-      text: "Some studios add a late fee. If you do, put the amount in writing before the dancer joins, keep it small and apply it to everyone. Check the rules that apply to your business before you add one, because we cannot tell you what is allowed for yours. Many owners choose not to charge one and use the reminder and the next step instead.",
-    },
-    { t: "h2", text: "Where to put the rule" },
-    {
-      t: "ul",
-      items: [
-        "In the message you send when a dancer joins.",
-        "Pinned in your studio's WhatsApp group, if you have one.",
-        "On a printed note at the front desk or door.",
-      ],
-    },
-    { t: "h2", text: "A short rule you can adapt" },
-    {
-      t: "msg",
-      label: "Fee rule",
-      text: "Studio fees are due on the 5th of each month. If your fee is still open on the 8th, we will send you one reminder. If it is still open a week after that, we will call to see if something is wrong. If you need more time, tell us before the due date and we will agree a date together.",
-    },
-    { t: "h2", text: "Handling the dancer who is always late" },
-    {
-      t: "p",
-      text: "If the same person is late every month, the rule is not the problem. Talk to them once, privately. Often the date does not fit their pay cycle, and moving their due date a few days solves it. Write the new date down so it is not a one-off favour.",
-    },
-    { t: "h2", text: "How ChoreoStudio helps" },
-    {
-      t: "p",
-      text: "ChoreoStudio lists who is due and who is overdue, with the number of days overdue. For each unpaid dancer it opens a WhatsApp reminder with the dancer's amount filled in, and you press Send. Nothing is sent automatically.",
-    },
-    {
-      t: "note",
-      text: "First month free, no card needed.",
-    },
-  ],
-  faq: [
-    {
-      q: "How long should a grace period be for dance class fees?",
-      a: "There is no standard. Many studios allow a few days after the due date before sending a reminder. Pick a number, write it down and use it for everyone.",
-    },
-    {
-      q: "Should a dance studio charge a late fee?",
-      a: "It is your choice. If you do, state the amount in writing before the dancer joins and apply it to everyone. Check the rules that apply to your business first. Many owners use a reminder and a conversation instead.",
-    },
-    {
-      q: "What should I do when a dancer pays late every month?",
-      a: "Talk to them once, privately. Often their due date does not match when they are paid, and agreeing a different date fixes it.",
-    },
-  ],
-};
-
-const monthEndChecklist: Post = {
-  slug: "month-end-checklist-dance-studio-owner",
-  title: "A month-end checklist for dance studio owners",
-  metaTitle: "Month-End Checklist for Dance Studio Owners | ChoreoStudio",
-  description:
-    "A one-page month-end checklist for a dance studio: count what came in, match cash, UPI and bank, chase the late ones, close the month and set up the next.",
-  date: "2026-10-27",
-  readingMinutes: 4,
-  related: ["reconcile-cash-upi-bank-dance-class-fees", "dance-class-late-payment-policy", "track-monthly-dance-class-fees"],
-  blocks: [
-    {
-      t: "p",
-      text: "This is a checklist you can print or copy into a notebook. It takes a studio owner through the last day or two of a month so that the next one starts clean. Tick as you go.",
-    },
-    { t: "h2", text: "1. Count what came in" },
-    {
-      t: "ul",
-      items: [
-        "List every dancer with the amount owed for the month.",
-        "Add up what has been received, and write the total next to the total owed.",
-        "Work out the share collected: received divided by owed.",
-      ],
-    },
-    { t: "h2", text: "2. Match how it was paid" },
-    {
-      t: "ul",
-      items: [
-        "Cash: check the cash notes against the cash you are holding.",
-        "UPI: match each credit to a dancer by amount, date and reference.",
-        "Bank transfer: do the same with your statement.",
-        "Write down anything you cannot match and ask that dancer by name.",
-      ],
-    },
-    { t: "h2", text: "3. Deal with part payments and extra amounts" },
-    {
-      t: "ul",
-      items: [
-        "For each part payment, write what is still owed.",
-        "For each extra amount, decide whether it is advance for next month or a mistake.",
-      ],
-    },
-    { t: "h2", text: "4. Chase the late ones" },
-    {
-      t: "ul",
-      items: [
-        "Sort the open fees by how long they have been open.",
-        "Send each one the same reminder you would send anyone. Copy the wording from your fee rule.",
-        "Note the date you reminded each dancer, so you do not message the same person twice in a day.",
-      ],
-    },
-    { t: "h2", text: "5. Close the month" },
-    {
-      t: "ul",
-      items: [
-        "Save a copy of the final list: collected, still owed, and who.",
-        "Carry the open amounts forward so they show next month.",
-      ],
-    },
-    { t: "h2", text: "6. Set up the next month" },
-    {
-      t: "ul",
-      items: [
-        "Check the dancer list: who joined, who left, who changed batch.",
-        "Check that each dancer's fee amount is right for the new month.",
-        "Send the heads-up message a few days before the due date.",
-      ],
-    },
-    { t: "h2", text: "How ChoreoStudio helps" },
-    {
-      t: "p",
-      text: "ChoreoStudio has a Month end page. It shows the share collected, how the money came in by method (cash, UPI, bank transfer, other), and the late dancers you can remind from there. You still check your own statements before you confirm a payment.",
-    },
-    {
-      t: "note",
-      text: "First month free, no card needed.",
-    },
-  ],
-  faq: [
-    {
-      q: "What should a dance studio owner do at the end of every month?",
-      a: "Count what came in against what was owed, match cash, UPI and bank payments to each dancer, deal with part and extra payments, remind the late ones, save the final list, and check the dancer list for the next month.",
-    },
-    {
-      q: "How do I work out the share of fees collected?",
-      a: "Divide the total received by the total owed for the month. For example, if ₹40,000 was owed and ₹34,000 came in, the share collected is 85 percent.",
-    },
-  ],
-};
-
-const whatsappGroup: Post = {
-  slug: "dance-studio-whatsapp-group-tips",
-  title: "How to run a dance studio WhatsApp group without it taking over",
-  metaTitle: "Dance Studio WhatsApp Group: Tips and Rules | ChoreoStudio",
-  description:
-    "Practical tips for a dance studio WhatsApp group: who should be in it, what to post, what to keep out, and when to message dancers privately about fees.",
-  date: "2026-10-27",
-  readingMinutes: 4,
-  related: ["dance-class-fee-reminder-messages", "dance-class-late-payment-policy", "track-monthly-dance-class-fees"],
-  blocks: [
-    {
-      t: "p",
-      text: "For most studios, WhatsApp is where the studio lives. Class timings, music, costume photos and fee questions all land in the same place. That is useful until the group is so noisy that dancers mute it and miss the one message that mattered.",
-    },
-    { t: "h2", text: "One group for each purpose" },
-    {
-      t: "p",
-      text: "Keep a group for announcements where only you and your instructors can post. Keep a separate group for chat if your dancers want one. Fees do not belong in either.",
-    },
-    { t: "h2", text: "What to post in the announcements group" },
-    {
-      t: "ul",
-      items: [
-        "Class changes and cancellations.",
-        "Event and show dates.",
-        "A short reminder that fees are due soon, with no names.",
-      ],
-    },
-    { t: "h2", text: "What to keep out" },
-    {
-      t: "ul",
-      items: [
-        "Who has and has not paid. Nobody should read their balance, or someone else's, in a group.",
-        "Long discussions. Move them to the chat group or to a call.",
-        "Forwarded messages that have nothing to do with the studio.",
-      ],
-    },
-    { t: "h2", text: "Fees go in private messages" },
-    {
-      t: "p",
-      text: "A group post saying \"some fees are still pending\" makes the dancers who paid feel accused and the dancers who did not feel exposed. Send each person their own amount and due date, one to one. It is more respectful and it gets more replies.",
-    },
-    {
-      t: "msg",
-      label: "Private reminder",
-      text: "Hi Chirag, a quick note from the studio: your fee of ₹2,000 for this month is due on 5 Oct. You can pay by UPI to [your UPI ID]. Thank you!",
-    },
-    { t: "h2", text: "Set a few rules on day one" },
-    {
-      t: "ol",
-      items: [
-        "Tell new dancers what the group is for, in the message you send when they join.",
-        "Say when you read messages, so nobody expects an answer at midnight.",
-        "Pin the studio's timings and the fee rule at the top.",
-      ],
-    },
-    { t: "h2", text: "How ChoreoStudio fits in" },
-    {
-      t: "p",
-      text: "ChoreoStudio does not post in your groups. For each unpaid dancer it opens a private WhatsApp message with the dancer's own amount filled in, and you press Send. That keeps fee talk out of the group without you typing each message.",
-    },
-    {
-      t: "note",
-      text: "First month free, no card needed.",
-    },
-  ],
-  faq: [
-    {
-      q: "Should fees be discussed in a dance studio WhatsApp group?",
-      a: "No. Send each dancer their own amount and due date in a private message. Use the group for announcements that apply to everyone.",
-    },
-    {
-      q: "How many WhatsApp groups does a dance studio need?",
-      a: "Two is usually enough: one for announcements where only you and your instructors post, and one for chat if your dancers want it.",
-    },
-  ],
-};
-
-export const posts: Post[] = [trackFees, cashUpiBank, reminderMessages, latePayment, monthEndChecklist, whatsappGroup];
+export const posts: Post[] = [
+  runStudio,
+  priceClasses,
+  gstClasses,
+  adultsQuit,
+  firstDancers,
+  payInstructors,
+  missedClasses,
+  showcase,
+];
 
 export const getPost = (slug: string) => posts.find((post) => post.slug === slug);
 

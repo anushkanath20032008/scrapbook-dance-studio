@@ -113,7 +113,8 @@ function Login() {
         const { data, error } = await supabase.auth.signUp({
           email: address,
           password,
-          options: { emailRedirectTo: `${window.location.origin}${landingPath}` },
+          // The role is kept on the account itself, so confirming the email on another device or browser still lands a teacher on the join screen.
+          options: { emailRedirectTo: `${window.location.origin}${landingPath}`, data: { role } },
         });
         if (error) throw error;
         if (isExistingAccount(data.user)) {

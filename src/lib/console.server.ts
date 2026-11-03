@@ -18,8 +18,16 @@ export async function getConsoleContext(context: StudioContext) {
       isPlatformOwner: false,
     };
   }
-  await ensureStudio(context);
+  // A studio is only ever made for someone who has not said they teach. Without this check, any account that
+  // reached the console before accepting an invite (another browser, a closed prompt) would be given an owner studio.
   const { supabase, userId } = context;
+  const existing = await supabase.from("studio_profiles").select("user_id").eq("user_id", userId).maybeSingle();
+  if (!existing.error && !existing.data) {
+    const { data: auth } = await supabase.auth.getUser();
+    if (auth.user?.user_metadata?.["role"] === "teacher")
+      throw new Error("Join your studio with an invite code first.");
+  }
+  await ensureStudio(context);
 
   const { data: profile, error } = await supabase
     .from("studio_profiles")

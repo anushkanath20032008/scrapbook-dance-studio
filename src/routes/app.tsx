@@ -95,6 +95,10 @@ function ConsoleLayout() {
     enabled: session.status === "signed-in" && teacherIntent,
   });
   const [joinHidden, setJoinHidden] = useState(false);
+  // A teacher who confirmed their email on another device has no local hint, but the account remembers.
+  useEffect(() => {
+    if (session.status === "signed-in" && session.teacher) setTeacherIntent(true);
+  }, [session]);
   const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
   const context = useQuery({
     queryKey: ["console-context"],

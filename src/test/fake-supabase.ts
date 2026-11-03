@@ -11,7 +11,10 @@ type Result = {
   count?: number | null;
 };
 
-export function fakeSupabase(script: (call: Call) => Result | undefined) {
+export function fakeSupabase(
+  script: (call: Call) => Result | undefined,
+  userMetadata: Record<string, unknown> = {},
+) {
   const calls = [] as unknown as [Call, ...Call[]];
   calls.length = 0;
   const run = (call: Call) => {
@@ -37,6 +40,7 @@ export function fakeSupabase(script: (call: Call) => Result | undefined) {
   const client = {
     from: (table: string) => builder({ table, steps: [] }),
     rpc: (fn: string, args?: unknown) => builder({ fn, args: [args], steps: [] }),
+    auth: { getUser: async () => ({ data: { user: { user_metadata: userMetadata } }, error: null }) },
   };
   return { client: client as unknown as Db, calls };
 }

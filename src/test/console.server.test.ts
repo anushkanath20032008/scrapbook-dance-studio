@@ -104,4 +104,12 @@ describe("getConsoleContext for an instructor", () => {
     expect(calls.some((call) => call.steps.some(([name]) => name === "upsert"))).toBe(false);
     expect(calls.some((call) => call.fn === "has_role")).toBe(false);
   });
+
+  it("never makes a studio for an account that said it teaches", async () => {
+    const { client, calls } = fakeSupabase(() => ({ data: null }), { role: "teacher" });
+    await expect(getConsoleContext({ supabase: client, userId: user })).rejects.toThrow(
+      "Join your studio with an invite code first.",
+    );
+    expect(calls.some((call) => call.steps.some(([name]) => name === "upsert"))).toBe(false);
+  });
 });

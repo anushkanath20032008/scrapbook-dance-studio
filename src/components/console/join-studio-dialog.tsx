@@ -6,6 +6,7 @@ import { ConsoleDialog } from "@/components/console/console-dialog";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { acceptInstructorInvite } from "@/lib/instructors.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { setRoleIntent } from "@/lib/role-intent";
 
 /** The first thing a dance teacher sees: which studio do you teach at? */
@@ -65,7 +66,9 @@ export function JoinStudioDialog({ onLeave, onDismiss }: { onLeave: () => void; 
             variant="retroPaper"
             type="button"
             title="Choose this if you own a dance studio"
-            onClick={() => {
+            onClick={async () => {
+              // The account remembers the choice, so the studio can now be made for them.
+              await supabase.auth.updateUser({ data: { role: "owner" } });
               setRoleIntent("owner");
               onLeave();
             }}

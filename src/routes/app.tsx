@@ -1,7 +1,7 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
@@ -13,7 +13,7 @@ import { getMessagingStatus } from "@/lib/reminders.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
 import { getSetupCounts } from "@/lib/setup.functions";
 import { GroupTabs } from "@/components/console/group-tabs";
-import { consoleGroups, groupForPath } from "@/lib/console-nav";
+import { consoleGroups, groupForPath, groupTabs } from "@/lib/console-nav";
 import { helpVideos } from "@/lib/help-videos";
 import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
@@ -222,8 +222,8 @@ function ConsoleLayout() {
             </NavLink>
           )}
           {consoleGroups.map((group) => (
+            <Fragment key={group.id}>
             <NavLink
-              key={group.id}
               to={group.to as NavTo}
               exact={group.exact}
               active={activeGroup === group.id}
@@ -234,6 +234,24 @@ function ConsoleLayout() {
             >
               {group.label}
             </NavLink>
+            {group.id === "studio" && (
+              <ul className="console-subnav" aria-label="Studio pages">
+                {groupTabs("studio", false).map((tab) => (
+                  <li key={tab.to}>
+                    <Link
+                      to={tab.to}
+                      title={tab.hint}
+                      className="console-nav-sub"
+                      aria-current={pathname.replace(/\/+$/, "") === tab.to ? "page" : undefined}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {tab.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+            </Fragment>
           ))}
           <div className="console-nav-foot">
             <section className="console-plan" aria-label="Your plan">

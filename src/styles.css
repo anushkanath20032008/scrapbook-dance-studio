@@ -606,3 +606,7 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
   .console-main { overflow-wrap:anywhere; }
   .console-main img, .console-main table { max-width:100%; }
 }
+
+.console-subnav { list-style:none; margin:0 0 6px; padding:0 0 0 14px; }
+.console-nav-sub { display:block; padding:6px 11px; border-left:2px solid var(--ink); color:var(--ink); text-decoration:none; font-weight:600; font-size:14px; }
+.console-nav-sub:hover, .console-nav-sub[aria-current="page"] { background:var(--marigold); }

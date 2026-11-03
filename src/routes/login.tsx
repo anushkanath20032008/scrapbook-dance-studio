@@ -129,6 +129,8 @@ function Login() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: address, password });
         if (error) throw error;
+        // Choosing "I teach" here is remembered on the account too, so no studio is made for it.
+        if (role === "teacher") await supabase.auth.updateUser({ data: { role: "teacher" } });
       }
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "";

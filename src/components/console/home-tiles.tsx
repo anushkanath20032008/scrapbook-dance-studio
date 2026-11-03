@@ -14,11 +14,16 @@ export function HomeTiles({
   return (
     <nav aria-label={label}>
       <ul className="home-tiles">
-        {tiles.map((tile) => {
+        {tiles.map((tile, i) => {
           const count = tile.badge ? counts[tile.badge] : undefined;
           return (
             <li key={tile.to}>
-              <Link to={tile.to} className="home-tile" data-waiting={count !== undefined && count > 0}>
+              <Link to={tile.to} className="home-tile" data-tone={i % 4} data-waiting={count !== undefined && count > 0}>
+                {tile.icon && (
+                  <span className="home-tile-icon" aria-hidden="true">
+                    {tile.icon}
+                  </span>
+                )}
                 <span className="home-tile-title">{tile.label}</span>
                 {count !== undefined && count > 0 && (
                   <span className="home-tile-badge" aria-label={`${count} waiting`}>

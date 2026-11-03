@@ -58,22 +58,22 @@ export function groupTabs(group: GroupId, messagingConfigured: boolean): Console
 export type HomeTile = { icon?: string; to: string; label: string; hint: string; badge?: "unpaid" | "toCheck" | "requests" | "myRequests" };
 
 export const ownerTiles: HomeTile[] = [
-  { icon: "💃", to: "/app/students", label: "Dancers", hint: "Add, find and edit your dancers" },
-  { icon: "₹", to: "/app/billing", label: "Billing", hint: "Charge fees and record payments", badge: "unpaid" },
-  { icon: "✅", to: "/app/verify", label: "Payments to check", hint: "Payments dancers say they made", badge: "toCheck" },
-  { icon: "📋", to: "/app/attendance", label: "Attendance", hint: "Mark who came to class" },
-  { icon: "🗓️", to: "/app/batches", label: "Batches", hint: "Your classes and teacher requests", badge: "requests" },
-  { icon: "🏷️", to: "/app/plans", label: "Fee plans", hint: "The monthly fee amounts you charge" },
-  { icon: "🔁", to: "/app/makeups", label: "Make-ups", hint: "Plan a class for dancers who missed one" },
-  { icon: "🧑‍🏫", to: "/app/team", label: "Team", hint: "Invite or remove dance teachers" },
-  { icon: "📅", to: "/app/month-end", label: "Month end", hint: "Billed, collected and still pending" },
-  { icon: "📈", to: "/app/insights", label: "Insights", hint: "Charts of fees and attendance" },
-  { icon: "⚙️", to: "/account", label: "Account", hint: "Studio details, plan and due day" },
+  { icon: "users", to: "/app/students", label: "Dancers", hint: "Add, find and edit your dancers" },
+  { icon: "indian-rupee", to: "/app/billing", label: "Billing", hint: "Charge fees and record payments", badge: "unpaid" },
+  { icon: "badge-check", to: "/app/verify", label: "Payments to check", hint: "Payments dancers say they made", badge: "toCheck" },
+  { icon: "clipboard-check", to: "/app/attendance", label: "Attendance", hint: "Mark who came to class" },
+  { icon: "calendar-days", to: "/app/batches", label: "Batches", hint: "Your classes and teacher requests", badge: "requests" },
+  { icon: "tag", to: "/app/plans", label: "Fee plans", hint: "The monthly fee amounts you charge" },
+  { icon: "repeat", to: "/app/makeups", label: "Make-ups", hint: "Plan a class for dancers who missed one" },
+  { icon: "graduation-cap", to: "/app/team", label: "Team", hint: "Invite or remove dance teachers" },
+  { icon: "calendar-check", to: "/app/month-end", label: "Month end", hint: "Billed, collected and still pending" },
+  { icon: "chart-line", to: "/app/insights", label: "Insights", hint: "Charts of fees and attendance" },
+  { icon: "settings", to: "/account", label: "Account", hint: "Studio details, plan and due day" },
 ];
 
 export const teacherTiles: HomeTile[] = [
-  { icon: "📋", to: "/app/class", label: "Take attendance", hint: "Pick a batch and mark who came" },
-  { icon: "💃", to: "/app/my-dancers", label: "Dancers", hint: "Everyone in the studio, with their batches and contact details" },
-  { icon: "🗓️", to: "/app/my-batches", label: "My batches", hint: "Your classes, rosters and batch suggestions", badge: "myRequests" },
-  { icon: "🔁", to: "/app/makeups", label: "Make-ups", hint: "Make-up classes for dancers who missed one" },
+  { icon: "clipboard-check", to: "/app/class", label: "Take attendance", hint: "Pick a batch and mark who came" },
+  { icon: "users", to: "/app/my-dancers", label: "Dancers", hint: "Everyone in the studio, with their batches and contact details" },
+  { icon: "calendar-days", to: "/app/my-batches", label: "My batches", hint: "Your classes, rosters and batch suggestions", badge: "myRequests" },
+  { icon: "repeat", to: "/app/makeups", label: "Make-ups", hint: "Make-up classes for dancers who missed one" },
 ];

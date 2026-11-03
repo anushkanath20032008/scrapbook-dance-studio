@@ -700,3 +700,10 @@ p, li, dd, label { line-height:1.6; }
 /* Hero headline and sub-line: the original look (size and spacing come from the older rules above). */
 .hero-type h1 { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0; line-height:1; }
 .hero-sub { background:var(--ink); color:var(--paper); padding:10px 13px; max-width:440px; font-size:17px; line-height:1.45; font-weight:600; }
+
+/* Home tiles: black and white icons and badge, and hint text that follows each tile's own colour. */
+.home-tile-icon { display:inline-flex; font-size:0; color:inherit; }
+.home-tile .home-tile-hint { color:inherit; opacity:.9; }
+.home-tile[data-tone="2"] .home-tile-hint, .home-tile[data-tone="2"] .home-tile-title { color:var(--paper); }
+.home-tile-badge { background:var(--ink); color:var(--paper); border-color:var(--paper); }
+.home-tile[data-tone="2"] .home-tile-badge { background:var(--paper); color:var(--ink); border-color:var(--paper); }

@@ -701,3 +701,6 @@ p, li, dd, label { line-height:1.6; }
 .step-heading { font-size:24px; } .desktop-icon h3 { font-size:22px; }
 @media (max-width:800px) { .hero-type h1 { font-size:clamp(38px,10vw,56px); } }
 @media (max-width:540px) { .hero-type h1 { font-size:clamp(34px,10.5vw,46px); } .hero-sub { font-size:17px; } }
+
+/* The hero headline only: a warm serif for the one line people read first. */
+.hero-type h1 { font-family:"Fraunces",Georgia,serif; font-weight:700; letter-spacing:-.02em; line-height:1.08; font-size:clamp(44px,5.6vw,76px); font-variation-settings:"opsz" 144; }

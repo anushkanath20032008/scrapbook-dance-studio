@@ -707,3 +707,6 @@ p, li, dd, label { line-height:1.6; }
 .home-tile[data-tone="2"] .home-tile-hint, .home-tile[data-tone="2"] .home-tile-title { color:var(--paper); }
 .home-tile-badge { background:var(--ink); color:var(--paper); border-color:var(--paper); }
 .home-tile[data-tone="2"] .home-tile-badge { background:var(--paper); color:var(--ink); border-color:var(--paper); }
+.console-nav-item { gap:10px; justify-content:flex-start; }
+.console-nav-icon { flex:none; }
+.console-nav-text { flex:1; }

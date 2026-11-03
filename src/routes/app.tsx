@@ -1,6 +1,7 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { CalendarDays, ClipboardCheck, IndianRupee, LayoutGrid, ListChecks, Repeat, Users, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -391,6 +392,20 @@ function ConsoleLayout() {
   );
 }
 
+// One plain line icon per menu entry, for both the owner and the teacher menu.
+const navIcons: Record<string, LucideIcon> = {
+  "/app": LayoutGrid,
+  "/app/setup": ListChecks,
+  "/app/students": Users,
+  "/app/my-dancers": Users,
+  "/app/billing": IndianRupee,
+  "/app/attendance": ClipboardCheck,
+  "/app/class": ClipboardCheck,
+  "/app/batches": CalendarDays,
+  "/app/my-batches": CalendarDays,
+  "/app/makeups": Repeat,
+};
+
 function NavLink({
   to,
   exact = false,
@@ -420,7 +435,12 @@ function NavLink({
       className={`console-nav-item${active ? " active" : ""}`}
       onClick={onPick}
     >
-      {children}
+      {navIcons[to] &&
+        (() => {
+          const Icon = navIcons[to]!;
+          return <Icon className="console-nav-icon" size={18} strokeWidth={1.9} aria-hidden="true" />;
+        })()}
+      <span className="console-nav-text">{children}</span>
       {badge > 0 && (
         <span className="console-nav-badge" aria-label={`${badge} waiting`}>
           {badge}

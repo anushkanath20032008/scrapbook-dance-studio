@@ -44,11 +44,6 @@ export function HomeTiles({
                   </span>
                 )}
                 <span className="home-tile-title">{tile.label}</span>
-                {count !== undefined && count > 0 && (
-                  <span className="home-tile-badge" aria-label={`${count} waiting`}>
-                    {count}
-                  </span>
-                )}
                 <span className="home-tile-hint">{tile.hint}</span>
               </Link>
             </li>

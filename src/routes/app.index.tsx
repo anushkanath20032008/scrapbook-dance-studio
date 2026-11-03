@@ -287,15 +287,6 @@ function Overview() {
         onClose={() => setPaying(null)}
         onSaved={() => setError("")}
       />
-
-      {!setupDone && !firstRun && (
-        <div className="window setup-card">
-          <div className="window-bar chrome-font">Setup.dialog</div>
-          <div className="window-inner">
-            <SetupChecklist />
-          </div>
-        </div>
-      )}
     </section>
   );
 }

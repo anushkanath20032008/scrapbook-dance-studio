@@ -77,7 +77,7 @@ function Tick({ checked, label, onChange }: { checked: boolean; label: string; o
 
 function FilterChips({ filter, onChange }: { filter: TableFilter; onChange: (next: TableFilter) => void }) {
   return (
-    <div className="table-chips" role="group" aria-label="Show">
+    <div className="table-chips" role="group" aria-label="Show" data-tour="filters">
       {FILTERS.map((item) => (
         <button
           key={item.id}
@@ -168,7 +168,7 @@ export function StudioTable({
     );
 
   return (
-    <div className="studio-table">
+    <div className="studio-table" data-tour="table">
       <FilterChips filter={filter} onChange={setFilter} />
       {undoable && (
         <div className="console-banner" role="status">
@@ -186,7 +186,7 @@ export function StudioTable({
           {filter === "unpaid" ? "Everyone has paid. Nothing to chase." : "Nothing matches this filter."}
         </p>
       )}
-      {batches.map((batch) => {
+      {batches.map((batch, position) => {
         const totals = batchTotals(batch.rows);
         const open = !closed.has(batch.id);
         const unpaidRows = batch.rows.filter(owes);
@@ -205,7 +205,7 @@ export function StudioTable({
                 {schedule(batch)} · {totals.count} dancer{totals.count === 1 ? "" : "s"} ·{" "}
                 {totals.unpaid === 0 ? "all paid ✓" : `${totals.paid} paid · ${formatRupees(totals.duePaise)} due`}
               </span>
-              <span className="table-batch-actions">
+              <span className="table-batch-actions" data-tour={position === 0 ? "batch-actions" : undefined}>
                 {totals.unpaid > 0 && (
                   <Button variant="retro" type="button" onClick={() => setPaying(paying === batch.id ? null : batch.id)}>
                     Mark all paid
@@ -253,7 +253,7 @@ export function StudioTable({
             )}
             {open && (
               <div className="table-scroll">
-                <table className="table-rows">
+                <table className="table-rows table-rows-money">
                   <thead>
                     <tr>
                       <th scope="col">Name</th>
@@ -456,7 +456,7 @@ export function TeacherTable({ today }: { today: string }) {
   const batches = filter === "today" ? table.data.filter((batch) => batch.meetsToday) : table.data;
 
   return (
-    <div className="studio-table">
+    <div className="studio-table" data-tour="table">
       <div className="table-chips" role="group" aria-label="Show">
         {(["all", "today"] as const).map((id) => (
           <button key={id} type="button" className="table-chip" aria-pressed={filter === id} onClick={() => setFilter(id)}>
@@ -465,7 +465,7 @@ export function TeacherTable({ today }: { today: string }) {
         ))}
       </div>
       {batches.length === 0 && <p className="console-empty">No class today.</p>}
-      {batches.map((batch) => {
+      {batches.map((batch, position) => {
         const open = !closed.has(batch.id);
         return (
           <section key={batch.id} className="table-batch" aria-label={batch.name}>
@@ -476,7 +476,7 @@ export function TeacherTable({ today }: { today: string }) {
               <span className="table-batch-meta">
                 {schedule(batch)} · {batch.rows.length} dancer{batch.rows.length === 1 ? "" : "s"}
               </span>
-              <span className="table-batch-actions">
+              <span className="table-batch-actions" data-tour={position === 0 ? "batch-actions" : undefined}>
                 {batch.meetsToday && batch.rows.length > 0 && (
                   <Button
                     variant="retro"

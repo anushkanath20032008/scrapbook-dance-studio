@@ -739,7 +739,16 @@ p, li, dd, label { line-height:1.6; }
 .table-confirm { padding:12px 14px; border-bottom:2px solid var(--ink); background:#eef2ff; }
 .table-confirm-list { list-style:none; margin:0 0 12px; padding:0; display:grid; gap:6px; max-height:220px; overflow:auto; }
 @media (max-width: 640px) {
-  .table-rows th:nth-child(2), .table-rows td:nth-child(2) { display:none; }
+  .table-rows-money th:nth-child(2), .table-rows-money td:nth-child(2) { display:none; }
+  .table-rows th, .table-rows td { padding:10px 8px; }
+  .table-tick { width:32px; height:32px; }
+  .table-batch-head { padding:10px; }
+  .table-batch-meta { min-width:100%; order:3; }
+  .table-batch-actions { width:100%; }
+  .table-batch-actions .retro-button, .table-batch-actions button { flex:1 1 140px; min-height:44px; }
+  .table-chip { padding:8px 14px; min-height:40px; }
+  .table-confirm { padding:10px; }
+  .tour-card { left:12px; right:12px; bottom:12px; width:auto; max-height:45vh; overflow:auto; padding:14px; }
 }
 
 /* Dialogs dock on the right and stop blacking out the page, so the table stays visible behind them */

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { TeacherAddDancer } from "@/components/console/teacher-add-dancer";
 import { BatchRequestDialog } from "@/components/console/batch-request-dialog";
 import { describeRequest } from "@/components/console/batch-requests-panel";
 import { weekdayNames } from "@/components/console/form-utils";
@@ -22,6 +23,7 @@ function InstructorBatches() {
   const requestsFn = useServerFn(getMyBatchRequests);
   const requests = useQuery({ queryKey: ["my-batch-requests"], queryFn: () => requestsFn() });
   const [suggesting, setSuggesting] = useState(false);
+  const [adding, setAdding] = useState<{ id: string; name: string } | null>(null);
 
   return (
     <section>
@@ -37,7 +39,7 @@ function InstructorBatches() {
       )}
       <ul className="console-list">
         {batches.data?.map((batch) => (
-          <BatchRow key={batch.id} batch={batch} />
+          <BatchRow onAdd={setAdding} key={batch.id} batch={batch} />
         ))}
       </ul>
       {requests.data && requests.data.length > 0 && (
@@ -62,13 +64,16 @@ function InstructorBatches() {
         </>
       )}
       <BatchRequestDialog open={suggesting} onClose={() => setSuggesting(false)} />
+      <TeacherAddDancer batch={adding} onClose={() => setAdding(null)} />
     </section>
   );
 }
 
 function BatchRow({
   batch,
+  onAdd,
 }: {
+  onAdd: (batch: { id: string; name: string }) => void;
   batch: {
     id: string;
     name: string;
@@ -102,6 +107,9 @@ function BatchRow({
           <p className="console-hint">{roster.data.map((row) => row.student_name).join(", ")}</p>
         )}
       </div>
+      <Button variant="retroPaper" type="button" onClick={() => onAdd({ id: batch.id, name: batch.name })}>
+        Add dancer
+      </Button>
     </li>
   );
 }

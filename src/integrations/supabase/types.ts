@@ -1138,6 +1138,10 @@ export type Database = {
         Args: { p_id: string }
         Returns: boolean
       }
+      instructor_add_student: {
+        Args: { p_batch: string; p_name: string; p_phone: string }
+        Returns: string
+      }
       instructor_mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number

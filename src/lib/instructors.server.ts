@@ -144,3 +144,16 @@ export async function declineBatchRequest({ supabase }: StudioContext, input: { 
   unwrap(await supabase.rpc("decline_batch_request", { p_id: input.id }));
   return { declined: true };
 }
+
+export async function addInstructorStudent(
+  { supabase }: StudioContext,
+  input: { batchId: string; name: string; phone: string | null },
+) {
+  return unwrap(
+    await supabase.rpc("instructor_add_student", {
+      p_batch: input.batchId,
+      p_name: input.name,
+      p_phone: input.phone ?? "",
+    }),
+  );
+}

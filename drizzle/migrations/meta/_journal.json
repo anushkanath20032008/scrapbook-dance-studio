@@ -225,6 +225,13 @@
       "when": 1791551600000,
       "tag": "0031_student_details",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791638000000,
+      "tag": "0032_instructor_add_student",
+      "breakpoints": true
     }
   ]
 }

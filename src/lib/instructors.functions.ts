@@ -3,7 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { batchInput } from "@/lib/schemas";
-import { isoDate, uuid, validate } from "@/lib/validators";
+import { isoDate, personName, phone, uuid, validate } from "@/lib/validators";
 
 // Owner side: invite, list and remove instructors. The database refuses anyone who is not the studio owner.
 export const inviteInstructor = createServerFn({ method: "POST" })
@@ -139,4 +139,13 @@ export const declineBatchRequest = createServerFn({ method: "POST" })
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).declineBatchRequest(context, data),
+  );
+
+export const addInstructorStudent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    validate(z.object({ batchId: uuid, name: personName, phone: phone.nullable() })),
+  )
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).addInstructorStudent(context, data),
   );

@@ -683,3 +683,6 @@ p, li, dd, label { line-height:1.6; }
 .console-fold-toggle { border:2px solid transparent; background:transparent; color:var(--ink); font-size:16px; width:36px; cursor:pointer; }
 .console-fold-toggle:hover, .console-fold-toggle:focus-visible { border-color:var(--ink); background:var(--marigold); }
 .console-subnav[hidden] { display:none; }
+/* When a batch under Batches is the one open, only that batch is highlighted; Batches itself just stays bold. */
+.console-nav-fold:has(+ .console-subnav .active) .console-nav-item.active { background:transparent; border-color:transparent; box-shadow:none; font-weight:800; }
+.console-nav-sub.active { background:var(--marigold); }

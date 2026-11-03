@@ -67,7 +67,7 @@ const steps: Record<TourRole, Step[]> = {
     {
       target: null,
       title: "Welcome to your studio",
-      text: "This takes under a minute. You see only what you need to teach: batches, dancer names and attendance.",
+      text: "This takes under a minute. It shows you where to mark attendance, find your batches and plan make-up classes.",
     },
     {
       to: "/app/class",

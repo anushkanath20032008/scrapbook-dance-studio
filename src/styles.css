@@ -678,3 +678,8 @@ p, li, dd, label { line-height:1.6; }
 .home-tile-title { font-size:20px; }
 
 @media (max-width:640px) { html { font-size:16px; } .console-title { font-size:28px; } }
+.console-nav-fold { display:flex; align-items:stretch; gap:4px; }
+.console-nav-fold .console-nav-item { flex:1; }
+.console-fold-toggle { border:2px solid transparent; background:transparent; color:var(--ink); font-size:16px; width:36px; cursor:pointer; }
+.console-fold-toggle:hover, .console-fold-toggle:focus-visible { border-color:var(--ink); background:var(--marigold); }
+.console-subnav[hidden] { display:none; }

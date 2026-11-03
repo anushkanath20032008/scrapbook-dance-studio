@@ -101,6 +101,22 @@ function ConsoleLayout() {
     queryFn: () => loadMyBatches(),
     enabled: session.status === "signed-in" && session.teacher,
   });
+  const [batchesOpen, setBatchesOpen] = useState(() => {
+    try {
+      return window.localStorage.getItem("choreo-batches-open") !== "no";
+    } catch {
+      return true;
+    }
+  });
+  const toggleBatches = () =>
+    setBatchesOpen((open) => {
+      try {
+        window.localStorage.setItem("choreo-batches-open", open ? "no" : "yes");
+      } catch {
+        // Not remembering the fold state is harmless.
+      }
+      return !open;
+    });
   const [joinHidden, setJoinHidden] = useState(false);
   // A teacher who confirmed their email on another device has no local hint, but the account remembers.
   useEffect(() => {
@@ -219,8 +235,19 @@ function ConsoleLayout() {
           )).flatMap((link, index) =>
             instructorItems[index]?.to === "/app/my-batches" && (myBatches.data?.length ?? 0) > 0
               ? [
-                  link,
-                  <ul key="batch-subnav" className="console-subnav" aria-label="Your batches">
+                  <div key="batches-head" className="console-nav-fold">
+                    {link}
+                    <button
+                      type="button"
+                      className="console-fold-toggle"
+                      aria-expanded={batchesOpen}
+                      aria-label={batchesOpen ? "Hide your batches" : "Show your batches"}
+                      onClick={toggleBatches}
+                    >
+                      {batchesOpen ? "▾" : "▸"}
+                    </button>
+                  </div>,
+                  <ul key="batch-subnav" className="console-subnav" aria-label="Your batches" hidden={!batchesOpen}>
                     {myBatches.data?.map((batch) => (
                       <li key={batch.id}>
                         <Link

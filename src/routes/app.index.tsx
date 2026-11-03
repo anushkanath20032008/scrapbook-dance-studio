@@ -115,6 +115,17 @@ function Overview() {
   return (
     <section>
       <h1 className="display console-title">Home</h1>
+      {!brandNew && (
+        <StudioTable
+          period={period}
+          today={today}
+          onRecord={(student) => setPaying(student)}
+          onRemindBatch={(ids) => {
+            setRemindIds(ids);
+            setBatchOpen(true);
+          }}
+        />
+      )}
       {unpaidRows.length > 0 && (
         <div className="console-banner" role="status">
           <span>
@@ -173,17 +184,6 @@ function Overview() {
       {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
       {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
-      {!brandNew && (
-        <StudioTable
-          period={period}
-          today={today}
-          onRecord={(student) => setPaying(student)}
-          onRemindBatch={(ids) => {
-            setRemindIds(ids);
-            setBatchOpen(true);
-          }}
-        />
-      )}
       {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
 
       {arrears.length > 0 && (

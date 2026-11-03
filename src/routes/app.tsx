@@ -19,6 +19,8 @@ import { helpVideos } from "@/lib/help-videos";
 import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
 import { getInstructorBatches, getMyTeacherStudio } from "@/lib/instructors.functions";
+import { TermsGate } from "@/components/console/terms-gate";
+import { TERMS_VERSION } from "@/lib/terms";
 import { setRoleIntent } from "@/lib/role-intent";
 
 export const Route = createFileRoute("/app")({
@@ -121,6 +123,7 @@ function ConsoleLayout() {
       return !open;
     });
   const [joinHidden, setJoinHidden] = useState(false);
+  const [termsDone, setTermsDone] = useState(false);
   // A teacher who confirmed their email on another device has no local hint, but the account remembers.
   // Only the account decides this. A browser-wide hint is not used: it outlives sign-out and would send the next
   // person to sign in here, such as a studio owner, to the teacher screen.
@@ -348,6 +351,7 @@ function ConsoleLayout() {
           />
         )}
         <main className="console-main">
+          {session.termsVersion !== TERMS_VERSION && !termsDone && <TermsGate onAccepted={() => setTermsDone(true)} />}
           {needsJoin && !joinHidden && (
             <JoinStudioDialog onLeave={() => setTeacherIntent(false)} onDismiss={() => setJoinHidden(true)} />
           )}

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { PasswordField } from "@/components/password-field";
 import { setRoleIntent } from "@/lib/role-intent";
+import { TermsAgreement } from "@/components/terms-agreement";
+import { TERMS_VERSION } from "@/lib/terms";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -95,6 +97,8 @@ function Login() {
     setMode(next);
   }
 
+  const [agreed, setAgreed] = useState(false);
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -114,7 +118,10 @@ function Login() {
           email: address,
           password,
           // The role is kept on the account itself, so confirming the email on another device or browser still lands a teacher on the join screen.
-          options: { emailRedirectTo: `${window.location.origin}${landingPath}`, data: { role } },
+          options: {
+            emailRedirectTo: `${window.location.origin}${landingPath}`,
+            data: { role, terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString() },
+          },
         });
         if (error) throw error;
         if (isExistingAccount(data.user)) {
@@ -350,11 +357,12 @@ function Login() {
                   </button>
                 </p>
               )}
+              {registering && <TermsAgreement accepted={agreed} onChange={setAgreed} />}
               <div className="login-actions">
                 <Button
                   variant="retro"
                   type="submit"
-                  disabled={busy || (registering && !rubricMet)}
+                  disabled={busy || (registering && (!rubricMet || !agreed))}
                 >
                   {busy
                     ? "One moment…"
@@ -366,12 +374,6 @@ function Login() {
                 </Button>
               </div>
             </form>
-            {registering && (
-              <p className="console-hint login-terms">
-                By creating an account you agree to our <a href="/terms">Terms</a> and{" "}
-                <a href="/privacy">Privacy Notice</a>.
-              </p>
-            )}
             {mode !== "forgot" && (
               <>
                 <p className="login-or">or</p>

@@ -86,6 +86,15 @@ function Login() {
     emailRef.current?.focus();
   }, [mode]);
 
+  // Switching between Sign in and Register starts a clean form: nothing typed carries over.
+  function switchTab(next: "sign-in" | "register") {
+    if (next !== mode) {
+      setEmail("");
+      setPassword("");
+    }
+    setMode(next);
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -237,7 +246,7 @@ function Login() {
                   role="tab"
                   aria-selected={mode === "sign-in"}
                   variant={mode === "sign-in" ? "retro" : "retroPaper"}
-                  onClick={() => setMode("sign-in")}
+                  onClick={() => switchTab("sign-in")}
                 >
                   Sign in
                 </Button>
@@ -246,7 +255,7 @@ function Login() {
                   role="tab"
                   aria-selected={registering}
                   variant={registering ? "retro" : "retroPaper"}
-                  onClick={() => setMode("register")}
+                  onClick={() => switchTab("register")}
                 >
                   Register
                 </Button>

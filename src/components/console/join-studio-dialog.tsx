@@ -9,7 +9,7 @@ import { acceptInstructorInvite } from "@/lib/instructors.functions";
 import { setRoleIntent } from "@/lib/role-intent";
 
 /** The first thing a dance teacher sees: which studio do you teach at? */
-export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
+export function JoinStudioDialog({ onLeave, onDismiss }: { onLeave: () => void; onDismiss: () => void }) {
   const queryClient = useQueryClient();
   const accept = useServerFn(acceptInstructorInvite);
   const [code, setCode] = useState("");
@@ -38,8 +38,8 @@ export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
     <ConsoleDialog
       open
       onOpenChange={(open) => {
-        // Closing is "not now": the console opens as usual, and the question returns next time they sign in as a teacher.
-        if (!open) onLeave();
+        // Closing is "not now". It must never open the owner console, which would create a studio for this account.
+        if (!open) onDismiss();
       }}
       title="Which studio do you teach at?"
     >

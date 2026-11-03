@@ -94,6 +94,7 @@ function ConsoleLayout() {
     queryFn: () => loadTeacherStudio(),
     enabled: session.status === "signed-in" && teacherIntent,
   });
+  const [joinHidden, setJoinHidden] = useState(false);
   const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
   const context = useQuery({
     queryKey: ["console-context"],
@@ -278,8 +279,22 @@ function ConsoleLayout() {
           />
         )}
         <main className="console-main">
-          {teacherIntent && teacherStudio.data === null && (
-            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} />
+          {teacherIntent && teacherStudio.data === null && !joinHidden && (
+            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} onDismiss={() => setJoinHidden(true)} />
+          )}
+          {teacherIntent && teacherStudio.data === null && joinHidden && (
+            <div className="console-form">
+              <h2>You have not joined a studio yet</h2>
+              <p>Ask your studio owner for an invite code. Nothing is set up for you until you join.</p>
+              <div className="console-actions">
+                <Button variant="retro" type="button" onClick={() => setJoinHidden(false)}>
+                  Enter an invite code
+                </Button>
+                <Button variant="retroPaper" type="button" onClick={() => supabase.auth.signOut()}>
+                  Sign out
+                </Button>
+              </div>
+            </div>
           )}
           {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
           {/* Wait to learn the role, so an instructor never briefly opens an owner screen. */}

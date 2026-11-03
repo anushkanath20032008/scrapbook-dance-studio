@@ -289,6 +289,23 @@ function ConsoleLayout() {
         </nav>
         ) : (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Console navigation">
+          <section className="console-plan" aria-label="Your plan">
+            <div className="console-plan-bar chrome-font">Your plan</div>
+            <dl className="console-plan-body">
+              <dt>Plan</dt>
+              <dd>
+                <span className="status-pill" data-tone="plan">
+                  {context.data?.plan && context.data.plan !== "waitlist" ? readable(context.data.plan) : "No plan yet"}
+                </span>
+              </dd>
+              <dt>Billing</dt>
+              <dd>
+                <span className="status-pill" data-tone={billingTone(context.data?.billingStatus)}>
+                  {readable(context.data?.billingStatus ?? "not_started")}
+                </span>
+              </dd>
+            </dl>
+          </section>
           {!setupDone && (
             <NavLink to="/app/setup" onPick={() => setMenuOpen(false)}>
               Set up your studio
@@ -309,26 +326,6 @@ function ConsoleLayout() {
             </NavLink>
           ))}
           <div className="console-nav-foot">
-            <section className="console-plan" aria-label="Your plan">
-              <div className="console-plan-bar chrome-font">Your plan</div>
-              <dl className="console-plan-body">
-                <dt>Plan</dt>
-                <dd>
-                  <span className="status-pill" data-tone="plan">
-                    {context.data?.plan && context.data.plan !== "waitlist" ? readable(context.data.plan) : "No plan yet"}
-                  </span>
-                </dd>
-                <dt>Billing</dt>
-                <dd>
-                  <span
-                    className="status-pill"
-                    data-tone={billingTone(context.data?.billingStatus)}
-                  >
-                    {readable(context.data?.billingStatus ?? "not_started")}
-                  </span>
-                </dd>
-              </dl>
-            </section>
             {context.data?.isPlatformOwner && (
               <Link to="/admin" className="console-nav-item">
                 Studio enquiries

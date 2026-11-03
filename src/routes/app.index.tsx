@@ -131,6 +131,23 @@ function Overview() {
   return (
     <section>
       <h1 className="display console-title">Home</h1>
+      {unpaidRows.length > 0 && (
+        <div className="console-banner" role="status">
+          <span>
+            <strong>
+              {unpaidRows.length} unpaid
+            </strong>{" "}
+            · {formatRupees(unpaidTotal)} owed this month
+          </span>
+          <Button
+            variant="retro"
+            type="button"
+            onClick={() => (providerConfigured ? setReminding({ period, allUnpaid: true }) : setBatchOpen(true))}
+          >
+            {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
+          </Button>
+        </div>
+      )}
       <HomeTiles
         label="Studio home"
         tiles={ownerTiles}
@@ -191,23 +208,6 @@ function Overview() {
             not include it: open a dancer&apos;s billing to see and record it.
           </span>
         </p>
-      )}
-      {unpaidRows.length > 0 && (
-        <div className="console-banner" role="status">
-          <span>
-            <strong>
-              {unpaidRows.length} unpaid
-            </strong>{" "}
-            · {formatRupees(unpaidTotal)} owed this month
-          </span>
-          <Button
-            variant="retro"
-            type="button"
-            onClick={() => (providerConfigured ? setReminding({ period, allUnpaid: true }) : setBatchOpen(true))}
-          >
-            {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
-          </Button>
-        </div>
       )}
 
       {needsCharges && !brandNew && (

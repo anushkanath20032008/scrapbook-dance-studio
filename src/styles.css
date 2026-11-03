@@ -690,17 +690,13 @@ p, li, dd, label { line-height:1.6; }
 /* Typography, second pass: one calm family for headings, a smaller hero with room to breathe, and no black text box. */
 .display, .signup-heading, .calc-body h3, .step-heading, .desktop-icon h3, .offer-window h3, .footer-heading,
 .pricing-card h3, .account-pricing h2, .email-sent-big, .paste-done-big, .legal-page h2, .console-subtitle,
-.hero-type h1, .calc-total, .pricing-price, .step-number, .stamp {
+.calc-total, .pricing-price, .step-number, .stamp {
   font-family:"DM Sans",Arial,sans-serif; font-weight:700; letter-spacing:-.015em;
 }
-.hero-type h1 { font-size:clamp(42px,5.2vw,70px); line-height:1.1; font-weight:800; letter-spacing:-.025em; }
-.hero-type { min-height:0; }
-.hero-sub { background:transparent; color:var(--ink); padding:0; max-width:520px; margin-top:22px; font-size:19px; line-height:1.6; font-weight:500; }
 .calc-body h3, .offer-window h3, .pricing-card h3, .step-heading, .desktop-icon h3 { line-height:1.2; }
 .calc-body h3 { font-size:28px; } .offer-window h3 { font-size:38px; } .pricing-card h3 { font-size:28px; }
 .step-heading { font-size:24px; } .desktop-icon h3 { font-size:22px; }
-@media (max-width:800px) { .hero-type h1 { font-size:clamp(38px,10vw,56px); } }
-@media (max-width:540px) { .hero-type h1 { font-size:clamp(34px,10.5vw,46px); } .hero-sub { font-size:17px; } }
 
-/* The hero headline only: a warm serif for the one line people read first. */
-.hero-type h1 { font-family:"Fraunces",Georgia,serif; font-weight:700; letter-spacing:-.02em; line-height:1.08; font-size:clamp(44px,5.6vw,76px); font-variation-settings:"opsz" 144; }
+/* Hero headline and sub-line: the original look (size and spacing come from the older rules above). */
+.hero-type h1 { font-family:"Space Grotesk",Arial,sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0; line-height:1; }
+.hero-sub { background:var(--ink); color:var(--paper); padding:10px 13px; max-width:440px; font-size:17px; line-height:1.45; font-weight:600; }

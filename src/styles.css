@@ -595,3 +595,14 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 
 /* Coming soon beside a plan name: blue on paper stands out on the marigold card. */
 .soon-tag.plan-soon { margin-left:10px; vertical-align:middle; background:var(--blue,#273FA3); color:var(--paper,#F7E8DC); border-color:var(--ink); }
+
+/* Phones: nothing sits off-screen. The top bar gives the logo room, tabs wrap instead of scrolling sideways. */
+@media (max-width:640px) {
+  .console-topbar .brand { flex-shrink:0; }
+  .console-studio { display:none; }
+  .group-tabs { overflow-x:visible; }
+  .group-tabs ul { flex-wrap:wrap; width:auto; min-width:0; }
+  .group-tab { white-space:normal; padding:9px 12px; }
+  .console-main { overflow-wrap:anywhere; }
+  .console-main img, .console-main table { max-width:100%; }
+}

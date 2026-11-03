@@ -127,7 +127,7 @@ function Overview() {
         />
       )}
       {unpaidRows.length > 0 && (
-        <div className="console-banner" role="status">
+        <div className="console-banner" data-tone="overdue" role="status">
           <span>
             <strong>
               {unpaidRows.length} unpaid

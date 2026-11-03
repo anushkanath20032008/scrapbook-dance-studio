@@ -25,7 +25,7 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
   const trend = useQuery({ queryKey: ["monthly-trend"], queryFn: () => trendFn() });
 
   const slices = [
-    { name: "Collected", paise: snapshot.collected_paise, color: "#273FA3" },
+    { name: "Collected", paise: snapshot.collected_paise, color: "#1E3188" },
     { name: "Not yet due", paise: snapshot.not_yet_due_paise, color: "#F0C24C" },
     { name: "Overdue", paise: snapshot.overdue_paise, color: "#E7AAA9" },
   ].filter((slice) => slice.paise > 0);
@@ -87,7 +87,7 @@ export function MonthCharts({ snapshot }: { snapshot: Snapshot }) {
                   <XAxis dataKey="month" />
                   <YAxis tickFormatter={(value: number) => `₹${value.toLocaleString("en-IN")}`} width={70} />
                   <Tooltip formatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`} />
-                  <Bar dataKey="Billed" fill="#273FA3" stroke="#1A1A1A" strokeWidth={2} />
+                  <Bar dataKey="Billed" fill="#1E3188" stroke="#1A1A1A" strokeWidth={2} />
                   <Bar dataKey="Collected" fill="#F0C24C" stroke="#1A1A1A" strokeWidth={2} />
                 </BarChart>
               </ResponsiveContainer>

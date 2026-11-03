@@ -80,7 +80,7 @@ function Insights() {
                   />
                   <Tooltip formatter={(value) => formatRupees(Number(value) * 100)} />
                   <Legend />
-                  <Bar dataKey="Billed" fill="#273FA3" />
+                  <Bar dataKey="Billed" fill="#1E3188" />
                   <Bar dataKey="Collected" fill="#F0C24C" stroke="#1A1A1A" strokeWidth={2} />
                 </BarChart>
               </ResponsiveContainer>

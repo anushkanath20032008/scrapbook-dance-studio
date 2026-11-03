@@ -59,15 +59,15 @@ const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
 ];
 const instructorPaths = instructorItems.map((item) => item.to as string);
 
-const readable = (value: string) => value.replace(/_/g, " ");
-
-const billingTone = (status: string | undefined) =>
-  status === "active" ? "good" : status === undefined || status === "not_started" ? "idle" : "warn";
+// Shown only when billing has a problem; a studio that has not started or is paying hears nothing.
+const needsBillingAttention = (status: string | undefined) =>
+  status !== undefined && !["not_started", "active", "trialing"].includes(status);
 
 function ConsoleLayout() {
   const navigate = useNavigate();
   const session = useOwnerSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [billingNoticeShut, setBillingNoticeShut] = useState(false);
   // On a wide screen the menu is open until the hamburger folds it away; on a phone it is closed until opened.
   const [folded, setFolded] = useState(false);
   const [wide, setWide] = useState(true);
@@ -254,26 +254,6 @@ function ConsoleLayout() {
             </Fragment>
           ))}
           <div className="console-nav-foot">
-            <section className="console-plan" aria-label="Your plan">
-              <div className="console-plan-bar chrome-font">Your plan</div>
-              <dl className="console-plan-body">
-                <dt>Plan</dt>
-                <dd>
-                  <span className="status-pill" data-tone="plan">
-                    {context.data?.plan && context.data.plan !== "waitlist" ? readable(context.data.plan) : "No plan yet"}
-                  </span>
-                </dd>
-                <dt>Billing</dt>
-                <dd>
-                  <span
-                    className="status-pill"
-                    data-tone={billingTone(context.data?.billingStatus)}
-                  >
-                    {readable(context.data?.billingStatus ?? "not_started")}
-                  </span>
-                </dd>
-              </dl>
-            </section>
             {context.data?.isPlatformOwner && (
               <Link to="/admin" className="console-nav-item">
                 Studio enquiries
@@ -305,6 +285,17 @@ function ConsoleLayout() {
             <span className="skeleton-block skeleton-card" />
           ) : (
             <>
+              {isOwner && !billingNoticeShut && needsBillingAttention(context.data?.billingStatus) && (
+                <p className="console-banner" role="status">
+                  <span>Your subscription needs attention ({context.data?.billingStatus.replace(/_/g, " ")}).</span>
+                  <span className="console-banner-actions">
+                    <Link to="/account" className="text-link">Open account</Link>
+                    <button type="button" className="text-link" onClick={() => setBillingNoticeShut(true)}>
+                      Dismiss
+                    </button>
+                  </span>
+                </p>
+              )}
               {!isInstructor && (
                 <GroupTabs
                   group={activeGroup}

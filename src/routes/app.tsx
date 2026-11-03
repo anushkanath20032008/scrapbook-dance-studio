@@ -18,7 +18,7 @@ import { helpVideos } from "@/lib/help-videos";
 import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
 import { getInstructorBatches, getMyTeacherStudio } from "@/lib/instructors.functions";
-import { getRoleIntent } from "@/lib/role-intent";
+import { setRoleIntent } from "@/lib/role-intent";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -90,7 +90,7 @@ function ConsoleLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
   // Someone who chose "I am a dance teacher" is asked which studio they teach at before anything is created for them.
-  const [teacherIntent, setTeacherIntent] = useState(() => (typeof window === "undefined" ? false : getRoleIntent() === "teacher"));
+  const [teacherIntent, setTeacherIntent] = useState(false);
   const loadTeacherStudio = useServerFn(getMyTeacherStudio);
   const teacherStudio = useQuery({
     queryKey: ["teacher-studio"],
@@ -121,8 +121,11 @@ function ConsoleLayout() {
     });
   const [joinHidden, setJoinHidden] = useState(false);
   // A teacher who confirmed their email on another device has no local hint, but the account remembers.
+  // Only the account decides this. A browser-wide hint is not used: it outlives sign-out and would send the next
+  // person to sign in here, such as a studio owner, to the teacher screen.
   useEffect(() => {
-    if (session.status === "signed-in" && session.teacher) setTeacherIntent(true);
+    setTeacherIntent(session.status === "signed-in" && session.teacher);
+    if (session.status === "signed-in") setRoleIntent("owner");
   }, [session]);
   const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
   const context = useQuery({

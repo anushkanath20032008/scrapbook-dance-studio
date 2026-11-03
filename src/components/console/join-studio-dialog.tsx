@@ -8,7 +8,7 @@ import { messageOf } from "@/components/console/form-utils";
 import { acceptInstructorInvite } from "@/lib/instructors.functions";
 import { setRoleIntent } from "@/lib/role-intent";
 
-/** The first thing a dance teacher sees: which studio do you teach at? It cannot be closed without choosing. */
+/** The first thing a dance teacher sees: which studio do you teach at? */
 export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
   const queryClient = useQueryClient();
   const accept = useServerFn(acceptInstructorInvite);
@@ -35,7 +35,14 @@ export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
   }
 
   return (
-    <ConsoleDialog open onOpenChange={() => undefined} title="Which studio do you teach at?">
+    <ConsoleDialog
+      open
+      onOpenChange={(open) => {
+        // Closing is "not now": the console opens as usual, and the question returns next time they sign in as a teacher.
+        if (!open) onLeave();
+      }}
+      title="Which studio do you teach at?"
+    >
       <form className="console-form" onSubmit={submit} noValidate>
         <p>Ask your studio owner for an invite code. Enter it here to join their studio.</p>
         <label className="form-label console-field">

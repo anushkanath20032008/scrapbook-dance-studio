@@ -25,8 +25,9 @@ export function TermsGate({ onAccepted }: { onAccepted: () => void }) {
 
   return (
     // It cannot be closed without choosing: agree, or sign out.
-    <ConsoleDialog open onOpenChange={() => undefined} title="Terms of use">
+    <ConsoleDialog open onOpenChange={() => undefined} title="Terms of Service">
       <div className="console-form">
+        <p>We have written down the terms for using ChoreoStudio. Please agree to carry on.</p>
         <TermsAgreement accepted={agreed} onChange={setAgreed} />
         <FormAlert message={error} />
         <div className="console-actions">

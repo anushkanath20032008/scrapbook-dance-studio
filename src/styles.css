@@ -712,8 +712,6 @@ p, li, dd, label { line-height:1.6; }
 .console-nav-text { flex:1; }
 
 /* Terms agreement */
-.terms-agreement { border:2px solid var(--ink); background:var(--paper); padding:14px 16px; display:grid; gap:10px; margin:14px 0; }
-.terms-agreement-title { margin:0; font-size:18px; font-weight:800; }
-.terms-points { margin:0; padding-left:20px; display:grid; gap:8px; max-height:240px; overflow:auto; font-size:15px; line-height:1.55; }
-.terms-accept { display:flex; gap:10px; align-items:flex-start; font-weight:700; font-size:15px; cursor:pointer; }
+.terms-accept { display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.5; cursor:pointer; margin:12px 0; }
 .terms-accept input { width:20px; height:20px; margin-top:2px; flex:none; accent-color:var(--ink); }
+.terms-accept a { text-decoration:underline; font-weight:700; }

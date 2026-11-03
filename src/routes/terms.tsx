@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage } from "@/components/legal-page";
+import { TERMS_POINTS } from "@/lib/terms";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -18,6 +19,16 @@ function Terms() {
         These terms are the agreement between you and ChoreoStudio ("we", "us") for using the ChoreoStudio website and
         app (the "Service"). Please read them with our <a href="/privacy">Privacy Notice</a>, which is part of them.
       </p>
+
+      <h2>The short version</h2>
+      <p>The full terms follow. These are the points that matter most, in plain words.</p>
+      <ul>
+        {TERMS_POINTS.map((point) => (
+          <li key={point.title}>
+            <strong>{point.title}.</strong> {point.body}
+          </li>
+        ))}
+      </ul>
 
       <h2>1. Who these terms are for</h2>
       <p>

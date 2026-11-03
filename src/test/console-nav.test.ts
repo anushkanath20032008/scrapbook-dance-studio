@@ -10,7 +10,7 @@ import {
 describe("console nav groups", () => {
   it("has exactly five group entries", () => {
     expect(consoleGroups.map((group) => group.label)).toEqual([
-      "Overview",
+      "Home",
       "Dancers",
       "Payments",
       "Attendance",

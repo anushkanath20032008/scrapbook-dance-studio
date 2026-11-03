@@ -15,12 +15,14 @@ import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { UnpaidList } from "@/components/console/unpaid-list";
-import { TelegramBatchDialog } from "@/components/console/telegram-batch";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
+import { HomeTiles } from "@/components/console/home-tiles";
 import { getConsoleContext } from "@/lib/console.functions";
+import { teacherTiles, ownerTiles } from "@/lib/console-nav";
+import { getInstructorBatches, getMyBatchRequests, listBatchRequests } from "@/lib/instructors.functions";
+import { listClaimQueue } from "@/lib/claims.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
-import { getTelegramStatus } from "@/lib/telegram.functions";
 import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
@@ -29,8 +31,37 @@ import { getSetupCounts } from "@/lib/setup.functions";
 import { firstOfMonth, todayInIndia } from "@/lib/validators";
 
 export const Route = createFileRoute("/app/")({
-  component: Overview,
+  head: () => ({ meta: [{ title: "Home | ChoreoStudio" }] }),
+  component: Home,
 });
+
+/** Teachers get their own home of tiles; the owner gets the month overview with tiles above it. */
+function Home() {
+  const loadContext = useServerFn(getConsoleContext);
+  const context = useQuery({ queryKey: ["console-context"], queryFn: () => loadContext() });
+  if (context.data?.role === "instructor") return <TeacherHome />;
+  if (!context.data) return null;
+  return <Overview />;
+}
+
+function TeacherHome() {
+  const requestsFn = useServerFn(getMyBatchRequests);
+  const batchesFn = useServerFn(getInstructorBatches);
+  const requests = useQuery({ queryKey: ["my-batch-requests"], queryFn: () => requestsFn() });
+  const batches = useQuery({ queryKey: ["instructor-batches"], queryFn: () => batchesFn() });
+  const waiting = (requests.data ?? []).filter((request) => request.status === "pending").length;
+  return (
+    <section>
+      <h1 className="display console-title">Home</h1>
+      <p className="console-hint">
+        {batches.data
+          ? `You teach ${batches.data.length} batch${batches.data.length === 1 ? "" : "es"}.`
+          : "Pick what you want to do."}
+      </p>
+      <HomeTiles tiles={teacherTiles} counts={{ myRequests: waiting }} label="Teacher home" />
+    </section>
+  );
+}
 
 function Overview() {
   const queryClient = useQueryClient();
@@ -46,7 +77,6 @@ function Overview() {
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [reminding, setReminding] = useState<RemindTarget | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
-  const [telegramOpen, setTelegramOpen] = useState(false);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
@@ -56,9 +86,6 @@ function Overview() {
   const loadMessaging = useServerFn(getMessagingStatus);
   const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => loadMessaging() });
   const providerConfigured = messaging.data?.providerConfigured === true;
-  const loadTelegram = useServerFn(getTelegramStatus);
-  const telegram = useQuery({ queryKey: ["telegram-status"], queryFn: () => loadTelegram() });
-  const telegramConfigured = telegram.data?.configured === true;
   const markOpened = (chargeId: string) => setReminded(new Set(markReminded(chargeId, today)));
 
   const report = useQuery({
@@ -66,6 +93,10 @@ function Overview() {
     queryFn: () => loadReport({ data: { period } }),
   });
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => loadCounts() });
+  const loadClaims = useServerFn(listClaimQueue);
+  const loadRequests = useServerFn(listBatchRequests);
+  const claims = useQuery({ queryKey: ["claim-queue"], queryFn: () => loadClaims() });
+  const teacherRequests = useQuery({ queryKey: ["batch-requests"], queryFn: () => loadRequests() });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : false;
   // A studio with no dancers yet sees the setup card first, with the paste box in it.
   const [pasted] = usePasteResult();
@@ -99,7 +130,16 @@ function Overview() {
 
   return (
     <section>
-      <h1 className="display console-title">Overview</h1>
+      <h1 className="display console-title">Home</h1>
+      <HomeTiles
+        label="Studio home"
+        tiles={ownerTiles}
+        counts={{
+          unpaid: report.data?.unpaid.length ?? 0,
+          toCheck: claims.data?.length ?? 0,
+          requests: (teacherRequests.data ?? []).filter((r) => r.status === "pending").length,
+        }}
+      />
       {firstRun && !setupDone && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Start here.dialog</div>
@@ -167,11 +207,6 @@ function Overview() {
           >
             {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
           </Button>
-          {telegramConfigured && (
-            <Button variant="retroPaper" type="button" onClick={() => setTelegramOpen(true)}>
-              Remind on Telegram
-            </Button>
-          )}
         </div>
       )}
 
@@ -278,11 +313,6 @@ function Overview() {
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}
-      />
-      <TelegramBatchDialog
-        open={telegramOpen}
-        onClose={() => setTelegramOpen(false)}
-        period={period}
       />
       <RemindDialog
         target={reminding}

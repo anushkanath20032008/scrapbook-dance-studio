@@ -677,25 +677,40 @@ export type Database = {
         Row: {
           archived_at: string | null
           created_at: string
+          email: string | null
+          emergency_name: string | null
+          emergency_phone: string | null
           guardian_id: string | null
           id: string
+          joined_on: string | null
           name: string
+          note: string | null
           studio_id: string
         }
         Insert: {
           archived_at?: string | null
           created_at?: string
+          email?: string | null
+          emergency_name?: string | null
+          emergency_phone?: string | null
           guardian_id?: string | null
           id?: string
+          joined_on?: string | null
           name: string
+          note?: string | null
           studio_id: string
         }
         Update: {
           archived_at?: string | null
           created_at?: string
+          email?: string | null
+          emergency_name?: string | null
+          emergency_phone?: string | null
           guardian_id?: string | null
           id?: string
+          joined_on?: string | null
           name?: string
+          note?: string | null
           studio_id?: string
         }
         Relationships: []

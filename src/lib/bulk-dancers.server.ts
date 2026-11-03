@@ -2,7 +2,16 @@ import { formatRupees } from "./money";
 import { ensureStudio, unwrap, type StudioContext } from "./studio.server";
 import { firstOfMonth, todayInIndia } from "./validators";
 
-export type BulkDancer = { name: string; phone: string | null; feePaise: number | null };
+export type BulkDancer = {
+  name: string;
+  phone: string | null;
+  feePaise: number | null;
+  email?: string | null | undefined;
+  joinedOn?: string | null | undefined;
+  emergencyName?: string | null | undefined;
+  emergencyPhone?: string | null | undefined;
+  note?: string | null | undefined;
+};
 
 const CHUNK = 8;
 const digitsOf = (phone: string | null) => (phone ?? "").replace(/\D/g, "");
@@ -80,6 +89,11 @@ export async function bulkAddDancers(
           studio_id: studioId,
           name: dancer.name,
           guardian_id: guardians[index]?.id ?? null,
+          email: dancer.email ?? null,
+          joined_on: dancer.joinedOn ?? null,
+          emergency_name: dancer.emergencyName ?? null,
+          emergency_phone: dancer.emergencyPhone ?? null,
+          note: dancer.note ?? null,
         })),
       )
       .select("id");

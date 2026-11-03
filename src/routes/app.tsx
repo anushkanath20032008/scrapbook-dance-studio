@@ -53,6 +53,7 @@ type NavTo =
 
 // An instructor sees only these two screens; the database refuses everything else even if a URL is typed in.
 const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
+  { to: "/app", label: "Home", exact: true },
   { to: "/app/class", label: "Attendance", exact: false },
   { to: "/app/my-batches", label: "Batches", exact: false },
   { to: "/app/makeups", label: "Make-ups", exact: false },
@@ -142,10 +143,10 @@ function ConsoleLayout() {
     if (session.status === "signed-out") void navigate({ to: "/login" });
   }, [session.status, navigate]);
 
-  // An instructor who lands anywhere but their two screens is sent to Attendance.
+  // An instructor who lands anywhere but their two screens is sent to Home.
   useEffect(() => {
     if (isInstructor && !instructorPaths.includes(pathname.replace(/\/+$/, ""))) {
-      void navigate({ to: "/app/class", replace: true });
+      void navigate({ to: "/app", replace: true });
     }
   }, [isInstructor, pathname, navigate]);
 
@@ -206,7 +207,7 @@ function ConsoleLayout() {
         {isInstructor ? (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
           {instructorItems.map((item) => (
-            <NavLink key={item.to} to={item.to} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
+            <NavLink key={item.to} to={item.to} exact={item.exact} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
               {item.label}
             </NavLink>
           ))}

@@ -10,7 +10,7 @@ export type ReminderRow = {
   due_on: string;
 };
 
-/** The reminder wording shared by WhatsApp tap-to-send and the Telegram bot. */
+/** The reminder wording used for WhatsApp tap-to-send. */
 export function reminderText(
   row: Pick<ReminderRow, "student_name" | "outstanding_paise" | "due_on">,
   studioName = "",

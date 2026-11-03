@@ -30,7 +30,7 @@ function Terms() {
       <h2>2. What the Service does, and what it does not</h2>
       <ul>
         <li>ChoreoStudio helps you keep records of dancers, fees, charges, payments, attendance and batches, see who owes what, and prepare reminders.</li>
-        <li>Reminders open in your own WhatsApp (or, if you turn it on, a Telegram bot) with the message filled in. You review and send them. We do not send messages to your dancers on our own.</li>
+        <li>Reminders open in your own WhatsApp with the message filled in. You review and send them. We do not send messages to your dancers on our own.</li>
         <li>We do not collect, hold, transfer or process money between your dancers and you. We are not a bank, payment aggregator or payment gateway. A payment exists in the Service only because you recorded it or confirmed a dancer's claim against your own bank or UPI statement.</li>
         <li>Amounts, balances and statuses are calculated from what you enter. They are a record, not accounting, tax or legal advice. You are responsible for checking them.</li>
         <li>Features marked "coming soon", including automated WhatsApp messages, are not part of the Service until we release them, and we give no date.</li>
@@ -88,7 +88,7 @@ function Terms() {
 
       <h2>8. Messages you send</h2>
       <p>
-        Reminders go out from your own WhatsApp or Telegram account. The terms and policies of those services apply to
+        Reminders go out from your own WhatsApp account. The terms and policies of WhatsApp apply to
         you, and you must follow them and the law. Send only fee and class messages that dancers would expect. No spam,
         no abuse, no misleading messages. We are not responsible if a message is not delivered, is blocked, or if a
         messaging service restricts your account.
@@ -108,9 +108,9 @@ function Terms() {
       <h2>10. Other services we rely on</h2>
       <p>
         The Service runs on providers such as Supabase (database and sign-in), Vercel (hosting), Dodo Payments
-        (billing), Zoho (support email) and, if you use it, Telegram. Microsoft Clarity runs on our public pages only if
+        (billing), Zoho (support email) and Microsoft Clarity runs on our public pages only if
         a visitor allows it. We are not responsible for outages or changes of services we do not control, but we will
-        take reasonable care in choosing them. Your use of WhatsApp or Telegram is between you and them.
+        take reasonable care in choosing them. Your use of WhatsApp is between you and them.
       </p>
 
       <h2>11. Availability and backups</h2>

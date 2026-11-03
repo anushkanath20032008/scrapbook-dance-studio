@@ -39,7 +39,6 @@ import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-n
 import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
-import { Route as ApiWebhooksTelegramRouteImport } from './routes/api/webhooks/telegram'
 import { Route as ApiWebhooksWhatsappRouteImport } from './routes/api/webhooks/whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
@@ -192,11 +191,6 @@ const ApiWebhooksDodoRoute = ApiWebhooksDodoRouteImport.update({
   path: '/api/webhooks/dodo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhooksTelegramRoute = ApiWebhooksTelegramRouteImport.update({
-  id: '/api/webhooks/telegram',
-  path: '/api/webhooks/telegram',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiWebhooksWhatsappRoute = ApiWebhooksWhatsappRouteImport.update({
   id: '/api/webhooks/whatsapp',
   path: '/api/webhooks/whatsapp',
@@ -234,7 +228,6 @@ export interface FileRoutesByFullPath {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesByTo {
@@ -267,7 +260,6 @@ export interface FileRoutesByTo {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesById {
@@ -302,7 +294,6 @@ export interface FileRoutesById {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRouteTypes {
@@ -338,7 +329,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -371,7 +361,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   id:
     | '__root__'
@@ -405,7 +394,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   fileRoutesById: FileRoutesById
 }
@@ -425,7 +413,6 @@ export interface RootRouteChildren {
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
-  ApiWebhooksTelegramRoute: typeof ApiWebhooksTelegramRoute
   ApiWebhooksWhatsappRoute: typeof ApiWebhooksWhatsappRoute
 }
 
@@ -641,13 +628,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksDodoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/telegram': {
-      id: '/api/webhooks/telegram'
-      path: '/api/webhooks/telegram'
-      fullPath: '/api/webhooks/telegram'
-      preLoaderRoute: typeof ApiWebhooksTelegramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/webhooks/whatsapp': {
       id: '/api/webhooks/whatsapp'
       path: '/api/webhooks/whatsapp'
@@ -712,7 +692,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
-  ApiWebhooksTelegramRoute: ApiWebhooksTelegramRoute,
   ApiWebhooksWhatsappRoute: ApiWebhooksWhatsappRoute,
 }
 export const routeTree = rootRouteImport

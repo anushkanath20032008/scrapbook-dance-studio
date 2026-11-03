@@ -8,7 +8,9 @@ import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { bulkAddDancers } from "@/lib/bulk-dancers.functions";
 import { getImportCapabilities, readDancersFromPhoto } from "@/lib/photo-import.functions";
-import { addableDancers, parseDancerList, suggestFeeRupees } from "@/lib/bulk-dancers";
+import { suggestFeeRupees } from "@/lib/bulk-dancers";
+import { DancerGrid, startRows } from "@/components/console/dancer-grid";
+import { addableFromGrid, checkGrid, pasteIntoGrid, type GridRow } from "@/lib/dancer-grid";
 import { listFeePlans } from "@/lib/fees.functions";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
 import { formatDay } from "@/lib/format";
@@ -55,19 +57,6 @@ async function photoToBase64(file: File): Promise<string> {
   return canvas.toDataURL("image/jpeg", 0.85).split(",")[1] ?? "";
 }
 
-/** Photo rows as pasted-list lines, so they go through the same checks and the same review as typed ones. */
-function linesFromPhoto(rows: { name: string; phone: string | null; feePaise: number | null }[]): string {
-  return rows
-    .map((row) =>
-      [row.name, row.phone ?? "", row.feePaise === null ? "" : String(row.feePaise / 100)]
-        .filter((cell) => cell !== "")
-        .join(", "),
-    )
-    .join("\n");
-}
-
-const EXAMPLE = "Asha Rao, 98765 43210\nBela Shah, 91234 56789, 1800\nChirag Nair, 99887 76655";
-
 /** The studio's due day this month, or today once it has gone, so the first reminders do not read as long overdue. */
 function defaultDueDate(today: string, dueDay: number): string {
   const month = firstOfMonth(today);
@@ -111,7 +100,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   });
 
   const today = todayInIndia();
-  const [text, setText] = useState("");
+  const [gridRows, setGridRows] = useState<GridRow[]>(() => startRows());
   const [fee, setFee] = useState<string | null>(null);
   const [bill, setBill] = useState(true);
   const [dueChoice, setDueChoice] = useState("");
@@ -125,8 +114,12 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
       ) ?? [],
     );
   const defaultFeePaise = parseRupees(feeText);
-  const rows = useMemo(() => parseDancerList(text), [text]);
-  const good = addableDancers(rows);
+  const rows = useMemo(() => checkGrid(gridRows), [gridRows]);
+  const good = addableFromGrid(rows);
+  const problems = useMemo(
+    () => new Map(rows.flatMap((row) => (row.problem ? [[row.index, row.problem] as [number, string]] : []))),
+    [rows],
+  );
   const fixes = rows.length - good.length;
   const needsFee = good.some((row) => row.feePaise === null) && defaultFeePaise === null;
   const dueOn = /^\d{4}-\d{2}-\d{2}$/.test(dueChoice) ? dueChoice : defaultDueDate(today, profile.data?.fee_due_day ?? 5);
@@ -139,6 +132,11 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
             name: row.name,
             phone: row.phone,
             feePaise: row.feePaise,
+            email: row.email,
+            joinedOn: row.joinedOn,
+            emergencyName: row.emergencyName,
+            emergencyPhone: row.emergencyPhone,
+            note: row.note,
           })),
           defaultFeePaise,
           billThisMonth: bill,
@@ -182,7 +180,14 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
       const image = await photoToBase64(file);
       const read = await readPhotoFn({ data: { image, mediaType: "image/jpeg" } });
       if (read.rows.length === 0) setError("No dancers could be read from that page. Try a clearer photo.");
-      else setText((current) => [current.trim(), linesFromPhoto(read.rows)].filter(Boolean).join("\n"));
+      else
+        setGridRows((current) => {
+          const kept = current.filter((row) => row.name.trim() !== "" || row.phone.trim() !== "");
+          const text = read.rows
+            .map((row) => [row.name, row.phone ?? "", row.feePaise === null ? "" : String(row.feePaise / 100)].join("\t"))
+            .join("\n");
+          return pasteIntoGrid(kept, kept.length, "name", ["name", "phone", "fee"], text).rows;
+        });
     } catch (e) {
       setError(messageOf(e));
     } finally {
@@ -238,7 +243,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
             type="button"
             onClick={() => {
               setResult(null);
-              setText("");
+              setGridRows(startRows());
             }}
           >
             Add more
@@ -250,23 +255,14 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
 
   return (
     <form className="console-form paste-form" onSubmit={submit} noValidate>
-      <label className="form-label console-field">
-        Paste your dancers, one per line
-        <textarea
-          className="field paste-box"
-          rows={7}
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          placeholder={EXAMPLE}
-          autoFocus
-          spellCheck={false}
-          aria-describedby="paste-help"
-        />
-        <span id="paste-help" className="console-hint">
-          Name, then phone number. Copy from a notebook, Excel or WhatsApp contacts. You can type a
-          fee after a name if it differs.
+      <div className="console-field">
+        <span className="form-label">Type or paste your dancers</span>
+        <DancerGrid rows={gridRows} onChange={setGridRows} problems={problems} />
+        <span className="console-hint">
+          One dancer per row. Copy from a notebook, Excel or WhatsApp contacts and paste into the first cell. Use
+          Columns to add email, joining date, emergency contact or a note.
         </span>
-      </label>
+      </div>
 
       {caps.data?.photo && (
         <div className="console-field">
@@ -329,7 +325,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
           </p>
           <ul className="paste-rows">
             {rows.slice(0, 60).map((row) => (
-              <li key={row.line} data-bad={row.problem !== null}>
+              <li key={row.index} data-bad={row.problem !== null}>
                 <span>{row.name || "(no name)"}</span>
                 <span className="console-hint">
                   {row.problem ??

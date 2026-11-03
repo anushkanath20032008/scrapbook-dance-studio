@@ -218,6 +218,13 @@
       "when": 1791465200000,
       "tag": "0030_batch_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1791551600000,
+      "tag": "0031_student_details",
+      "breakpoints": true
     }
   ]
 }

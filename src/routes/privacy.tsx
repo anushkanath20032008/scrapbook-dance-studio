@@ -34,7 +34,6 @@ function Privacy() {
         <li><strong>Subscription.</strong> Your plan, status and renewal date, and a customer reference from our payment partner. Card or UPI details go to Dodo Payments and are not seen or stored by us.</li>
         <li><strong>Dancer records entered by a studio.</strong> Dancer name and phone number, fees and charges, payments, attendance, class batches, and whether the dancer asked not to be messaged. Why: so the studio can track fees and classes and prepare reminders.</li>
         <li><strong>Payment notes from dancers.</strong> If a dancer tells a studio they have paid, we keep the amount, the date, the method, an optional reference number and an optional screenshot, so the studio can check it. Screenshots can show a name, UPI ID or phone number, so please send one only if you are comfortable.</li>
-        <li><strong>Telegram (only if your studio switches it on).</strong> The Telegram chat identifier of a dancer who joined the bot, and what they type to it, such as "paid".</li>
         <li><strong>Your country (from your network address).</strong> When you view prices or start checkout, our host tells us which country your connection appears to be in, so we can show prices near your own currency. We do not store it or link it to you.</li>
         <li><strong>Technical records.</strong> Basic logs kept by our hosting and database providers for security and fixing faults.</li>
         <li><strong>Website analytics (only if you allow it).</strong> See section 7.</li>
@@ -55,11 +54,10 @@ function Privacy() {
         <li>Vercel: hosting of the website and app.</li>
         <li>Dodo Payments: subscription billing.</li>
         <li>Zoho: our support email.</li>
-        <li>Telegram: only if a studio uses the Telegram bot.</li>
         <li>Microsoft Clarity: website analytics, only if a visitor allows it.</li>
       </ul>
       <p>
-        A studio's reminders are sent by the studio from its own WhatsApp or Telegram account, so those services see
+        A studio's reminders are sent by the studio from its own WhatsApp account, so that service sees
         the message. We may also disclose data if the law or a court requires it. Each studio sees only its own
         records. Some of our providers may handle data outside India. We transfer data only where the DPDP Act allows.
       </p>

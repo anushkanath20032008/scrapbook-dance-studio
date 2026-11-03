@@ -1,5 +1,6 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import { useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,12 @@ export function StudentForm({
 
   const [name, setName] = useState(initial?.name ?? "");
   const [dancerPhone, setDancerPhone] = useState(initial?.guardian?.phone ?? "");
+  const d = initial?.details;
+  const [email, setEmail] = useState(d?.email ?? "");
+  const [joinedOn, setJoinedOn] = useState(d?.joinedOn ?? "");
+  const [emergencyName, setEmergencyName] = useState(d?.emergencyName ?? "");
+  const [emergencyPhone, setEmergencyPhone] = useState(d?.emergencyPhone ?? "");
+  const [note, setNote] = useState(d?.note ?? "");
   const [batchId, setBatchId] = useState("");
   const [planId, setPlanId] = useState("");
   const [startsOn, setStartsOn] = useState(todayInIndia());
@@ -59,7 +66,17 @@ export function StudentForm({
     : undefined;
 
   const mutation = useMutation({
-    mutationFn: async (values: { name: string; phone: string | null }) => {
+    mutationFn: async (values: {
+      name: string;
+      phone: string | null;
+      details: {
+        email: string | null;
+        joinedOn: string | null;
+        emergencyName: string | null;
+        emergencyPhone: string | null;
+        note: string | null;
+      };
+    }) => {
       const contact = (await saveGuardianFn({
         data: {
           ...(existing ? { id: existing.id } : {}),
@@ -74,6 +91,7 @@ export function StudentForm({
           ...(initial ? { id: initial.id } : {}),
           name: values.name,
           guardianId: contact.id,
+          ...values.details,
         },
       })) as SavedRow;
       if (!student) throw new Error("Could not save the dancer. Please try again.");
@@ -103,6 +121,11 @@ export function StudentForm({
           // Keep the batch and fee: the next dancer is usually in the same class.
           setName("");
           setDancerPhone("");
+          setEmail("");
+          setJoinedOn("");
+          setEmergencyName("");
+          setEmergencyPhone("");
+          setNote("");
           setErrors({});
           nameInput.current?.focus();
           return;
@@ -139,11 +162,34 @@ export function StudentForm({
       if (parsed.success) phoneValue = parsed.data;
       else found["phone"] = parsed.error.issues[0]?.message ?? "Enter a valid phone number";
     }
+    const orNull = (text: string) => (text.trim() === "" ? null : text.trim());
+    const emailValue = orNull(email);
+    if (emailValue !== null && !z.string().email().max(200).safeParse(emailValue).success)
+      found["email"] = "Enter a valid email address";
+    const joinedValue = orNull(joinedOn);
+    if (joinedValue !== null && !isoDate.safeParse(joinedValue).success) found["joinedOn"] = "Choose a date";
+    let emergencyPhoneValue: string | null = null;
+    if (orNull(emergencyPhone) !== null) {
+      const parsed = phone.safeParse(emergencyPhone.trim());
+      if (parsed.success) emergencyPhoneValue = parsed.data;
+      else found["emergencyPhone"] = "Enter a valid phone number";
+    }
+    if (note.trim().length > 500) found["note"] = "Keep the note under 500 letters";
     if (!initial && planId && !isoDate.safeParse(startsOn).success)
       found["startsOn"] = "Choose a start date";
     setErrors(found);
     if (Object.keys(found).length > 0 || !dancer.success) return;
-    mutation.mutate({ name: dancer.data, phone: phoneValue });
+    mutation.mutate({
+      name: dancer.data,
+      phone: phoneValue,
+      details: {
+        email: emailValue,
+        joinedOn: joinedValue,
+        emergencyName: orNull(emergencyName),
+        emergencyPhone: emergencyPhoneValue,
+        note: orNull(note),
+      },
+    });
   }
 
   return (
@@ -168,6 +214,26 @@ export function StudentForm({
           placeholder="+91 98765 43210"
         />
       </Field>
+      <details className="console-more" open={Boolean(d?.email || d?.joinedOn || d?.emergencyName || d?.emergencyPhone || d?.note)}>
+        <summary>More details (optional)</summary>
+        <Field label="Email" error={errors["email"]}>
+          <input className="field" type="email" value={email} onChange={(event) => setEmail(event.target.value)} maxLength={200} />
+        </Field>
+        <Field label="Joined on" error={errors["joinedOn"]}>
+          <input className="field" type="date" value={joinedOn} onChange={(event) => setJoinedOn(event.target.value)} />
+        </Field>
+        <div className="console-two">
+          <Field label="Emergency contact name">
+            <input className="field" value={emergencyName} onChange={(event) => setEmergencyName(event.target.value)} maxLength={120} />
+          </Field>
+          <Field label="Emergency contact phone" error={errors["emergencyPhone"]}>
+            <input className="field" type="tel" inputMode="tel" value={emergencyPhone} onChange={(event) => setEmergencyPhone(event.target.value)} />
+          </Field>
+        </div>
+        <Field label="Note" error={errors["note"]} hint="Anything the studio should remember. Please do not add health details.">
+          <textarea className="field" rows={2} value={note} onChange={(event) => setNote(event.target.value)} maxLength={500} />
+        </Field>
+      </details>
       {!initial && (
         <>
           <Field label="Batch (optional)">

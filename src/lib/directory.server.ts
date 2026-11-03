@@ -95,10 +95,28 @@ export async function listStudents(
 
 export async function saveStudent(
   context: StudioContext,
-  input: { id?: string | undefined; name: string; guardianId: string | null },
+  input: {
+    id?: string | undefined;
+    name: string;
+    guardianId: string | null;
+    email?: string | null | undefined;
+    joinedOn?: string | null | undefined;
+    emergencyName?: string | null | undefined;
+    emergencyPhone?: string | null | undefined;
+    note?: string | null | undefined;
+  },
 ) {
   const { supabase, studioId } = await ensureStudio(context);
-  const values = { name: input.name, guardian_id: input.guardianId };
+  // Details are only written when the caller sends them, so older callers leave them as they are.
+  const values = {
+    name: input.name,
+    guardian_id: input.guardianId,
+    ...(input.email !== undefined ? { email: input.email } : {}),
+    ...(input.joinedOn !== undefined ? { joined_on: input.joinedOn } : {}),
+    ...(input.emergencyName !== undefined ? { emergency_name: input.emergencyName } : {}),
+    ...(input.emergencyPhone !== undefined ? { emergency_phone: input.emergencyPhone } : {}),
+    ...(input.note !== undefined ? { note: input.note } : {}),
+  };
   if (input.id) {
     return unwrap(
       await supabase

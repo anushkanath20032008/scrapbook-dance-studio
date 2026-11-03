@@ -638,3 +638,4 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .dancer-grid-table tr[data-bad="true"] { background:#fbe3e0; }
 .dancer-grid-remove { border:0; background:transparent; cursor:pointer; font-size:18px; width:100%; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.console-more { border:2px solid var(--ink); padding:8px 12px; display:grid; gap:10px; background:var(--paper); } .console-more summary { cursor:pointer; font-weight:800; }

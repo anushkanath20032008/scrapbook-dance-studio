@@ -414,17 +414,19 @@ function Login() {
               {sentTo.kind === "confirm" ? "One more step." : "Reset link sent."}
             </p>
             <p>
-              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"}{" "}
-              to <strong>{sentTo.email}</strong>.{" "}
+              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"} to:
+            </p>
+            <p className="email-sent-address">{sentTo.email}</p>
+            <p>
               {sentTo.kind === "confirm"
                 ? "Open it on this device and you will land in your studio."
                 : "Open it to choose a new password."}
             </p>
-            <p className="console-hint">
-              It can take a few minutes. Check spam or promotions too. Nothing yet? Send it again,
-              try Continue with Google, or write to support@choreostudio.live and we will sort it
-              out.
-            </p>
+            <ul className="email-sent-tips">
+              <li>It can take a few minutes.</li>
+              <li>Check spam or promotions too.</li>
+              <li>Still nothing? Send it again, or write to support@choreostudio.live.</li>
+            </ul>
             {resendNote && <p role="status">{resendNote}</p>}
             <div className="console-form-actions">
               <Button variant="retro" type="button" onClick={() => setSentTo(null)}>

@@ -341,7 +341,12 @@ button { cursor:pointer; }
 .legal-page ul { padding-left:22px; margin:6px 0 10px; }
 .legal-meta { font-size:13px; opacity:.8; }
 button.text-link { background:none; border:0; padding:0; font:inherit; font-weight:800; color:inherit; cursor:pointer; }
-.email-sent-big { font-family:"Space Grotesk",Arial,sans-serif; font-size:30px; font-weight:700; margin:0 0 8px; text-transform:uppercase; }
+.email-sent { display:grid; gap:12px; }
+.email-sent p { margin:0; }
+.email-sent-big { font-family:"Space Grotesk",Arial,sans-serif; font-size:24px; font-weight:700; line-height:1.15; text-transform:uppercase; color:var(--blue); }
+.email-sent-address { padding:10px 12px; border:2px solid var(--ink); background:var(--marigold); font-weight:800; overflow-wrap:anywhere; box-shadow:3px 3px 0 var(--ink); }
+.email-sent-tips { margin:0; padding:0 0 0 18px; display:grid; gap:4px; font-size:14px; opacity:.8; }
+.email-sent .console-form-actions { margin-top:6px; }
 
 
 /* Elements fade and rise into place as they scroll into view (see src/lib/scroll-reveal.ts). Uses the separate

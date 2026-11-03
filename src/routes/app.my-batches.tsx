@@ -12,12 +12,15 @@ import { getInstructorBatches, getInstructorRoster, getMyBatchRequests } from "@
 // The instructor's batches: when each meets and which dancers are on it (names only).
 export const Route = createFileRoute("/app/my-batches")({
   head: () => ({ meta: [{ title: "Batches | ChoreoStudio" }] }),
+  validateSearch: (search: Record<string, unknown>): { batch?: string } =>
+    typeof search["batch"] === "string" && search["batch"] !== "" ? { batch: search["batch"] } : {},
   component: InstructorBatches,
 });
 
 const clock = (value: string | null) => (value ? value.slice(0, 5) : "");
 
 function InstructorBatches() {
+  const { batch: onlyBatch } = Route.useSearch();
   const batchesFn = useServerFn(getInstructorBatches);
   const batches = useQuery({ queryKey: ["instructor-batches"], queryFn: () => batchesFn() });
   const requestsFn = useServerFn(getMyBatchRequests);
@@ -38,7 +41,7 @@ function InstructorBatches() {
         <p className="console-empty">The studio has no batches yet. Suggest one above, or ask the owner to add it.</p>
       )}
       <ul className="console-list">
-        {batches.data?.map((batch) => (
+        {batches.data?.filter((batch) => !onlyBatch || batch.id === onlyBatch).map((batch) => (
           <BatchRow onAdd={setAdding} key={batch.id} batch={batch} />
         ))}
       </ul>

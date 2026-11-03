@@ -17,7 +17,7 @@ import { consoleGroups, groupForPath } from "@/lib/console-nav";
 import { helpVideos } from "@/lib/help-videos";
 import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
-import { getMyTeacherStudio } from "@/lib/instructors.functions";
+import { getInstructorBatches, getMyTeacherStudio } from "@/lib/instructors.functions";
 import { getRoleIntent } from "@/lib/role-intent";
 
 export const Route = createFileRoute("/app")({
@@ -94,6 +94,12 @@ function ConsoleLayout() {
     queryKey: ["teacher-studio"],
     queryFn: () => loadTeacherStudio(),
     enabled: session.status === "signed-in" && teacherIntent,
+  });
+  const loadMyBatches = useServerFn(getInstructorBatches);
+  const myBatches = useQuery({
+    queryKey: ["instructor-batches"],
+    queryFn: () => loadMyBatches(),
+    enabled: session.status === "signed-in" && session.teacher,
   });
   const [joinHidden, setJoinHidden] = useState(false);
   // A teacher who confirmed their email on another device has no local hint, but the account remembers.
@@ -210,7 +216,29 @@ function ConsoleLayout() {
             <NavLink key={item.to} to={item.to} exact={item.exact} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
               {item.label}
             </NavLink>
-          ))}
+          )).flatMap((link, index) =>
+            instructorItems[index]?.to === "/app/my-batches" && (myBatches.data?.length ?? 0) > 0
+              ? [
+                  link,
+                  <ul key="batch-subnav" className="console-subnav" aria-label="Your batches">
+                    {myBatches.data?.map((batch) => (
+                      <li key={batch.id}>
+                        <Link
+                          to="/app/my-batches"
+                          search={{ batch: batch.id }}
+                          className="console-nav-item console-nav-sub"
+                          activeOptions={{ includeSearch: true }}
+                          activeProps={{ className: "active" }}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {batch.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>,
+                ]
+              : [link],
+          )}
           <div className="console-nav-foot">
             <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
               Take the tour

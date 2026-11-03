@@ -127,7 +127,10 @@ function ConsoleLayout() {
     setTeacherIntent(session.status === "signed-in" && session.teacher);
     if (session.status === "signed-in") setRoleIntent("owner");
   }, [session]);
-  const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
+  // Someone is asked to join only when the account is a teacher in name but has neither a studio of its own nor a
+  // studio it teaches at.
+  const needsJoin = teacherIntent && teacherStudio.data !== undefined && teacherStudio.data.studioName === null && !teacherStudio.data.ownsStudio;
+  const mustJoin = teacherIntent && (teacherStudio.isPending || needsJoin);
   const context = useQuery({
     queryKey: ["console-context"],
     queryFn: () => loadContext(),
@@ -344,10 +347,10 @@ function ConsoleLayout() {
           />
         )}
         <main className="console-main">
-          {teacherIntent && teacherStudio.data === null && !joinHidden && (
+          {needsJoin && !joinHidden && (
             <JoinStudioDialog onLeave={() => setTeacherIntent(false)} onDismiss={() => setJoinHidden(true)} />
           )}
-          {teacherIntent && teacherStudio.data === null && joinHidden && (
+          {needsJoin && joinHidden && (
             <div className="console-form">
               <h2>You have not joined a studio yet</h2>
               <p>Ask your studio owner for an invite code. Nothing is set up for you until you join.</p>

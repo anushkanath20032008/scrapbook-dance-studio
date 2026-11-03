@@ -92,13 +92,15 @@ export const markInstructorAttendance = createServerFn({ method: "POST" })
     (await import("@/lib/instructors.server")).markInstructorAttendance(context, data),
   );
 
-// The studio the caller teaches at, or null. Lets the console ask a new dance teacher to join a studio
-// before it creates anything for them.
+// What the account already is: the studio it teaches at, and whether it owns a studio. The console asks someone
+// to join a studio only when it is neither, so an owner is never sent to the teacher screen.
 export const getMyTeacherStudio = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const me = await (await import("@/lib/instructors.server")).getInstructorMe(context);
-    return me ? { studioName: me.studio_name } : null;
+    const server = await import("@/lib/instructors.server");
+    const me = await server.getInstructorMe(context);
+    const ownsStudio = await server.ownsStudio(context);
+    return { studioName: me ? me.studio_name : null, ownsStudio };
   });
 
 // Batch requests: a teacher suggests, the owner decides. Nothing is a real batch until the owner approves.

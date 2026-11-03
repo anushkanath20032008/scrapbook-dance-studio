@@ -161,3 +161,14 @@ export async function addInstructorStudent(
 export async function getInstructorStudents({ supabase }: StudioContext) {
   return unwrap(await supabase.rpc("instructor_students"));
 }
+
+/** Whether the caller already has a studio of their own. Read-only: it never creates one. */
+export async function ownsStudio({ supabase, userId }: StudioContext) {
+  const { data, error } = await supabase
+    .from("studio_profiles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw friendlyError(error);
+  return data !== null;
+}

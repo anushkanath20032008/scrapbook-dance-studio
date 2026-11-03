@@ -1103,6 +1103,26 @@ export type Database = {
         Args: { p_batch: string; p_on: string }
         Returns: { present: boolean | null; student_id: string; student_name: string }[]
       }
+      instructor_request_batch: {
+        Args: { p_ends_at: string | null; p_name: string; p_room: string | null; p_starts_at: string | null; p_weekdays: number[] }
+        Returns: string
+      }
+      instructor_my_batch_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: { created_at: string; ends_at: string | null; id: string; name: string; room: string | null; starts_at: string | null; status: string; weekdays: number[] }[]
+      }
+      list_batch_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: { created_at: string; ends_at: string | null; id: string; name: string; requester_email: string | null; room: string | null; starts_at: string | null; status: string; weekdays: number[] }[]
+      }
+      approve_batch_request: {
+        Args: { p_id: string }
+        Returns: string
+      }
+      decline_batch_request: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
       instructor_mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }
         Returns: number

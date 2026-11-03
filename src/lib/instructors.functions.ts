@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { batchInput } from "@/lib/schemas";
 import { isoDate, uuid, validate } from "@/lib/validators";
 
 // Owner side: invite, list and remove instructors. The database refuses anyone who is not the studio owner.
@@ -99,3 +100,43 @@ export const getMyTeacherStudio = createServerFn({ method: "GET" })
     const me = await (await import("@/lib/instructors.server")).getInstructorMe(context);
     return me ? { studioName: me.studio_name } : null;
   });
+
+// Batch requests: a teacher suggests, the owner decides. Nothing is a real batch until the owner approves.
+export const requestBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(batchInput))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).requestBatch(context, {
+      name: data.name,
+      weekdays: data.weekdays,
+      startsAt: data.startsAt,
+      endsAt: data.endsAt,
+      room: data.room,
+    }),
+  );
+
+export const getMyBatchRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).getMyBatchRequests(context),
+  );
+
+export const listBatchRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).listBatchRequests(context),
+  );
+
+export const approveBatchRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ id: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).approveBatchRequest(context, data),
+  );
+
+export const declineBatchRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ id: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).declineBatchRequest(context, data),
+  );

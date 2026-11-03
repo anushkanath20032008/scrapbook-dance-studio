@@ -211,6 +211,13 @@
       "when": 1791378800000,
       "tag": "0029_family_link_reminder_token",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1791465200000,
+      "tag": "0030_batch_requests",
+      "breakpoints": true
     }
   ]
 }

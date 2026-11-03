@@ -14,13 +14,9 @@ import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
-import { UnpaidList } from "@/components/console/unpaid-list";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
-import { HomeTiles } from "@/components/console/home-tiles";
+import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
-import { teacherTiles, ownerTiles } from "@/lib/console-nav";
-import { getInstructorBatches, getMyBatchRequests, listBatchRequests } from "@/lib/instructors.functions";
-import { listClaimQueue } from "@/lib/claims.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
 import { formatMonthLong } from "@/lib/format";
@@ -45,20 +41,11 @@ function Home() {
 }
 
 function TeacherHome() {
-  const requestsFn = useServerFn(getMyBatchRequests);
-  const batchesFn = useServerFn(getInstructorBatches);
-  const requests = useQuery({ queryKey: ["my-batch-requests"], queryFn: () => requestsFn() });
-  const batches = useQuery({ queryKey: ["instructor-batches"], queryFn: () => batchesFn() });
-  const waiting = (requests.data ?? []).filter((request) => request.status === "pending").length;
   return (
     <section>
       <h1 className="display console-title">Home</h1>
-      <p className="console-hint">
-        {batches.data
-          ? `You teach ${batches.data.length} batch${batches.data.length === 1 ? "" : "es"}.`
-          : "Pick what you want to do."}
-      </p>
-      <HomeTiles tiles={teacherTiles} counts={{ myRequests: waiting }} label="Teacher home" />
+      <p className="console-hint">Your batches and dancers. Tick who is here today.</p>
+      <TeacherTable today={todayInIndia()} />
     </section>
   );
 }
@@ -77,6 +64,7 @@ function Overview() {
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [reminding, setReminding] = useState<RemindTarget | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
+  const [remindIds, setRemindIds] = useState<string[] | null>(null);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
@@ -93,10 +81,6 @@ function Overview() {
     queryFn: () => loadReport({ data: { period } }),
   });
   const counts = useQuery({ queryKey: setupCountsKey, queryFn: () => loadCounts() });
-  const loadClaims = useServerFn(listClaimQueue);
-  const loadRequests = useServerFn(listBatchRequests);
-  const claims = useQuery({ queryKey: ["claim-queue"], queryFn: () => loadClaims() });
-  const teacherRequests = useQuery({ queryKey: ["batch-requests"], queryFn: () => loadRequests() });
   const setupDone = counts.data ? setupProgress(buildSetupSteps(counts.data)).complete : false;
   // A studio with no dancers yet sees the setup card first, with the paste box in it.
   const [pasted] = usePasteResult();
@@ -148,15 +132,6 @@ function Overview() {
           </Button>
         </div>
       )}
-      <HomeTiles
-        label="Studio home"
-        tiles={ownerTiles}
-        counts={{
-          unpaid: report.data?.unpaid.length ?? 0,
-          toCheck: claims.data?.length ?? 0,
-          requests: (teacherRequests.data ?? []).filter((r) => r.status === "pending").length,
-        }}
-      />
       {firstRun && !setupDone && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Start here.dialog</div>
@@ -198,6 +173,17 @@ function Overview() {
       {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
       {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
+      {!brandNew && (
+        <StudioTable
+          period={period}
+          today={today}
+          onRecord={(student) => setPaying(student)}
+          onRemindBatch={(ids) => {
+            setRemindIds(ids);
+            setBatchOpen(true);
+          }}
+        />
+      )}
       {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
 
       {arrears.length > 0 && (
@@ -277,39 +263,13 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {snapshot && snapshot.charged_students > 0 && (
-        <>
-          <div className="console-list-head">
-            <h2>Who hasn&apos;t paid</h2>
-            {providerConfigured && (
-              <Button
-                variant="retroPaper"
-                type="button"
-                onClick={() => setReminding({ period })}
-                disabled={snapshot.overdue_paise === 0}
-              >
-                Remind everyone overdue
-              </Button>
-            )}
-          </div>
-          <UnpaidList
-            rows={report.data?.unpaid ?? []}
-            onRecord={(row) => setPaying({ id: row.student_id, name: row.student_name })}
-            onRemind={(row) =>
-              setReminding({ period, studentId: row.student_id, name: row.student_name })
-            }
-            studioName={studioName}
-            reminded={reminded}
-            onOpened={markOpened}
-            showQueue={providerConfigured}
-          />
-        </>
-      )}
-
       <WhatsAppBatchDialog
         open={batchOpen}
-        onClose={() => setBatchOpen(false)}
-        rows={unpaidRows}
+        onClose={() => {
+          setBatchOpen(false);
+          setRemindIds(null);
+        }}
+        rows={remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows}
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}

@@ -507,7 +507,7 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .me-row { display:grid; grid-template-columns:110px 1fr auto; gap:12px; align-items:center; }
 .me-label { font-weight:700; }
 .me-track { display:block; height:16px; border:2px solid var(--ink,#1a1a1a); background:#fff; }
-.me-fill { display:block; height:100%; background:#273FA3; }
+.me-fill { display:block; height:100%; background:#1E3188; }
 .me-meter { height:22px; border:2px solid var(--ink,#1a1a1a); background:#fff; margin-bottom:16px; }
 .me-meter span { display:block; height:100%; background:#5E9C76; }
 .me-value { text-align:right; font-variant-numeric:tabular-nums; }
@@ -599,7 +599,7 @@ button.text-link { background:none; border:0; padding:0; font:inherit; font-weig
 .price-country select { margin-left:.4rem; padding:.3rem .5rem; border:2px solid var(--ink,#1A1A1A); background:var(--paper,#F7E8DC); font:inherit; }
 
 /* Coming soon beside a plan name: blue on paper stands out on the marigold card. */
-.soon-tag.plan-soon { margin-left:10px; vertical-align:middle; background:var(--blue,#273FA3); color:var(--paper,#F7E8DC); border-color:var(--ink); }
+.soon-tag.plan-soon { margin-left:10px; vertical-align:middle; background:var(--blue,#1E3188); color:var(--paper,#F7E8DC); border-color:var(--ink); }
 
 /* Phones: nothing sits off-screen. The top bar gives the logo room, tabs wrap instead of scrolling sideways. */
 @media (max-width:640px) {

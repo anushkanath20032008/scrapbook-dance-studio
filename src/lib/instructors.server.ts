@@ -157,3 +157,7 @@ export async function addInstructorStudent(
     }),
   );
 }
+
+export async function getInstructorStudents({ supabase }: StudioContext) {
+  return unwrap(await supabase.rpc("instructor_students"));
+}

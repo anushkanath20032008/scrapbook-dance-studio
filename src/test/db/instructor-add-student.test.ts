@@ -64,4 +64,17 @@ describe("instructor_add_student", () => {
     const { owner, batch } = await setup();
     await expect(add(owner, batch, "Bela", "")).rejects.toThrow(/access/);
   });
+
+  it("lets a teacher list every dancer without any fee or payment columns", async () => {
+    const { owner, teacher, batch } = await setup();
+    await add(teacher, batch, "Asha Rao", "98765 43210");
+    await db.admin("INSERT INTO public.students (studio_id, name, note) VALUES ($1, 'Not in a batch', 'left-handed')", [owner]);
+    const rows = await db.query<Record<string, unknown>>({ user: teacher }, "SELECT * FROM public.instructor_students()");
+    expect(rows.map((r) => r["name"])).toEqual(["Asha Rao", "Not in a batch"]);
+    expect(rows[0]?.["batches"]).toEqual(["Hip Hop"]);
+    expect(Object.keys(rows[0]!).some((key) => /fee|amount|paid|charge|status/i.test(key))).toBe(false);
+    const other = await setup();
+    const none = await db.query({ user: other.owner }, "SELECT * FROM public.instructor_students()");
+    expect(none).toHaveLength(0);
+  });
 });

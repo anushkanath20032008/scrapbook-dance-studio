@@ -232,6 +232,13 @@
       "when": 1791638000000,
       "tag": "0032_instructor_add_student",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791724400000,
+      "tag": "0033_instructor_students",
+      "breakpoints": true
     }
   ]
 }

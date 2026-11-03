@@ -49,6 +49,7 @@ type NavTo =
   | "/app/team"
   | "/app/class"
   | "/app/my-batches"
+  | "/app/my-dancers"
   | "/app/makeups";
 
 // An instructor sees only these two screens; the database refuses everything else even if a URL is typed in.
@@ -56,6 +57,7 @@ const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
   { to: "/app", label: "Home", exact: true },
   { to: "/app/class", label: "Attendance", exact: false },
   { to: "/app/my-batches", label: "Batches", exact: false },
+  { to: "/app/my-dancers", label: "Dancers", exact: false },
   { to: "/app/makeups", label: "Make-ups", exact: false },
 ];
 const instructorPaths = instructorItems.map((item) => item.to as string);

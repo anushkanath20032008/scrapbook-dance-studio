@@ -29,6 +29,7 @@ import { Route as AppMakeupsRouteImport } from './routes/app.makeups'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMonthEndRouteImport } from './routes/app.month-end'
 import { Route as AppMyBatchesRouteImport } from './routes/app.my-batches'
+import { Route as AppMyDancersRouteImport } from './routes/app.my-dancers'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
@@ -141,6 +142,11 @@ const AppMyBatchesRoute = AppMyBatchesRouteImport.update({
   path: '/my-batches',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMyDancersRoute = AppMyDancersRouteImport.update({
+  id: '/my-dancers',
+  path: '/my-dancers',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -558,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyBatchesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/my-dancers': {
+      id: '/app/my-dancers'
+      path: '/my-dancers'
+      fullPath: '/app/my-dancers'
+      preLoaderRoute: typeof AppMyDancersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -648,6 +667,7 @@ interface AppRouteChildren {
   AppMessagesRoute: typeof AppMessagesRoute
   AppMonthEndRoute: typeof AppMonthEndRoute
   AppMyBatchesRoute: typeof AppMyBatchesRoute
+  AppMyDancersRoute: typeof AppMyDancersRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
@@ -666,6 +686,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMessagesRoute: AppMessagesRoute,
   AppMonthEndRoute: AppMonthEndRoute,
   AppMyBatchesRoute: AppMyBatchesRoute,
+  AppMyDancersRoute: AppMyDancersRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,

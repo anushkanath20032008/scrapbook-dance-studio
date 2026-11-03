@@ -1138,6 +1138,20 @@ export type Database = {
         Args: { p_id: string }
         Returns: boolean
       }
+      instructor_students: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          phone: string | null
+          email: string | null
+          joined_on: string | null
+          emergency_name: string | null
+          emergency_phone: string | null
+          note: string | null
+          batches: string[]
+        }[]
+      }
       instructor_add_student: {
         Args: { p_batch: string; p_name: string; p_phone: string }
         Returns: string

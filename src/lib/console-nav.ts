@@ -73,6 +73,7 @@ export const ownerTiles: HomeTile[] = [
 
 export const teacherTiles: HomeTile[] = [
   { icon: "📋", to: "/app/class", label: "Take attendance", hint: "Pick a batch and mark who came" },
+  { icon: "💃", to: "/app/my-dancers", label: "Dancers", hint: "Everyone in the studio, with their batches and contact details" },
   { icon: "🗓️", to: "/app/my-batches", label: "My batches", hint: "Your classes, rosters and batch suggestions", badge: "myRequests" },
   { icon: "🔁", to: "/app/makeups", label: "Make-ups", hint: "Make-up classes for dancers who missed one" },
 ];

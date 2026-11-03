@@ -149,3 +149,9 @@ export const addInstructorStudent = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).addInstructorStudent(context, data),
   );
+
+export const getInstructorStudents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).getInstructorStudents(context),
+  );

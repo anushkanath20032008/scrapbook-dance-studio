@@ -1057,3 +1057,8 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .dancer-card[data-c="0"], .dancer-card[data-c="1"], .dancer-card[data-c="2"], .dancer-card[data-c="3"], .dancer-card[data-c="4"], .dancer-card[data-c="5"], .dancer-card[data-c="none"] { background:#fff; }
 .dancer-card[data-archived="true"] { opacity:.6; }
 .dancer-card-actions { display:inline-flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+
+/* Nothing in the board may be clipped: the group row's action sits next to its label (not at the far right edge of a wide table), its button text never truncates, and the "Reminded" heading fits its column. */
+.board-link { margin-left:12px; white-space:nowrap; overflow:visible; }
+.board-group-row { flex-wrap:wrap; }
+.board-table .c-rem { width:110px; }

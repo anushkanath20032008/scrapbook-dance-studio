@@ -485,7 +485,9 @@ export function DancerBoard({
                 Fee
               </th>
               <th scope="col">Status</th>
-              <th scope="col">Last reminded</th>
+              <th scope="col" title="Last reminded">
+                Reminded
+              </th>
               <th scope="col">
                 <span className="sr-only">Actions</span>
               </th>

@@ -107,7 +107,9 @@ export async function markBatchPaid(context: StudioContext, input: BatchPaidInpu
   const failed: { studentId: string; reason: string }[] = [];
   let totalPaise = 0;
   for (const row of ledger) {
-    const owed = Number(row.balance_paise);
+    // What this month's row shows, not the dancer's whole-account balance: balance_paise also carries
+    // arrears from earlier months, so using it would record more than the table and the confirm dialog say.
+    const owed = Number(row.outstanding_paise);
     if (owed <= 0) continue;
     try {
       const result = await recordPayment(context, {

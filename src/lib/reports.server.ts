@@ -24,7 +24,38 @@ export async function getHomeReport({ supabase }: StudioContext, input: { period
     supabase.rpc("dancers_awaiting_fee", { p_period: period }),
   ]);
   const snapshots = unwrap(snapshotResult);
-  const unpaid = unwrap(unpaidResult);
+  const unpaidRaw = unwrap(unpaidResult);
+  // The reminder is written to whoever owns the phone number, so it needs the guardian's name too.
+  const studentRows =
+    unpaidRaw.length === 0
+      ? []
+      : unwrap(
+          await supabase
+            .from("students")
+            .select("id, guardian_id")
+            .in(
+              "id",
+              unpaidRaw.map((row) => row.student_id),
+            ),
+        );
+  const guardianIds = [
+    ...new Set(studentRows.flatMap((row) => (row.guardian_id ? [row.guardian_id] : []))),
+  ];
+  const guardianRows =
+    guardianIds.length === 0
+      ? []
+      : unwrap(await supabase.from("guardians").select("id, name").in("id", guardianIds));
+  const nameOfGuardian = new Map(guardianRows.map((row) => [row.id, row.name]));
+  const guardianByStudent = new Map(
+    studentRows.map((row) => [
+      row.id,
+      row.guardian_id ? (nameOfGuardian.get(row.guardian_id) ?? null) : null,
+    ]),
+  );
+  const unpaid = unpaidRaw.map((row) => ({
+    ...row,
+    guardian_name: guardianByStudent.get(row.student_id) ?? null,
+  }));
   // Money still owed from months before this one, per dancer: Overview is one month, so say so out loud.
   const arrears = unwrap(arrearsResult);
   const awaitingFee = unwrap(awaitingResult);

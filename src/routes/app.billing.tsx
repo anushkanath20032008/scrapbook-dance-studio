@@ -61,6 +61,7 @@ function Billing() {
       ? {
           charge_id: oldestOpen.charge_id,
           student_name: student.name,
+          guardian_name: student.guardian?.name ?? null,
           phone: student.guardian?.phone ?? null,
           outstanding_paise: balance,
           due_on: oldestOpen.due_on,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { markReminded, remindedToday, whatsappLink } from "@/lib/manual-reminders";
+import { markReminded, remindedToday, reminderText, whatsappLink } from "@/lib/manual-reminders";
 
 const row = {
   charge_id: "c1",
@@ -22,7 +22,9 @@ describe("whatsappLink", () => {
     const link = whatsappLink(row, "Rhythm House") ?? "";
     expect(link.startsWith("https://wa.me/919090909090?text=")).toBe(true);
     const text = decodeURIComponent(link.split("text=")[1] ?? "");
-    expect(text).toBe("Hi Bindu, a reminder from Rhythm House: your fee of ₹4,500 was due on 5 Oct. Thank you!");
+    expect(text).toBe(
+      "Hi Bindu, a reminder from Rhythm House: your fee of ₹4,500 was due on 5 Oct. Thank you!",
+    );
   });
 
   it("leaves the studio out when it has no name", () => {
@@ -51,7 +53,12 @@ describe("reminder log", () => {
   it("copes with a broken or missing store", () => {
     expect(remindedToday("2026-10-20", null).size).toBe(0);
     expect(markReminded("c1", "2026-10-20", null).has("c1")).toBe(true);
-    const broken = { getItem: () => "not json", setItem: () => { throw new Error("full"); } };
+    const broken = {
+      getItem: () => "not json",
+      setItem: () => {
+        throw new Error("full");
+      },
+    };
     expect(remindedToday("2026-10-20", broken).size).toBe(0);
     expect(() => markReminded("c1", "2026-10-20", broken)).not.toThrow();
   });
@@ -64,5 +71,20 @@ describe("reminder wording", () => {
     expect(reminderText(row, "", "2026-10-23")).toContain("is due on 23 Oct");
     expect(reminderText(row, "", "2026-10-22")).toContain("is due on 23 Oct");
     expect(reminderText(row, "", "2026-10-24")).toContain("was due on 23 Oct");
+  });
+});
+
+describe("reminder wording for a parent's number", () => {
+  const base = { student_name: "Pushpak", outstanding_paise: 500000, due_on: "2026-11-05" };
+  it("addresses the parent and names the dancer", () => {
+    const text = reminderText({ ...base, guardian_name: "Ashwin" }, "Studio", "2026-11-06");
+    expect(text.startsWith("Hi Ashwin,")).toBe(true);
+    expect(text).toContain("Pushpak's fee of");
+    expect(text).not.toContain("your fee");
+  });
+  it("keeps 'your fee' when the number is the dancer's own", () => {
+    const text = reminderText({ ...base, guardian_name: "pushpak" }, "Studio", "2026-11-06");
+    expect(text.startsWith("Hi Pushpak,")).toBe(true);
+    expect(text).toContain("your fee of");
   });
 });

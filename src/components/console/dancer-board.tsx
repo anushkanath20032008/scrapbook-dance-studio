@@ -7,6 +7,7 @@ import { DancerPeek } from "@/components/console/dancer-peek";
 import { formatRupees } from "@/lib/money";
 import { markAttendance } from "@/lib/attendance.functions";
 import { sampleMark } from "@/lib/sample-studio";
+import { toneOf } from "@/lib/tone";
 import { getStudioTable } from "@/lib/studio-table.functions";
 import type { PayStatus, TableBatch } from "@/lib/studio-table";
 
@@ -122,13 +123,6 @@ export function groupBoardRows(rows: BoardRow[], by: GroupBy): BoardGroup[] {
     groups.push({ key: "no-batch", label: "No batch", tone: "plain", rows: none });
   return groups;
 }
-
-/** A steady colour for a name, so the same batch or dancer always looks the same. */
-const toneOf = (text: string) => {
-  let sum = 0;
-  for (const ch of text) sum = (sum * 31 + ch.charCodeAt(0)) % 6;
-  return sum;
-};
 
 type Tab = "unpaid" | "nofee" | "today" | "all";
 type Density = "compact" | "roomy";
@@ -642,6 +636,7 @@ export function DancerBoard({
       {peek && (
         <DancerPeek
           row={peek}
+          today={today}
           reminded={reminded.has(peek.studentId)}
           sample={Boolean(sample)}
           onClose={() => setPeekId(null)}

@@ -983,3 +983,7 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-name-btn { color:#1e3188; }
 .board-table .c-status { width:186px; } .board-table .c-batch { width:15%; } .board-table .c-rem { width:96px; }
 .board-status { white-space:nowrap; }
+
+/* Inactive look for "nothing here" chips: no fill, dashed outline, faded text. */
+.bchip[data-c="none"] { background:transparent; color:#a39a90; font-weight:400; border:1px dashed #cfc6bb; opacity:.85; }
+.board-table .c-status .chip[data-tone="paid"] { opacity:1; }

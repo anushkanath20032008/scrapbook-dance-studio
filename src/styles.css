@@ -851,3 +851,7 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
   .strip-cell { border-bottom:1px solid #e9ddd0; }
   .board-search { width:100%; flex:1 1 140px; }
 }
+
+/* A long private link must wrap inside the docked dialog instead of widening it. */
+.reminder-preview { overflow-wrap:anywhere; word-break:break-word; }
+.console-dialog { overflow-x:hidden; }

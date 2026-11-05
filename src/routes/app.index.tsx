@@ -108,7 +108,7 @@ function Overview() {
   });
 
   const snapshot = report.data?.snapshot;
-  const unpaidRows = report.data?.unpaid ?? [];
+  const unpaidRows = useMemo(() => report.data?.unpaid ?? [], [report.data]);
   const arrears = report.data?.arrears ?? [];
   const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const awaitingFee = report.data?.awaitingFee ?? 0;
@@ -129,6 +129,10 @@ function Overview() {
     () =>
       new Set(unpaidRows.filter((row) => reminded.has(row.charge_id)).map((row) => row.student_id)),
     [unpaidRows, reminded],
+  );
+  const dialogRows = useMemo(
+    () => (remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows),
+    [remindIds, unpaidRows],
   );
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
@@ -347,11 +351,9 @@ function Overview() {
         open={batchOpen}
         onClose={() => {
           setBatchOpen(false);
-          setRemindIds(null);
         }}
-        rows={
-          remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows
-        }
+        rows={dialogRows}
+        explicit={remindIds !== null}
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}

@@ -743,7 +743,7 @@ p, li, dd, label { line-height:1.6; }
 }
 
 /* Dialogs dock on the right and stop blacking out the page, so the table stays visible behind them */
-.console-dialog { left:auto !important; right:0 !important; top:0 !important; transform:none !important; height:100vh; max-height:100vh !important; width:min(460px,100vw); max-width:min(460px,100vw) !important; }
+.console-dialog { left:auto !important; right:0 !important; top:0 !important; transform:none !important; translate:none !important; height:100vh; max-height:100vh !important; width:min(460px,100vw); max-width:min(460px,100vw) !important; }
 div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 @media (max-width: 640px) { .console-dialog { width:100vw; max-width:100vw !important; } }
 .console-nav > .console-plan { margin-bottom:14px; }

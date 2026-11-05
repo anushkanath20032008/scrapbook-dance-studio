@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applyFilter, batchTotals, unpaidAcross, type TableBatch, type TableRow } from "@/lib/studio-table";
-import { getTeacherTable } from "@/lib/studio-table.server";
+import { getTeacherTable, markBatchPaid } from "@/lib/studio-table.server";
 import { fakeSupabase } from "./fake-supabase";
 
 const row = (id: string, outstandingPaise: number): TableRow => ({
@@ -65,5 +65,40 @@ describe("teacher table", () => {
     const table = await getTeacherTable({ supabase: client, userId: "u" }, { date: "2026-11-03" });
     expect(table[0]!.rows).toEqual([{ studentId: "s1", name: "Asha", present: true }]);
     expect(JSON.stringify(table)).not.toMatch(/fee|paise|outstanding|status/i);
+  });
+
+  it("marks paid for what this month's row shows, never the dancer's earlier arrears", async () => {
+    // Bindu owes 5,500 this month and 4,500 from earlier, so balance_paise is 10,000. The table and the
+    // confirm dialog both show 5,500, so that is what may be recorded.
+    const { client, calls } = fakeSupabase((call) => {
+      if (call.fn === "student_ledger_status")
+        return {
+          data: [
+            {
+              student_id: "bindu",
+              student_name: "Bindu",
+              amount_paise: 550000,
+              outstanding_paise: 550000,
+              balance_paise: 1000000,
+            },
+          ],
+        };
+      if (call.fn === "record_payment") return { data: [{ id: "p1" }] };
+      return undefined;
+    });
+    const result = await markBatchPaid(
+      { supabase: client, userId: "u" },
+      {
+        batchId: "b1",
+        method: "cash",
+        paidOn: "2026-11-05",
+        period: "2026-11-01",
+        studentIds: ["bindu"],
+        idempotencyKey: "key",
+      },
+    );
+    const payment = calls.find((call) => call.fn === "record_payment");
+    expect((payment?.args?.[0] as { p_amount_paise: number }).p_amount_paise).toBe(550000);
+    expect(result.totalPaise).toBe(550000);
   });
 });

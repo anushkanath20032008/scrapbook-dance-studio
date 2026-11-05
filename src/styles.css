@@ -1022,3 +1022,16 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .gate-person[data-absent="true"] .gate-mark { background:#d64545; }
 .board-table .c-tick { width:96px; }
 .board-table th[data-tour="ticks"] { white-space:normal; line-height:1.15; }
+.home-views { margin:0; }
+@media (max-width:640px) { .home-views { order:3; width:100%; } }
+
+/* Fixed slots in the Status column: the pill always sits in the same box and the amount in its own right-aligned box, so rows line up whatever the status. */
+.board-table .chip { width:76px; justify-content:center; padding:0; }
+.board-status { display:inline-grid; grid-template-columns:76px 72px; column-gap:10px; align-items:center; }
+.board-status strong { text-align:right; }
+.board-table .c-status { width:192px; }
+
+/* Side dialogs on tablets and phones: 100vh is taller than the visible area there (browser bars), which hid the bottom buttons and left nothing to scroll. Use the dynamic height and let the panel scroll on its own. */
+.console-dialog { height:100dvh; max-height:100dvh !important; overflow-y:auto !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.console-dialog .window-inner { padding-bottom:calc(17px + env(safe-area-inset-bottom, 0px)); }
+.peek { max-height:100dvh; overflow-y:auto; overscroll-behavior:contain; }

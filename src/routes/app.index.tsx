@@ -72,6 +72,7 @@ function Overview() {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   // A made-up studio for practising and demos; null means the real one is showing.
   const [sample, setSample] = useState<TableBatch[] | null>(null);
+  const [view, setView] = useState<"table" | "batches" | "charts">("table");
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -146,6 +147,27 @@ function Overview() {
     <section>
       <div className="home-head">
         <h1 className="home-title">Home</h1>
+        {!sample && !brandNew && (
+          <div className="table-chips home-views" role="group" aria-label="View">
+            {(
+              [
+                ["table", "Table"],
+                ["batches", "By batch"],
+                ["charts", "Charts"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="table-chip"
+                aria-pressed={view === id}
+                onClick={() => setView(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="home-head-right">
           <button
             type="button"
@@ -204,29 +226,31 @@ function Overview() {
               />
             )
           )}
-          <DancerBoard
-            period={period}
-            today={today}
-            loose={looseUnpaid}
-            reminded={remindedStudents}
-            picked={picked}
-            onPickedChange={setPicked}
-            sample={sample}
-            onSampleChange={setSample}
-            onRecord={(student) => {
-              if (sample && isSampleId(student.id)) setSample(samplePay(sample, student.id));
-              else setPaying(student);
-            }}
-            onRemindMany={(ids) => {
-              setRemindIds(ids);
-              setBatchOpen(true);
-            }}
-            onWhatsApp={(studentId) => {
-              setRemindIds([studentId]);
-              setBatchOpen(true);
-            }}
-          />
-          {!sample && providerConfigured && unpaidRows.length > 0 && (
+          {(sample || view === "table") && (
+            <DancerBoard
+              period={period}
+              today={today}
+              loose={looseUnpaid}
+              reminded={remindedStudents}
+              picked={picked}
+              onPickedChange={setPicked}
+              sample={sample}
+              onSampleChange={setSample}
+              onRecord={(student) => {
+                if (sample && isSampleId(student.id)) setSample(samplePay(sample, student.id));
+                else setPaying(student);
+              }}
+              onRemindMany={(ids) => {
+                setRemindIds(ids);
+                setBatchOpen(true);
+              }}
+              onWhatsApp={(studentId) => {
+                setRemindIds([studentId]);
+                setBatchOpen(true);
+              }}
+            />
+          )}
+          {!sample && view === "table" && providerConfigured && unpaidRows.length > 0 && (
             <div className="home-auto">
               <button
                 type="button"
@@ -334,9 +358,8 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {!brandNew && !sample && (
-        <details className="home-more">
-          <summary>Batch view — mark a whole batch paid or present</summary>
+      {!brandNew && !sample && view === "batches" && (
+        <>
           <StudioTable
             period={period}
             today={today}
@@ -346,14 +369,9 @@ function Overview() {
               setBatchOpen(true);
             }}
           />
-        </details>
+        </>
       )}
-      {snapshot && !brandNew && !sample && (
-        <details className="home-more">
-          <summary>Charts for {formatMonthLong(period)}</summary>
-          <MonthCharts snapshot={snapshot} />
-        </details>
-      )}
+      {snapshot && !brandNew && !sample && view === "charts" && <MonthCharts snapshot={snapshot} />}
 
       <WhatsAppBatchDialog
         open={batchOpen}

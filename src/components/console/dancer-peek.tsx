@@ -94,9 +94,6 @@ export function DancerPeek({
   return (
     <aside className="peek" role="dialog" aria-label={`${row.name}, profile`}>
       <div className="peek-head">
-        <span className="avatar avatar-lg" data-c={toneOf(row.name)} aria-hidden="true">
-          {row.name.trim().charAt(0).toUpperCase()}
-        </span>
         <div className="peek-title">
           <h2>{row.name}</h2>
           <span className="peek-sub">

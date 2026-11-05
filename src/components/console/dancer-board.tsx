@@ -507,9 +507,6 @@ export function DancerBoard({
                       </td>
                       <td className="board-name">
                         <span className="board-name-wrap">
-                          <span className="avatar" data-c={toneOf(row.name)} aria-hidden="true">
-                            {row.name.trim().charAt(0).toUpperCase()}
-                          </span>
                           <button
                             type="button"
                             className="board-name-btn"

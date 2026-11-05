@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { hereToday, owes, toBoardRows } from "@/components/console/dancer-board";
+import { groupBoardRows, hereToday, owes, toBoardRows } from "@/components/console/dancer-board";
+import { sampleBatches, sampleNumbers, samplePay, sampleMark } from "@/lib/sample-studio";
 import type { TableBatch, TableRow } from "@/lib/studio-table";
 
 const row = (id: string, over: Partial<TableRow> = {}): TableRow => ({
@@ -97,5 +98,51 @@ describe("dancers who are in no batch", () => {
     );
     expect(rows).toHaveLength(1);
     expect(rows[0]!.batchNames).toEqual(["Adults"]);
+  });
+});
+
+describe("grouping", () => {
+  const rows = toBoardRows([
+    batch("Adults", [row("asha", { outstandingPaise: 100000, status: "due" }), row("meera")]),
+    batch("Kids", [row("asha")]),
+  ]);
+
+  it("puts the unpaid band first and drops empty bands", () => {
+    const groups = groupBoardRows(rows, "status");
+    expect(groups.map((g) => g.label)).toEqual(["Unpaid", "Paid or no fee yet"]);
+    expect(groups[0]!.rows.map((r) => r.studentId)).toEqual(["asha"]);
+    expect(groupBoardRows(rows.filter(owes), "status").map((g) => g.label)).toEqual(["Unpaid"]);
+  });
+
+  it("groups by batch, listing a dancer in each of her batches, and keeps no-batch dancers", () => {
+    const withLoose = toBoardRows(
+      [batch("Adults", [row("asha")]), batch("Kids", [row("asha")])],
+      [{ studentId: "bindu", name: "Bindu", outstandingPaise: 100, status: "due" }],
+    );
+    const groups = groupBoardRows(withLoose, "batch");
+    expect(groups.map((g) => g.label)).toEqual(["Adults", "Kids", "No batch"]);
+    expect(groups[2]!.rows.map((r) => r.studentId)).toEqual(["bindu"]);
+  });
+});
+
+describe("sample studio", () => {
+  it("adds up the month from its rows and moves when someone pays", () => {
+    const start = sampleBatches();
+    const before = sampleNumbers(start);
+    expect(before.active_students).toBe(8);
+    expect(before.billed_paise).toBe(before.collected_paise + before.missing_paise);
+    const owing = start[0]!.rows.find((r) => r.outstandingPaise > 0)!;
+    const after = sampleNumbers(samplePay(start, owing.studentId));
+    expect(after.missing_paise).toBe(before.missing_paise - owing.feePaise);
+    expect(after.paid_students).toBe(before.paid_students + 1);
+  });
+
+  it("marks attendance only for the batch asked", () => {
+    const start = sampleBatches();
+    const id = start[0]!.rows[0]!.studentId;
+    const next = sampleMark(start, start[0]!.id, id, true);
+    expect(next[0]!.rows[0]!.present).toBe(true);
+    expect(start[0]!.rows[0]!.present).toBeNull();
+    expect(next[1]).toBe(start[1]);
   });
 });

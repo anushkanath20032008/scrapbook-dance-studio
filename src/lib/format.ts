@@ -28,3 +28,7 @@ export const paymentMethodLabels: Record<string, string> = {
 };
 
 export const paymentMethodLabel = (method: string) => paymentMethodLabels[method] ?? method;
+
+/** "Thursday, 5 November" */
+export const formatDayLong = (iso: string) =>
+  toDate(iso).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });

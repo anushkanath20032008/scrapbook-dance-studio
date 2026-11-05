@@ -1035,3 +1035,21 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .console-dialog { height:100dvh; max-height:100dvh !important; overflow-y:auto !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
 .console-dialog .window-inner { padding-bottom:calc(17px + env(safe-area-inset-bottom, 0px)); }
 .peek { max-height:100dvh; overflow-y:auto; overscroll-behavior:contain; }
+
+/* Cards view: each batch is a band in its own colour, and every dancer is a card in that colour. */
+.card-groups { display:grid; gap:18px; }
+.card-group { --cg-bg:#f1f1f1; --cg-fg:#333; --cg-line:#cfcfcf; padding:12px; border-radius:10px; background:var(--cg-bg); border:1.5px solid var(--cg-line); }
+.card-group[data-c="0"] { --cg-bg:#fdeae7; --cg-fg:#7a1f12; --cg-line:#f1b9b0; }
+.card-group[data-c="1"] { --cg-bg:#e6f0fb; --cg-fg:#14396b; --cg-line:#b5cfee; }
+.card-group[data-c="2"] { --cg-bg:#e6f5ea; --cg-fg:#14502e; --cg-line:#b2dcc0; }
+.card-group[data-c="3"] { --cg-bg:#fdf3d4; --cg-fg:#5e4300; --cg-line:#ecd488; }
+.card-group[data-c="4"] { --cg-bg:#f0e8fa; --cg-fg:#41206e; --cg-line:#cdb8ea; }
+.card-group[data-c="5"] { --cg-bg:#fbe8f1; --cg-fg:#6e1a47; --cg-line:#eab7d1; }
+.card-group-title { margin:0 0 10px; font-size:.95rem; font-weight:700; color:var(--cg-fg); }
+.dancer-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:10px; }
+.dancer-card { display:grid; grid-template-rows:auto auto 1fr; gap:4px; min-height:96px; padding:10px 12px; background:#fff; border:1.5px solid var(--cg-line); border-left:6px solid var(--cg-fg); border-radius:8px; }
+.dancer-card-name { justify-self:start; max-width:100%; border:0; padding:0; background:none; font:inherit; font-weight:700; color:var(--cg-fg); text-align:left; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dancer-card-name:hover { text-decoration:underline; }
+.dancer-card-fee { font-size:.8rem; color:#5f544a; }
+.dancer-card-foot { align-self:end; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.dancer-card-foot .chip { width:auto; padding:0 8px; }

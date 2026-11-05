@@ -16,6 +16,8 @@ import { RecordPaymentDialog, type PayingStudent } from "@/components/console/re
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
 import { DancerBoard } from "@/components/console/dancer-board";
+import { ConsoleDialog } from "@/components/console/console-dialog";
+import { ImportSheet } from "@/components/console/import-sheet";
 import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
@@ -72,7 +74,8 @@ function Overview() {
   const [picked, setPicked] = useState<Set<string>>(new Set());
   // A made-up studio for practising and demos; null means the real one is showing.
   const [sample, setSample] = useState<TableBatch[] | null>(null);
-  const [view, setView] = useState<"table" | "batches" | "charts">("table");
+  const [importOpen, setImportOpen] = useState(false);
+  const [view, setView] = useState<"table" | "cards" | "batches" | "charts">("table");
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -152,6 +155,7 @@ function Overview() {
             {(
               [
                 ["table", "Table"],
+                ["cards", "Cards"],
                 ["batches", "By batch"],
                 ["charts", "Charts"],
               ] as const
@@ -169,6 +173,11 @@ function Overview() {
           </div>
         )}
         <div className="home-head-right">
+          {!sample && (
+            <button type="button" className="board-secondary" onClick={() => setImportOpen(true)}>
+              Import Excel / CSV
+            </button>
+          )}
           <button
             type="button"
             className="board-secondary"
@@ -226,8 +235,9 @@ function Overview() {
               />
             )
           )}
-          {(sample || view === "table") && (
+          {(sample || view === "table" || view === "cards") && (
             <DancerBoard
+              layout={view === "cards" && !sample ? "cards" : "table"}
               period={period}
               today={today}
               loose={looseUnpaid}
@@ -373,6 +383,13 @@ function Overview() {
       )}
       {snapshot && !brandNew && !sample && view === "charts" && <MonthCharts snapshot={snapshot} />}
 
+      <ConsoleDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import from Excel or CSV"
+      >
+        {importOpen && <ImportSheet onDone={() => setImportOpen(false)} />}
+      </ConsoleDialog>
       <WhatsAppBatchDialog
         open={batchOpen}
         onClose={() => {

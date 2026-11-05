@@ -163,6 +163,7 @@ export function DancerBoard({
   onRemindMany,
   sample,
   onSampleChange,
+  layout = "table",
 }: {
   period: string;
   today: string;
@@ -176,6 +177,8 @@ export function DancerBoard({
   /** When set, the board shows this made-up studio instead of the real one and changes it only in memory. */
   sample?: TableBatch[] | null;
   onSampleChange?: (next: TableBatch[]) => void;
+  /** "cards" shows each dancer as a card, grouped by batch and tinted in the batch's colour. */
+  layout?: "table" | "cards";
 }) {
   const queryClient = useQueryClient();
   const load = useServerFn(getStudioTable);
@@ -275,7 +278,7 @@ export function DancerBoard({
           ? row.batchNames.length === 0
           : row.batchNames.includes(batchFilter)),
   );
-  const groups = groupBoardRows(shown, groupBy);
+  const groups = groupBoardRows(shown, layout === "cards" ? "batch" : groupBy);
   const chosen = unpaid.filter((row) => picked.has(row.studentId));
   const chosenTotal = chosen.reduce((sum, row) => sum + row.outstandingPaise, 0);
   const allPicked = unpaid.length > 0 && chosen.length === unpaid.length;
@@ -386,7 +389,7 @@ export function DancerBoard({
           </select>
         )}
         <span className="board-bar-gap" />
-        <label className="board-bar-label">
+        <label className="board-bar-label" hidden={layout === "cards"}>
           Group by
           <select
             className="board-input"
@@ -399,7 +402,64 @@ export function DancerBoard({
         </label>
       </div>
 
-      <div className="board-scroll">
+      {layout === "cards" && (
+        <div className="card-groups">
+          {groups.map((group) => (
+            <section key={group.key} className="card-group" data-c={toneOf(group.label)}>
+              <h3 className="card-group-title">
+                {group.label} <span className="seg-count">{group.rows.length}</span>
+              </h3>
+              <div className="dancer-cards">
+                {group.rows.map((row) => (
+                  <article key={row.studentId} className="dancer-card" data-c={toneOf(group.label)}>
+                    <button
+                      type="button"
+                      className="dancer-card-name"
+                      onClick={() => setPeekId(row.studentId)}
+                    >
+                      {row.name}
+                    </button>
+                    <span className="dancer-card-fee">
+                      {row.feePaise > 0 ? `${formatRupees(row.feePaise)} / month` : "No fee set"}
+                    </span>
+                    <span className="dancer-card-foot">
+                      {owes(row) ? (
+                        <span
+                          className="chip"
+                          data-tone={row.status === "overdue" ? "overdue" : "due"}
+                        >
+                          {row.status === "overdue" ? "Overdue" : "Due"}{" "}
+                          {formatRupees(row.outstandingPaise)}
+                        </span>
+                      ) : row.status === "paid" ? (
+                        <span className="chip" data-tone="paid">
+                          Paid
+                        </span>
+                      ) : (
+                        <span className="chip" data-tone="none">
+                          No fee yet
+                        </span>
+                      )}
+                      {owes(row) && (
+                        <button
+                          type="button"
+                          className="board-ib"
+                          aria-label={`Remind ${row.name} on WhatsApp`}
+                          onClick={() => remindOne(row.studentId)}
+                        >
+                          <WhatsAppIcon />
+                        </button>
+                      )}
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))}
+          {groups.length === 0 && <p className="console-empty">No dancers match this view.</p>}
+        </div>
+      )}
+      <div className="board-scroll" hidden={layout === "cards"}>
         <table className="board-table">
           <colgroup>
             <col className="c-pick" />

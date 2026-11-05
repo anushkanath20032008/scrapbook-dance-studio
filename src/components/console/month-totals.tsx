@@ -3,10 +3,13 @@ import type { getHomeReport } from "@/lib/reports.functions";
 
 type Snapshot = Awaited<ReturnType<typeof getHomeReport>>["snapshot"];
 
-/** The month in numbers. Overdue is the headline: it is the money the owner can chase today. */
-export function MonthTotals({ snapshot }: { snapshot: Snapshot }) {
+/**
+ * The month in numbers. Overdue is the headline: it is the money the owner can chase today.
+ * Compact is the corner version that sits beside the dancer table on Home.
+ */
+export function MonthTotals({ snapshot, compact }: { snapshot: Snapshot; compact?: boolean }) {
   return (
-    <div className="totals" data-tour="totals">
+    <div className="totals" data-tour="totals" data-compact={compact ? "yes" : undefined}>
       <div className="totals-headline" data-tone={snapshot.overdue_paise > 0 ? "warn" : "good"}>
         <span className="totals-label">Overdue</span>
         <strong>{formatRupees(snapshot.overdue_paise)}</strong>

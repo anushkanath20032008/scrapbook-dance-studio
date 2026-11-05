@@ -2,7 +2,7 @@ import { formatRupees } from "@/lib/money";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
@@ -15,6 +15,7 @@ import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
+import { DancerBoard } from "@/components/console/dancer-board";
 import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
@@ -66,6 +67,7 @@ function Overview() {
   const [batchOpen, setBatchOpen] = useState(false);
   const [remindIds, setRemindIds] = useState<string[] | null>(null);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
+  const [picked, setPicked] = useState<Set<string>>(new Set());
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -90,7 +92,8 @@ function Overview() {
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
     onSuccess: ({ created }) => {
       setError("");
-      if (created === 0) setNotice("No charges created. Dancers need a monthly fee that covers this month.");
+      if (created === 0)
+        setNotice("No charges created. Dancers need a monthly fee that covers this month.");
       else
         toast.success(
           `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
@@ -106,6 +109,12 @@ function Overview() {
   const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const awaitingFee = report.data?.awaitingFee ?? 0;
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
+  // The board keys dancers by student; the reminder log keys them by charge.
+  const remindedStudents = useMemo(
+    () =>
+      new Set(unpaidRows.filter((row) => reminded.has(row.charge_id)).map((row) => row.student_id)),
+    [unpaidRows, reminded],
+  );
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
   const optionalLeft = counts.data ? counts.data.batches === 0 : false;
@@ -114,33 +123,65 @@ function Overview() {
 
   return (
     <section>
-      <h1 className="display console-title">Home</h1>
+      <div className="home-head">
+        <h1 className="display console-title">Home</h1>
+        <label className="console-inline-label">
+          Month
+          <input
+            className="field month-field"
+            type="month"
+            value={month}
+            onChange={(event) => {
+              if (event.target.value) {
+                setMonth(event.target.value);
+                setDueOn("");
+                setNotice("");
+                setError("");
+                setPicked(new Set());
+              }
+            }}
+          />
+        </label>
+      </div>
       {!brandNew && (
-        <StudioTable
-          period={period}
-          today={today}
-          onRecord={(student) => setPaying(student)}
-          onRemindBatch={(ids) => {
-            setRemindIds(ids);
-            setBatchOpen(true);
-          }}
-        />
-      )}
-      {unpaidRows.length > 0 && (
-        <div className="console-banner" data-tone="overdue" role="status">
-          <span>
-            <strong>
-              {unpaidRows.length} unpaid
-            </strong>{" "}
-            · {formatRupees(unpaidTotal)} owed this month
-          </span>
-          <Button
-            variant="retro"
-            type="button"
-            onClick={() => (providerConfigured ? setReminding({ period, allUnpaid: true }) : setBatchOpen(true))}
-          >
-            {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
-          </Button>
+        <div className="home-top">
+          <div className="home-main">
+            <DancerBoard
+              period={period}
+              today={today}
+              reminded={remindedStudents}
+              picked={picked}
+              onPickedChange={setPicked}
+              onRecord={(student) => setPaying(student)}
+              onRemindMany={(ids) => {
+                setRemindIds(ids);
+                setBatchOpen(true);
+              }}
+              onWhatsApp={(studentId) => {
+                setRemindIds([studentId]);
+                setBatchOpen(true);
+              }}
+            />
+          </div>
+          <aside className="home-side">
+            {snapshot && <MonthTotals snapshot={snapshot} compact />}
+            {arrears.length > 0 && (
+              <p className="home-side-note" role="status">
+                <strong>{formatRupees(arrearsTotal)}</strong> unpaid from earlier months across{" "}
+                {arrears.length} dancer{arrears.length === 1 ? "" : "s"}. Open a dancer&apos;s
+                billing to record it.
+              </p>
+            )}
+            {providerConfigured && unpaidRows.length > 0 && (
+              <Button
+                variant="retroPaper"
+                type="button"
+                onClick={() => setReminding({ period, allUnpaid: true })}
+              >
+                Queue automatic reminders
+              </Button>
+            )}
+          </aside>
         </div>
       )}
       {firstRun && !setupDone && (
@@ -162,39 +203,7 @@ function Overview() {
           </Link>
         </p>
       )}
-      <div className="console-toolbar">
-        <label className="console-inline-label">
-          Month
-          <input
-            className="field month-field"
-            type="month"
-            value={month}
-            onChange={(event) => {
-              if (event.target.value) {
-                setMonth(event.target.value);
-                setDueOn("");
-                setNotice("");
-                setError("");
-              }
-            }}
-          />
-        </label>
-      </div>
-
-      {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
-      {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
-      {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
-
-      {arrears.length > 0 && (
-        <p className="console-banner" role="status">
-          <span>
-            <strong>{formatRupees(arrearsTotal)}</strong> is still unpaid from earlier months across{" "}
-            {arrears.length} dancer{arrears.length === 1 ? "" : "s"}. This month&apos;s list below does
-            not include it: open a dancer&apos;s billing to see and record it.
-          </span>
-        </p>
-      )}
 
       {needsCharges && !brandNew && (
         <div className="window generate-card">
@@ -263,13 +272,36 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
+      {!brandNew && (
+        <details className="home-more">
+          <summary>Batch view — mark a whole batch paid or present</summary>
+          <StudioTable
+            period={period}
+            today={today}
+            onRecord={(student) => setPaying(student)}
+            onRemindBatch={(ids) => {
+              setRemindIds(ids);
+              setBatchOpen(true);
+            }}
+          />
+        </details>
+      )}
+      {snapshot && !brandNew && (
+        <details className="home-more">
+          <summary>Charts for {formatMonthLong(period)}</summary>
+          <MonthCharts snapshot={snapshot} />
+        </details>
+      )}
+
       <WhatsAppBatchDialog
         open={batchOpen}
         onClose={() => {
           setBatchOpen(false);
           setRemindIds(null);
         }}
-        rows={remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows}
+        rows={
+          remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows
+        }
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}

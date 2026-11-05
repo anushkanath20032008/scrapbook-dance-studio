@@ -296,18 +296,6 @@ export function DancerBoard({
   useEffect(() => setSkipped(readSkipped(today)), [today, gateOpen]);
   const waiting = pendingBatches(batches ?? [], skipped);
   const unmarkedToday = waiting.length;
-  // Once a day, on this device, the gate opens by itself when a batch is waiting for attendance.
-  useEffect(() => {
-    if (sample || table.isPending || waiting.length === 0) return;
-    try {
-      const flag = `choreo-gate-${today}`;
-      if (window.localStorage.getItem(flag)) return;
-      window.localStorage.setItem(flag, "1");
-    } catch {
-      return;
-    }
-    setGateOpen(true);
-  }, [sample, table.isPending, waiting.length, today]);
   const saveGate = async (batchId: string, marks: { studentId: string; present: boolean }[]) => {
     if (sample && onSampleChange) {
       onSampleChange(
@@ -409,20 +397,6 @@ export function DancerBoard({
             <option value="batch">Batch</option>
           </select>
         </label>
-        <div className="seg" role="group" aria-label="Row size">
-          {(["compact", "roomy"] as const).map((value) => (
-            <button
-              key={value}
-              type="button"
-              className="seg-btn"
-              aria-pressed={density === value}
-              data-active={density === value}
-              onClick={() => chooseDensity(value)}
-            >
-              {value === "compact" ? "Compact" : "Roomy"}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="board-scroll">
@@ -446,11 +420,6 @@ export function DancerBoard({
               <th scope="col">Batch</th>
               <th scope="col" className="board-center" data-tour="ticks">
                 Attendance today
-                {unmarkedToday > 0 && (
-                  <button type="button" className="board-markall" onClick={() => setGateOpen(true)}>
-                    Take attendance
-                  </button>
-                )}
               </th>
               <th scope="col" className="board-num">
                 Fee
@@ -661,6 +630,8 @@ export function DancerBoard({
       </div>
       <AttendanceGate
         open={gateOpen}
+        onOpen={() => setGateOpen(true)}
+        waiting={sample ? 0 : unmarkedToday}
         onClose={() => setGateOpen(false)}
         batches={batches ?? []}
         today={today}

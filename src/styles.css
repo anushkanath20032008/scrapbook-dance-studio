@@ -1008,6 +1008,10 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 
 /* Daily attendance gate */
 .gate { gap:12px; }
+.gate-bar { position:fixed; left:50%; bottom:14px; transform:translateX(-50%); z-index:40; display:flex; align-items:center; gap:12px; padding:8px 10px 8px 14px; background:#fff; border:1px solid #1e3188; border-radius:999px; box-shadow:0 6px 22px rgba(30,49,136,.22); font-size:13px; }
+.gate-dock { position:fixed; left:50%; bottom:14px; transform:translateX(-50%); z-index:40; width:min(640px,calc(100vw - 24px)); max-height:46vh; overflow-y:auto; background:#fff; border:1px solid #1e3188; border-radius:12px; padding:10px 12px; box-shadow:0 8px 28px rgba(30,49,136,.28); }
+.gate-title { display:flex; justify-content:space-between; align-items:center; }
+.gate-x { border:0; background:transparent; color:#6b5f55; font-size:14px; cursor:pointer; padding:2px 6px; }
 .gate-batch { border:1px solid #e3d9cc; border-radius:8px; padding:8px 10px; background:#fffdf9; }
 .gate-batch[data-off="true"] { background:#f3f0ec; opacity:.7; }
 .gate-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -1016,3 +1020,5 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .gate-person[data-absent="true"] { border-color:#d64545; background:#fde8e6; color:#b02a2a; }
 .gate-mark { display:inline-grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#2f7d52; color:#fff; font-size:11px; font-weight:700; }
 .gate-person[data-absent="true"] .gate-mark { background:#d64545; }
+.board-table .c-tick { width:96px; }
+.board-table th[data-tour="ticks"] { white-space:normal; line-height:1.15; }

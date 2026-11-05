@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ConsoleDialog } from "@/components/console/console-dialog";
 import type { TableBatch } from "@/lib/studio-table";
 
 const skipKey = (today: string) => `choreo-no-class-${today}`;
@@ -40,13 +39,18 @@ export const pendingBatches = (batches: TableBatch[], skipped: string[]) =>
  */
 export function AttendanceGate({
   open,
+  onOpen,
   onClose,
+  waiting,
   batches,
   today,
   onSave,
 }: {
   open: boolean;
+  onOpen: () => void;
   onClose: () => void;
+  /** How many batches still need attendance today. Zero hides the reminder bar. */
+  waiting: number;
   batches: TableBatch[];
   today: string;
   onSave: (batchId: string, marks: { studentId: string; present: boolean }[]) => Promise<void>;
@@ -106,12 +110,51 @@ export function AttendanceGate({
     0,
   );
 
+  const [hushed, setHushed] = useState(false);
+  useEffect(() => {
+    try {
+      setHushed(window.localStorage.getItem(`choreo-gate-hush-${today}`) === "1");
+    } catch {
+      setHushed(false);
+    }
+  }, [today]);
+  const hush = () => {
+    setHushed(true);
+    try {
+      window.localStorage.setItem(`choreo-gate-hush-${today}`, "1");
+    } catch {
+      // Only means the bar shows again after a reload.
+    }
+  };
+
+  // Closed: a slim reminder at the bottom of the screen, easy to ignore. Open: the same strip grows into a panel.
+  if (!open) {
+    if (waiting === 0 || hushed) return null;
+    return (
+      <div className="gate-bar" role="status">
+        <span>
+          Attendance today: {waiting} batch{waiting === 1 ? "" : "es"} not marked yet
+        </span>
+        <Button variant="retro" type="button" onClick={onOpen}>
+          Take attendance
+        </Button>
+        <button type="button" className="gate-x" aria-label="Not now" onClick={hush}>
+          ✕
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <ConsoleDialog open={open} onOpenChange={(next) => !next && onClose()} title="Attendance today">
+    <div className="gate-dock" role="region" aria-label="Attendance today">
       <div className="console-form gate">
-        <p className="console-hint">
-          Everyone starts as here. Tap a name only if they were absent, then press Mark attendance.
-        </p>
+        <div className="gate-title">
+          <strong>Attendance today</strong>
+          <button type="button" className="gate-x" aria-label="Close" onClick={onClose}>
+            ✕
+          </button>
+        </div>
+        <p className="console-hint">Everyone starts as here. Tap only those who were absent.</p>
         {todays.length === 0 && <p className="console-empty">No batch meets today.</p>}
         {todays.map((batch) => {
           const called = off.has(batch.id);
@@ -174,6 +217,6 @@ export function AttendanceGate({
           </Button>
         </div>
       </div>
-    </ConsoleDialog>
+    </div>
   );
 }

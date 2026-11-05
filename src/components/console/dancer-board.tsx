@@ -84,18 +84,27 @@ export type GroupBy = "status" | "batch";
 export type BoardGroup = {
   key: string;
   label: string;
-  tone: "warn" | "good" | "plain";
+  tone: "warn" | "alert" | "good" | "plain";
   rows: BoardRow[];
 };
 
 /** Splits the rows into labelled bands. By status the unpaid band comes first; by batch each batch is a band. */
 export function groupBoardRows(rows: BoardRow[], by: GroupBy): BoardGroup[] {
   if (by === "status") {
-    const unpaid = rows.filter(owes);
-    const rest = rows.filter((row) => !owes(row));
     return [
-      { key: "unpaid", label: "Unpaid", tone: "warn" as const, rows: unpaid },
-      { key: "rest", label: "Paid or no fee yet", tone: "good" as const, rows: rest },
+      { key: "unpaid", label: "Unpaid", tone: "warn" as const, rows: rows.filter(owes) },
+      {
+        key: "nofee",
+        label: "No fee set",
+        tone: "alert" as const,
+        rows: rows.filter((row) => !owes(row) && row.status === "none"),
+      },
+      {
+        key: "paid",
+        label: "Paid",
+        tone: "good" as const,
+        rows: rows.filter((row) => !owes(row) && row.status !== "none"),
+      },
     ].filter((group) => group.rows.length > 0);
   }
   const names: string[] = [];
@@ -121,7 +130,7 @@ const toneOf = (text: string) => {
   return sum;
 };
 
-type Tab = "unpaid" | "today" | "all";
+type Tab = "unpaid" | "nofee" | "today" | "all";
 type Density = "compact" | "roomy";
 const DENSITY_KEY = "choreo-density";
 
@@ -238,6 +247,7 @@ export function DancerBoard({
     [batches, loose, sample],
   );
   const unpaid = rows.filter(owes);
+  const noFeeCount = rows.filter((row) => !owes(row) && row.status === "none").length;
   const todayCount = rows.filter((row) => row.todayBatches.length > 0).length;
   const batchNames = useMemo(
     () => [...new Set(rows.flatMap((row) => row.batchNames))].sort((a, b) => a.localeCompare(b)),
@@ -246,7 +256,13 @@ export function DancerBoard({
   const needle = search.trim().toLowerCase();
   const shown = rows.filter(
     (row) =>
-      (tab === "unpaid" ? owes(row) : tab === "today" ? row.todayBatches.length > 0 : true) &&
+      (tab === "unpaid"
+        ? owes(row)
+        : tab === "nofee"
+          ? !owes(row) && row.status === "none"
+          : tab === "today"
+            ? row.todayBatches.length > 0
+            : true) &&
       (needle === "" || row.name.toLowerCase().includes(needle)) &&
       (batchFilter === ""
         ? true
@@ -303,6 +319,7 @@ export function DancerBoard({
           {(
             [
               ["unpaid", "Unpaid", unpaid.length],
+              ...(noFeeCount > 0 ? ([["nofee", "No fee", noFeeCount]] as const) : []),
               ["today", "Today's class", todayCount],
               ["all", "All", rows.length],
             ] as const
@@ -389,17 +406,7 @@ export function DancerBoard({
           <thead>
             <tr>
               <th scope="col" className="board-pick">
-                <input
-                  type="checkbox"
-                  checked={allPicked}
-                  disabled={unpaid.length === 0}
-                  onChange={() =>
-                    onPickedChange(
-                      allPicked ? new Set() : new Set(unpaid.map((row) => row.studentId)),
-                    )
-                  }
-                  aria-label="Pick every unpaid dancer"
-                />
+                <span className="sr-only">Pick</span>
               </th>
               <th scope="col">Dancer</th>
               <th scope="col">Batch</th>
@@ -425,7 +432,24 @@ export function DancerBoard({
             return (
               <tbody key={group.key}>
                 <tr className="board-group" data-tone={group.tone}>
-                  <th scope="colgroup" colSpan={8}>
+                  <th scope="row" className="board-pick">
+                    {showRemind && (
+                      <input
+                        type="checkbox"
+                        checked={groupUnpaid.every((row) => picked.has(row.studentId))}
+                        onChange={() => {
+                          const next = new Set(picked);
+                          const all = groupUnpaid.every((row) => next.has(row.studentId));
+                          for (const row of groupUnpaid)
+                            if (all) next.delete(row.studentId);
+                            else next.add(row.studentId);
+                          onPickedChange(next);
+                        }}
+                        aria-label={`Pick every dancer in ${group.label}`}
+                      />
+                    )}
+                  </th>
+                  <th scope="colgroup" colSpan={7}>
                     <span className="board-group-row">
                       <span className="board-dot" data-tone={group.tone} aria-hidden="true" />
                       <strong>{group.label}</strong>
@@ -433,6 +457,11 @@ export function DancerBoard({
                         {group.rows.length} dancer{group.rows.length === 1 ? "" : "s"}
                         {groupOwed > 0 ? ` · ${formatRupees(groupOwed)} owed` : ""}
                       </span>
+                      {group.tone === "alert" && !sample && (
+                        <Link to="/app/students" className="board-link">
+                          Set their fees →
+                        </Link>
+                      )}
                       {showRemind && (
                         <button
                           type="button"
@@ -454,6 +483,7 @@ export function DancerBoard({
                   return (
                     <tr
                       key={row.studentId}
+                      data-fee={!owes(row) && row.status === "none" ? "none" : undefined}
                       data-owes={owes(row) ? "yes" : "no"}
                       data-picked={isPicked}
                     >

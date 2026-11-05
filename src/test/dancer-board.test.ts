@@ -125,7 +125,7 @@ describe("grouping", () => {
 
   it("puts the unpaid band first and drops empty bands", () => {
     const groups = groupBoardRows(rows, "status");
-    expect(groups.map((g) => g.label)).toEqual(["Unpaid", "Paid or no fee yet"]);
+    expect(groups.map((g) => g.label)).toEqual(["Unpaid", "Paid"]);
     expect(groups[0]!.rows.map((r) => r.studentId)).toEqual(["asha"]);
     expect(groupBoardRows(rows.filter(owes), "status").map((g) => g.label)).toEqual(["Unpaid"]);
   });

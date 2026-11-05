@@ -910,3 +910,42 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-link { color:#a3260f; }
 .board-bulk-main { background:#f0c24c; }
 .peek-head { margin:-18px -20px 0; padding:14px 20px; background:#e3e9fb; color:#1e3188; }
+
+/* One type scale for every console page, the same one Home uses: 13px body, 22px page title, 15px section
+   headings. Controls are small and flat so a page fits on one screen. */
+.console-main { font-size:13px; line-height:1.45; }
+.console-main .console-title, .home-title { font-family:"DM Sans",Arial,sans-serif; font-size:22px; font-weight:700; line-height:1.15; letter-spacing:-.01em; text-transform:none; color:var(--blue); margin:0 0 14px; position:relative; padding-bottom:8px; }
+.console-main .console-title::after, .home-title::after { content:""; position:absolute; left:0; bottom:0; width:34px; height:3px; border-radius:2px; background:var(--marigold); }
+.home-head { align-items:flex-end; }
+.home-head .home-title { margin:0 0 0; }
+.console-main h2, .console-main h3 { font-size:15px; line-height:1.25; }
+.console-main .display:not(.console-title) { font-size:16px; text-transform:none; letter-spacing:0; line-height:1.2; }
+.console-main .console-hint { font-size:12px; }
+.console-main .console-banner { font-size:13px; padding:9px 12px; }
+.console-main .chrome-font, .console-main .window-bar { font-size:16px; min-height:30px; }
+.console-main .retro-button { font-size:13px; padding:5px 12px; min-height:34px; }
+.console-main .field { font-size:13px; min-height:34px; padding:5px 9px; }
+.console-main .form-label { font-size:12px; }
+.console-main .group-tab { font-size:13px; padding:5px 11px; }
+.console-main .status-pill { font-size:11px; padding:2px 8px; }
+.console-main .console-row { padding:9px 11px; }
+.console-main .console-empty { font-size:13px; }
+.console-nav-item { font-size:13px; }
+
+/* Status badges: a dot and a stronger tint, so Overdue, Due, Paid and No fee read at a glance. */
+.chip { gap:5px; height:22px; padding:0 9px 0 7px; font-size:11.5px; font-weight:700; letter-spacing:.01em; border:1px solid transparent; }
+.chip::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.chip[data-tone="due"] { background:#fde9a8; color:#6b4e00; border-color:#f0cf6a; }
+.chip[data-tone="overdue"] { background:#fcc9c0; color:#9b1f0c; border-color:#f2a79b; }
+.chip[data-tone="paid"] { background:#c9ebd5; color:#14603a; border-color:#9fd5b4; }
+.chip[data-tone="none"] { background:#ffe0a3; color:#7a4a00; border:1px dashed #d99a1d; }
+
+/* People with no fee set stand out: amber band, amber row, and a clear Set fee action. */
+.board-group[data-tone="alert"] th { background:#ffe3a6; }
+.board-dot[data-tone="alert"] { background:#e08a00; }
+.board-table tbody tr[data-fee="none"]:not([data-picked="true"]) { background:#fff6dc; }
+.board-ib-text { background:#1e3188; color:#fff; border-color:#1e3188; }
+.board-ib-text:hover { background:#162670; }
+.board-group .board-pick input { width:15px; height:15px; accent-color:var(--blue); }
+.board-group th { font-size:12.5px; }
+.board-link { text-decoration:underline; }

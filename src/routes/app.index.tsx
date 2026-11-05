@@ -20,7 +20,7 @@ import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
-import { formatDayLong, formatMonthLong } from "@/lib/format";
+import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
@@ -146,7 +146,6 @@ function Overview() {
     <section>
       <div className="home-head">
         <h1 className="home-title">Home</h1>
-        <span className="home-date">{formatDayLong(today)}</span>
         <div className="home-head-right">
           <button
             type="button"
@@ -303,7 +302,13 @@ function Overview() {
             <strong>
               {awaitingFee} dancer{awaitingFee === 1 ? "" : "s"}
             </strong>
-            {awaitingNames.length > 0 && <> ({awaitingNames.slice(0, 5).join(", ")}{awaitingNames.length > 5 ? "…" : ""})</>}{" "}
+            {awaitingNames.length > 0 && (
+              <>
+                {" "}
+                ({awaitingNames.slice(0, 5).join(", ")}
+                {awaitingNames.length > 5 ? "…" : ""})
+              </>
+            )}{" "}
             {awaitingFee === 1 ? "has" : "have"} no fee for {formatMonthLong(period)} yet. A dancer
             needs a monthly fee first.
           </span>

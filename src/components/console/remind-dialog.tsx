@@ -1,3 +1,4 @@
+import { maskPhone } from "@/lib/format";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -112,7 +113,7 @@ function RemindForm({
               <li key={row.student_id} className="console-row">
                 <div>
                   <strong>{row.student_name}</strong>
-                  <span className="console-hint">{row.phone}</span>
+                  <span className="console-hint">{maskPhone(row.phone)}</span>
                 </div>
                 <strong>{formatRupees(row.outstanding_paise)}</strong>
               </li>

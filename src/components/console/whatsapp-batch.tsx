@@ -1,3 +1,4 @@
+import { maskPhone } from "@/lib/format";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -102,7 +103,7 @@ export function WhatsAppBatchDialog({
             <div>
               <strong>{next.row.student_name}</strong>
               <span className="console-hint">
-                {next.row.phone} · {formatRupees(next.row.outstanding_paise)} owed
+                {maskPhone(next.row.phone)} · {formatRupees(next.row.outstanding_paise)} owed
               </span>
             </div>
           </div>

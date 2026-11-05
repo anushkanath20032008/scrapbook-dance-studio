@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { formatDay } from "@/lib/format";
+import { formatDay, maskPhone } from "@/lib/format";
 import { getInstructorStudents } from "@/lib/instructors.functions";
 
 // The teacher's view of every dancer in the studio: who they are and which batches they are in. Fees, charges
@@ -30,10 +30,16 @@ function InstructorDancers() {
   return (
     <section>
       <h1 className="display console-title">Dancers</h1>
-      <p className="console-hint">Everyone in the studio. Fees and payments are kept by the studio owner.</p>
+      <p className="console-hint">
+        Everyone in the studio. Fees and payments are kept by the studio owner.
+      </p>
       <label className="form-label console-field">
         Search by name, phone or batch
-        <input className="field" value={search} onChange={(event) => setSearch(event.target.value)} />
+        <input
+          className="field"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
       </label>
       {dancers.isError && <p role="alert">Could not load the dancers. Please refresh.</p>}
       {dancers.data?.length === 0 && <p className="console-empty">No dancers in the studio yet.</p>}
@@ -43,8 +49,13 @@ function InstructorDancers() {
             <div>
               <strong>{d.name}</strong>
               <span className="console-hint">
-                {[d.phone, d.email, d.joined_on ? `Joined ${formatDay(d.joined_on)}` : null].filter(Boolean).join(" · ") ||
-                  "No contact details"}
+                {[
+                  maskPhone(d.phone),
+                  d.email,
+                  d.joined_on ? `Joined ${formatDay(d.joined_on)}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ") || "No contact details"}
               </span>
               <span className="console-hint">
                 {d.batches.length > 0 ? d.batches.join(", ") : "Not in a batch yet"}

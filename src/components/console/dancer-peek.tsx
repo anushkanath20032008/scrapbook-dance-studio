@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getStudentAttendance } from "@/lib/attendance.functions";
-import { formatDayWithYear, formatMonthLong, paymentMethodLabel } from "@/lib/format";
+import { formatDayWithYear, formatMonthLong, maskPhone, paymentMethodLabel } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { getStudentLedger } from "@/lib/ledger.functions";
 import { listStudentOverview } from "@/lib/setup.functions";
@@ -40,6 +40,7 @@ export function DancerPeek({
   onWhatsApp: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [showPhone, setShowPhone] = useState(false);
   useEffect(() => {
     closeRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
@@ -204,7 +205,18 @@ export function DancerPeek({
             </div>
             <div>
               <dt>Phone</dt>
-              <dd>{phone ?? "Not added"}</dd>
+              <dd>
+                {phone ? (showPhone ? phone : maskPhone(phone)) : "Not added"}
+                {phone && (
+                  <button
+                    type="button"
+                    className="board-link"
+                    onClick={() => setShowPhone((v) => !v)}
+                  >
+                    {showPhone ? "Hide" : "Show"}
+                  </button>
+                )}
+              </dd>
             </div>
             {person?.details.email && (
               <div>

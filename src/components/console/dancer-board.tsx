@@ -21,8 +21,20 @@ export type BoardRow = {
 
 const ORDER: Record<PayStatus, number> = { overdue: 0, due: 1, none: 2, paid: 3 };
 
-/** One row per dancer, whatever batches they are in. Unpaid first, so the work is at the top. */
-export function toBoardRows(batches: TableBatch[]): BoardRow[] {
+/** A dancer who owes but is in no batch. Without these the board's total would miss them. */
+export type LooseUnpaid = {
+  studentId: string;
+  name: string;
+  outstandingPaise: number;
+  status: PayStatus;
+};
+
+/**
+ * One row per dancer, whatever batches they are in. Unpaid first, so the work is at the top.
+ * Dancers in no batch still appear, otherwise money owed by them would be invisible here while
+ * the month totals counted it.
+ */
+export function toBoardRows(batches: TableBatch[], loose: LooseUnpaid[] = []): BoardRow[] {
   const byStudent = new Map<string, BoardRow>();
   for (const batch of batches) {
     for (const row of batch.rows) {
@@ -41,6 +53,18 @@ export function toBoardRows(batches: TableBatch[]): BoardRow[] {
       if (!found) byStudent.set(row.studentId, entry);
     }
   }
+  for (const row of loose) {
+    if (byStudent.has(row.studentId)) continue;
+    byStudent.set(row.studentId, {
+      studentId: row.studentId,
+      name: row.name,
+      batchNames: [],
+      todayBatches: [],
+      feePaise: 0,
+      outstandingPaise: row.outstandingPaise,
+      status: row.status,
+    });
+  }
   return [...byStudent.values()].sort(
     (a, b) => ORDER[a.status] - ORDER[b.status] || a.name.localeCompare(b.name),
   );
@@ -57,6 +81,7 @@ type Filter = "all" | "unpaid" | "today";
 export function DancerBoard({
   period,
   today,
+  loose,
   reminded,
   picked,
   onPickedChange,
@@ -66,6 +91,7 @@ export function DancerBoard({
 }: {
   period: string;
   today: string;
+  loose: LooseUnpaid[];
   reminded: Set<string>;
   picked: Set<string>;
   onPickedChange: (next: Set<string>) => void;
@@ -117,7 +143,7 @@ export function DancerBoard({
     onSettled: () => void queryClient.invalidateQueries({ queryKey: ["studio-table"] }),
   });
 
-  const rows = useMemo(() => toBoardRows(table.data ?? []), [table.data]);
+  const rows = useMemo(() => toBoardRows(table.data ?? [], loose), [table.data, loose]);
   const shown = rows.filter((row) =>
     filter === "unpaid" ? owes(row) : filter === "today" ? row.todayBatches.length > 0 : true,
   );

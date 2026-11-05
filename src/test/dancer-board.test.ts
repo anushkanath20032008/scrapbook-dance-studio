@@ -77,3 +77,25 @@ describe("dancer board", () => {
     expect(rows.filter(owes).map((r) => r.studentId)).toEqual(["asha"]);
   });
 });
+
+describe("dancers who are in no batch", () => {
+  it("still appear, so money they owe is not hidden", () => {
+    const rows = toBoardRows(
+      [batch("Adults", [row("asha", { outstandingPaise: 100000, status: "due" })])],
+      [{ studentId: "bindu", name: "Bindu", outstandingPaise: 550000, status: "overdue" }],
+    );
+    expect(rows.map((r) => r.studentId)).toEqual(["bindu", "asha"]);
+    expect(rows.filter(owes).reduce((sum, r) => sum + r.outstandingPaise, 0)).toBe(650000);
+    expect(rows[0]!.batchNames).toEqual([]);
+    expect(hereToday(rows[0]!)).toBe(false);
+  });
+
+  it("does not duplicate a dancer who is already in a batch", () => {
+    const rows = toBoardRows(
+      [batch("Adults", [row("asha", { outstandingPaise: 100000, status: "due" })])],
+      [{ studentId: "asha", name: "asha", outstandingPaise: 100000, status: "due" }],
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.batchNames).toEqual(["Adults"]);
+  });
+});

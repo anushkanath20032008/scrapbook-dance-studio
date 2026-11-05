@@ -109,6 +109,17 @@ function Overview() {
   const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const awaitingFee = report.data?.awaitingFee ?? 0;
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
+  // Dancers who owe but sit in no batch: the board builds itself from batches, so they arrive this way.
+  const looseUnpaid = useMemo(
+    () =>
+      unpaidRows.map((row) => ({
+        studentId: row.student_id,
+        name: row.student_name,
+        outstandingPaise: Number(row.outstanding_paise),
+        status: (row.status === "overdue" ? "overdue" : "due") as "overdue" | "due",
+      })),
+    [unpaidRows],
+  );
   // The board keys dancers by student; the reminder log keys them by charge.
   const remindedStudents = useMemo(
     () =>
@@ -149,6 +160,7 @@ function Overview() {
             <DancerBoard
               period={period}
               today={today}
+              loose={looseUnpaid}
               reminded={remindedStudents}
               picked={picked}
               onPickedChange={setPicked}

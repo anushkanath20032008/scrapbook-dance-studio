@@ -55,7 +55,9 @@ function useClosedBatches() {
 }
 
 const schedule = (batch: { weekdays: number[]; startsAt: string | null }) =>
-  [batch.weekdays.map((d) => DAYS[d]).join("/"), batch.startsAt?.slice(0, 5)].filter(Boolean).join(" ");
+  [batch.weekdays.map((d) => DAYS[d]).join("/"), batch.startsAt?.slice(0, 5)]
+    .filter(Boolean)
+    .join(" ");
 
 function statusText(row: TableRow) {
   if (row.status === "none") return "No fee yet";
@@ -63,7 +65,15 @@ function statusText(row: TableRow) {
   return `${row.status === "overdue" ? "Overdue" : "Unpaid"} ${formatRupees(row.outstandingPaise)}`;
 }
 
-function Tick({ checked, label, onChange }: { checked: boolean; label: string; onChange: (next: boolean) => void }) {
+function Tick({
+  checked,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  label: string;
+  onChange: (next: boolean) => void;
+}) {
   return (
     <input
       type="checkbox"
@@ -75,7 +85,13 @@ function Tick({ checked, label, onChange }: { checked: boolean; label: string; o
   );
 }
 
-function FilterChips({ filter, onChange }: { filter: TableFilter; onChange: (next: TableFilter) => void }) {
+function FilterChips({
+  filter,
+  onChange,
+}: {
+  filter: TableFilter;
+  onChange: (next: TableFilter) => void;
+}) {
   return (
     <div className="table-chips" role="group" aria-label="Show" data-tour="filters">
       {FILTERS.map((item) => (
@@ -176,14 +192,21 @@ export function StudioTable({
             Marked {formatRupees(undoable.total)} as paid ({undoable.ids.length} dancer
             {undoable.ids.length === 1 ? "" : "s"}).
           </span>
-          <Button variant="retroPaper" type="button" disabled={undoMutation.isPending} onClick={() => undoMutation.mutate(undoable.ids)}>
+          <Button
+            variant="retroPaper"
+            type="button"
+            disabled={undoMutation.isPending}
+            onClick={() => undoMutation.mutate(undoable.ids)}
+          >
             Undo
           </Button>
         </div>
       )}
       {batches.length === 0 && (
         <p className="console-empty">
-          {filter === "unpaid" ? "Everyone has paid. Nothing to chase." : "Nothing matches this filter."}
+          {filter === "unpaid"
+            ? "Everyone has paid. Nothing to chase."
+            : "Nothing matches this filter."}
         </p>
       )}
       {batches.map((batch, position) => {
@@ -203,11 +226,20 @@ export function StudioTable({
               </button>
               <span className="table-batch-meta">
                 {schedule(batch)} · {totals.count} dancer{totals.count === 1 ? "" : "s"} ·{" "}
-                {totals.unpaid === 0 ? "all paid ✓" : `${totals.paid} paid · ${formatRupees(totals.duePaise)} due`}
+                {totals.unpaid === 0
+                  ? "all paid ✓"
+                  : `${totals.paid} paid · ${formatRupees(totals.duePaise)} due`}
               </span>
-              <span className="table-batch-actions" data-tour={position === 0 ? "batch-actions" : undefined}>
+              <span
+                className="table-batch-actions"
+                data-tour={position === 0 ? "batch-actions" : undefined}
+              >
                 {totals.unpaid > 0 && (
-                  <Button variant="retro" type="button" onClick={() => setPaying(paying === batch.id ? null : batch.id)}>
+                  <Button
+                    variant="retro"
+                    type="button"
+                    onClick={() => setPaying(paying === batch.id ? null : batch.id)}
+                  >
                     Mark all paid
                   </Button>
                 )}
@@ -219,7 +251,10 @@ export function StudioTable({
                     onClick={() =>
                       present.mutate({
                         batchId: batch.id,
-                        marks: batch.rows.map((row) => ({ studentId: row.studentId, present: true })),
+                        marks: batch.rows.map((row) => ({
+                          studentId: row.studentId,
+                          present: true,
+                        })),
                       })
                     }
                   >
@@ -271,7 +306,12 @@ export function StudioTable({
                         <td>{row.name}</td>
                         <td>{row.feePaise > 0 ? formatRupees(row.feePaise) : "—"}</td>
                         <td>
-                          <span className="table-pill" data-status={owes(row) ? row.status : row.status === "none" ? "none" : "paid"}>
+                          <span
+                            className="table-pill"
+                            data-status={
+                              owes(row) ? row.status : row.status === "none" ? "none" : "paid"
+                            }
+                          >
                             {statusText(row)}
                           </span>
                         </td>
@@ -288,7 +328,9 @@ export function StudioTable({
                               }
                             />
                           ) : (
-                            <span className="console-hint">{schedule(batch).split(" ")[0] ?? ""}</span>
+                            <span className="console-hint">
+                              {schedule(batch).split(" ")[0] ?? ""}
+                            </span>
                           )}
                         </td>
                         <td>
@@ -322,7 +364,7 @@ export function StudioTable({
   );
 }
 
-function ConfirmPaid({
+export function ConfirmPaid({
   batch,
   period,
   today,
@@ -341,7 +383,9 @@ function ConfirmPaid({
   const [chosen, setChosen] = useState<Set<string>>(new Set(owing.map((row) => row.studentId)));
   const [method, setMethod] = useState<(typeof paymentMethods)[number]>("upi");
   const [attempt] = useState(() => crypto.randomUUID());
-  const total = owing.filter((row) => chosen.has(row.studentId)).reduce((sum, row) => sum + row.outstandingPaise, 0);
+  const total = owing
+    .filter((row) => chosen.has(row.studentId))
+    .reduce((sum, row) => sum + row.outstandingPaise, 0);
   const save = useMutation({
     mutationFn: () =>
       pay({
@@ -404,7 +448,12 @@ function ConfirmPaid({
             <option value="other">Other</option>
           </select>
         </label>
-        <Button variant="retro" type="button" disabled={chosen.size === 0 || save.isPending} onClick={() => save.mutate()}>
+        <Button
+          variant="retro"
+          type="button"
+          disabled={chosen.size === 0 || save.isPending}
+          onClick={() => save.mutate()}
+        >
           {save.isPending ? "Saving…" : `Confirm ${formatRupees(total)} paid`}
         </Button>
         <Button variant="retroPaper" type="button" onClick={onCancel}>
@@ -452,14 +501,24 @@ export function TeacherTable({ today }: { today: string }) {
   if (table.isPending) return <p className="console-empty">Loading your batches…</p>;
   if (table.isError) return <p role="alert">Could not load your batches. Please refresh.</p>;
   if (table.data.length === 0)
-    return <p className="console-empty">You have no batches yet. Ask the studio owner to add you to one.</p>;
+    return (
+      <p className="console-empty">
+        You have no batches yet. Ask the studio owner to add you to one.
+      </p>
+    );
   const batches = filter === "today" ? table.data.filter((batch) => batch.meetsToday) : table.data;
 
   return (
     <div className="studio-table" data-tour="table">
       <div className="table-chips" role="group" aria-label="Show">
         {(["all", "today"] as const).map((id) => (
-          <button key={id} type="button" className="table-chip" aria-pressed={filter === id} onClick={() => setFilter(id)}>
+          <button
+            key={id}
+            type="button"
+            className="table-chip"
+            aria-pressed={filter === id}
+            onClick={() => setFilter(id)}
+          >
             {id === "all" ? "All" : "Today's classes"}
           </button>
         ))}
@@ -470,13 +529,21 @@ export function TeacherTable({ today }: { today: string }) {
         return (
           <section key={batch.id} className="table-batch" aria-label={batch.name}>
             <header className="table-batch-head">
-              <button type="button" className="table-batch-toggle" aria-expanded={open} onClick={() => toggle(batch.id)}>
+              <button
+                type="button"
+                className="table-batch-toggle"
+                aria-expanded={open}
+                onClick={() => toggle(batch.id)}
+              >
                 {open ? "▾" : "▸"} <strong>{batch.name}</strong>
               </button>
               <span className="table-batch-meta">
                 {schedule(batch)} · {batch.rows.length} dancer{batch.rows.length === 1 ? "" : "s"}
               </span>
-              <span className="table-batch-actions" data-tour={position === 0 ? "batch-actions" : undefined}>
+              <span
+                className="table-batch-actions"
+                data-tour={position === 0 ? "batch-actions" : undefined}
+              >
                 {batch.meetsToday && batch.rows.length > 0 && (
                   <Button
                     variant="retro"
@@ -485,7 +552,10 @@ export function TeacherTable({ today }: { today: string }) {
                     onClick={() =>
                       present.mutate({
                         batchId: batch.id,
-                        marks: batch.rows.map((row) => ({ studentId: row.studentId, present: true })),
+                        marks: batch.rows.map((row) => ({
+                          studentId: row.studentId,
+                          present: true,
+                        })),
                       })
                     }
                   >
@@ -520,7 +590,9 @@ export function TeacherTable({ today }: { today: string }) {
                               }
                             />
                           ) : (
-                            <span className="console-hint">{schedule(batch).split(" ")[0] ?? ""}</span>
+                            <span className="console-hint">
+                              {schedule(batch).split(" ")[0] ?? ""}
+                            </span>
                           )}
                         </td>
                       </tr>

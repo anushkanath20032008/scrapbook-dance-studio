@@ -9,7 +9,10 @@ import { markAttendance } from "@/lib/attendance.functions";
 import { sampleMark } from "@/lib/sample-studio";
 import { AttendanceGate, pendingBatches, readSkipped } from "@/components/console/attendance-gate";
 import { toneOf } from "@/lib/tone";
-import { getStudioTable } from "@/lib/studio-table.functions";
+import { getStudioTable, markBatchPaid, undoBatchPaid } from "@/lib/studio-table.functions";
+import { ConfirmPaid } from "@/components/console/studio-table";
+import { Button } from "@/components/ui/button";
+import { messageOf } from "@/components/console/form-utils";
 import type { PayStatus, TableBatch } from "@/lib/studio-table";
 
 export type BoardRow = {
@@ -192,7 +195,10 @@ export function DancerBoard({
   const [tab, setTab] = useState<Tab>("unpaid");
   const [search, setSearch] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
-  const [groupBy, setGroupBy] = useState<GroupBy>("status");
+  const [groupBy, setGroupBy] = useState<GroupBy>("batch");
+  const [payingBatch, setPayingBatch] = useState<string | null>(null);
+  const payBatch = useServerFn(markBatchPaid);
+  const undoPaid = useServerFn(undoBatchPaid);
   const [density, setDensity] = useState<Density>("compact");
   const [peekId, setPeekId] = useState<string | null>(null);
   // While the pointer is held on a tick, sliding across the column sets every tick it touches the same way.
@@ -497,11 +503,19 @@ export function DancerBoard({
             const groupUnpaid = group.rows.filter(owes);
             const groupOwed = groupUnpaid.reduce((sum, row) => sum + row.outstandingPaise, 0);
             const showRemind = groupUnpaid.length > 0;
+            const batchOf =
+              layout === "table" && groupBy === "batch" && group.key.startsWith("batch-")
+                ? (batches ?? []).find((batch) => batch.name === group.label)
+                : undefined;
             const tourRemind = showRemind && firstRemind;
             if (showRemind) firstRemind = false;
             return (
               <tbody key={group.key}>
-                <tr className="board-group" data-tone={group.tone}>
+                <tr
+                  className="board-group"
+                  data-tone={group.tone}
+                  data-kind={batchOf ? "batch" : undefined}
+                >
                   <th scope="row" className="board-pick">
                     {showRemind && (
                       <input
@@ -521,7 +535,9 @@ export function DancerBoard({
                   </th>
                   <th scope="colgroup" colSpan={7}>
                     <span className="board-group-row">
-                      <span className="board-dot" data-tone={group.tone} aria-hidden="true" />
+                      {batchOf ? null : (
+                        <span className="board-dot" data-tone={group.tone} aria-hidden="true" />
+                      )}
                       <strong>{group.label}</strong>
                       <span className="board-group-meta">
                         {group.rows.length} dancer{group.rows.length === 1 ? "" : "s"}
@@ -532,20 +548,95 @@ export function DancerBoard({
                           Set their fees →
                         </Link>
                       )}
-                      {showRemind && (
-                        <button
-                          type="button"
-                          className="board-link"
-                          data-tour={tourRemind ? "remind" : undefined}
-                          onClick={() => remind(groupUnpaid.map((row) => row.studentId))}
-                        >
-                          Remind {groupUnpaid.length === 1 ? "1" : `all ${groupUnpaid.length}`} on
-                          WhatsApp
-                        </button>
+                      {batchOf ? (
+                        <span className="board-group-actions">
+                          {showRemind && !sample && (
+                            <Button
+                              variant="retro"
+                              type="button"
+                              onClick={() =>
+                                setPayingBatch(payingBatch === batchOf.id ? null : batchOf.id)
+                              }
+                            >
+                              Mark all paid
+                            </Button>
+                          )}
+                          {batchOf.meetsToday && group.rows.length > 0 && (
+                            <Button
+                              variant="retro"
+                              type="button"
+                              onClick={() => group.rows.forEach((row) => setMark(row, true))}
+                            >
+                              All present today
+                            </Button>
+                          )}
+                          {showRemind && (
+                            <Button
+                              variant="retroPaper"
+                              type="button"
+                              data-tour={tourRemind ? "remind" : undefined}
+                              onClick={() => remind(groupUnpaid.map((row) => row.studentId))}
+                            >
+                              Remind unpaid ({groupUnpaid.length})
+                            </Button>
+                          )}
+                        </span>
+                      ) : (
+                        showRemind && (
+                          <button
+                            type="button"
+                            className="board-link"
+                            data-tour={tourRemind ? "remind" : undefined}
+                            onClick={() => remind(groupUnpaid.map((row) => row.studentId))}
+                          >
+                            Remind {groupUnpaid.length === 1 ? "1" : `all ${groupUnpaid.length}`} on
+                            WhatsApp
+                          </button>
+                        )
                       )}
                     </span>
                   </th>
                 </tr>
+                {batchOf && payingBatch === batchOf.id && (
+                  <tr className="board-confirm">
+                    <td colSpan={8}>
+                      <ConfirmPaid
+                        batch={batchOf}
+                        period={period}
+                        today={today}
+                        pay={payBatch}
+                        onCancel={() => setPayingBatch(null)}
+                        onDone={(ids, total) => {
+                          setPayingBatch(null);
+                          void queryClient.invalidateQueries({ queryKey: ["studio-table"] });
+                          void queryClient.invalidateQueries({ queryKey: ["home-report"] });
+                          if (ids.length > 0)
+                            toast.success(
+                              `Marked ${formatRupees(total)} as paid (${ids.length}).`,
+                              {
+                                duration: 60000,
+                                action: {
+                                  label: "Undo",
+                                  onClick: () =>
+                                    undoPaid({ data: { paymentIds: ids } })
+                                      .then(() => {
+                                        toast.success("Undone.");
+                                        void queryClient.invalidateQueries({
+                                          queryKey: ["studio-table"],
+                                        });
+                                        void queryClient.invalidateQueries({
+                                          queryKey: ["home-report"],
+                                        });
+                                      })
+                                      .catch((error) => toast.error(messageOf(error))),
+                                },
+                              },
+                            );
+                        }}
+                      />
+                    </td>
+                  </tr>
+                )}
                 {group.rows.map((row) => {
                   const mark = markOf(row);
                   const hasClass = row.todayBatches.length > 0;

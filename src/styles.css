@@ -1062,3 +1062,12 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-link { margin-left:12px; white-space:nowrap; overflow:visible; }
 .board-group-row { flex-wrap:wrap; }
 .board-table .c-rem { width:110px; }
+
+/* Batch headers on the Table view: the bold blue bar with the batch's own buttons. */
+.board-group[data-kind="batch"] th { background:var(--blue); color:var(--paper); height:48px; font-size:.95rem; border-bottom:2px solid var(--ink); }
+.board-group[data-kind="batch"] strong { font-size:1.15rem; color:var(--paper); }
+.board-group[data-kind="batch"] .board-group-meta { color:#dfe5ff; }
+.board-group[data-kind="batch"] th.board-pick input { accent-color:var(--gold); }
+.board-group-actions { margin-left:auto; display:inline-flex; gap:8px; flex-wrap:wrap; }
+.board-group-actions button { white-space:nowrap; }
+.board-confirm td { padding:0; white-space:normal; overflow:visible; }

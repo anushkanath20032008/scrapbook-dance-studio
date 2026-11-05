@@ -91,6 +91,22 @@ describe("dancers who are in no batch", () => {
     expect(hereToday(rows[0]!)).toBe(false);
   });
 
+  it("shows the fee from this month's charge", () => {
+    const rows = toBoardRows(
+      [],
+      [
+        {
+          studentId: "bhagavath",
+          name: "Bhagavath",
+          outstandingPaise: 100000,
+          status: "due",
+          feePaise: 500000,
+        },
+      ],
+    );
+    expect(rows[0]!.feePaise).toBe(500000);
+  });
+
   it("does not duplicate a dancer who is already in a batch", () => {
     const rows = toBoardRows(
       [batch("Adults", [row("asha", { outstandingPaise: 100000, status: "due" })])],

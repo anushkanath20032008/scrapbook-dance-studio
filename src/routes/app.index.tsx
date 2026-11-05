@@ -120,6 +120,7 @@ function Overview() {
         studentId: row.student_id,
         name: row.student_name,
         outstandingPaise: Number(row.outstanding_paise),
+        feePaise: Number(row.amount_paise),
         status: (row.status === "overdue" ? "overdue" : "due") as "overdue" | "due",
       })),
     [unpaidRows],

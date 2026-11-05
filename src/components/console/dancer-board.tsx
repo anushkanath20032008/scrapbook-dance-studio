@@ -29,6 +29,8 @@ export type LooseUnpaid = {
   name: string;
   outstandingPaise: number;
   status: PayStatus;
+  /** What this month's fee is, from the charge. Without it a dancer in no batch would show no fee at all. */
+  feePaise?: number;
 };
 
 /**
@@ -62,7 +64,7 @@ export function toBoardRows(batches: TableBatch[], loose: LooseUnpaid[] = []): B
       name: row.name,
       batchNames: [],
       todayBatches: [],
-      feePaise: 0,
+      feePaise: row.feePaise ?? 0,
       outstandingPaise: row.outstandingPaise,
       status: row.status,
     });

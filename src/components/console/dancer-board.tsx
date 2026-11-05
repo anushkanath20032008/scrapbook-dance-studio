@@ -114,6 +114,13 @@ export function groupBoardRows(rows: BoardRow[], by: GroupBy): BoardGroup[] {
   return groups;
 }
 
+/** A steady colour for a name, so the same batch or dancer always looks the same. */
+const toneOf = (text: string) => {
+  let sum = 0;
+  for (const ch of text) sum = (sum * 31 + ch.charCodeAt(0)) % 6;
+  return sum;
+};
+
 type Tab = "unpaid" | "today" | "all";
 type Density = "compact" | "roomy";
 const DENSITY_KEY = "choreo-density";
@@ -461,15 +468,32 @@ export function DancerBoard({
                         )}
                       </td>
                       <td className="board-name">
-                        <button
-                          type="button"
-                          className="board-name-btn"
-                          onClick={() => setPeekId(row.studentId)}
-                        >
-                          {row.name}
-                        </button>
+                        <span className="board-name-wrap">
+                          <span className="avatar" data-c={toneOf(row.name)} aria-hidden="true">
+                            {row.name.trim().charAt(0).toUpperCase()}
+                          </span>
+                          <button
+                            type="button"
+                            className="board-name-btn"
+                            onClick={() => setPeekId(row.studentId)}
+                          >
+                            {row.name}
+                          </button>
+                        </span>
                       </td>
-                      <td className="board-batch">{row.batchNames.join(", ") || "No batch"}</td>
+                      <td className="board-batch">
+                        {row.batchNames.length === 0 ? (
+                          <span className="bchip" data-c="none">
+                            No batch
+                          </span>
+                        ) : (
+                          row.batchNames.map((name) => (
+                            <span key={name} className="bchip" data-c={toneOf(name)}>
+                              {name}
+                            </span>
+                          ))
+                        )}
+                      </td>
                       <td className="board-center">
                         <button
                           type="button"

@@ -800,3 +800,11 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
   .board-table { font-size:.88rem; }
   .board-table th, .board-table td { padding:8px; }
 }
+
+/* Keep rows one line tall: the whole point of the board is seeing everyone at once. */
+.board-table th, .board-table td { padding:6px 10px; }
+.board-row-actions { flex-wrap:nowrap; justify-content:flex-end; }
+.board-row-actions .retro-button { padding:5px 9px; font-size:12px; box-shadow:2px 2px 0 var(--ink); white-space:nowrap; }
+.board-tick { width:26px; height:26px; font-size:15px; }
+.board-tick-head, .board-tick-cell { width:80px; }
+.board-table tbody td { line-height:1.25; }

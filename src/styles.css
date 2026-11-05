@@ -1053,3 +1053,7 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .dancer-card-fee { font-size:.8rem; color:#5f544a; }
 .dancer-card-foot { align-self:end; display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .dancer-card-foot .chip { width:auto; padding:0 8px; }
+.card-group[data-c="none"] { --cg-bg:#f1eee9; --cg-fg:#4a413a; --cg-line:#d6cfc5; }
+.dancer-card[data-c="0"], .dancer-card[data-c="1"], .dancer-card[data-c="2"], .dancer-card[data-c="3"], .dancer-card[data-c="4"], .dancer-card[data-c="5"], .dancer-card[data-c="none"] { background:#fff; }
+.dancer-card[data-archived="true"] { opacity:.6; }
+.dancer-card-actions { display:inline-flex; gap:6px; margin-left:auto; flex-wrap:wrap; }

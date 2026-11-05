@@ -112,6 +112,7 @@ function Overview() {
   const arrears = report.data?.arrears ?? [];
   const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const awaitingFee = report.data?.awaitingFee ?? 0;
+  const awaitingNames = report.data?.awaitingNames ?? [];
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   // Dancers who owe but sit in no batch: the board builds itself from batches, so they arrive this way.
   const looseUnpaid = useMemo(
@@ -301,7 +302,8 @@ function Overview() {
           <span>
             <strong>
               {awaitingFee} dancer{awaitingFee === 1 ? "" : "s"}
-            </strong>{" "}
+            </strong>
+            {awaitingNames.length > 0 && <> ({awaitingNames.slice(0, 5).join(", ")}{awaitingNames.length > 5 ? "…" : ""})</>}{" "}
             {awaitingFee === 1 ? "has" : "have"} no fee for {formatMonthLong(period)} yet. A dancer
             needs a monthly fee first.
           </span>

@@ -14,6 +14,18 @@ const emptySnapshot = {
   ongoing_batches: 0,
 };
 
+/** Names of active dancers with no charge for the month, so the "no fee yet" banner can say who. */
+async function namesAwaitingFee(supabase: StudioContext["supabase"], period: string): Promise<string[]> {
+  const [students, charges] = await Promise.all([
+    supabase.from("students").select("id, name").is("archived_at", null).order("name").limit(2000),
+    supabase.from("charges").select("student_id").eq("period", period).is("voided_at", null).limit(5000),
+  ]);
+  const charged = new Set(unwrap(charges).map((row) => row.student_id));
+  return unwrap(students)
+    .filter((student) => !charged.has(student.id))
+    .map((student) => student.name);
+}
+
 /** The Home screen's data for one month: the money totals and who still owes, from the database's report functions. */
 export async function getHomeReport({ supabase }: StudioContext, input: { period: string }) {
   const period = firstOfMonth(input.period);
@@ -59,7 +71,8 @@ export async function getHomeReport({ supabase }: StudioContext, input: { period
   // Money still owed from months before this one, per dancer: Overview is one month, so say so out loud.
   const arrears = unwrap(arrearsResult);
   const awaitingFee = unwrap(awaitingResult);
-  return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid, arrears, awaitingFee };
+  const awaitingNames = awaitingFee > 0 ? await namesAwaitingFee(supabase, period) : [];
+  return { period, snapshot: snapshots[0] ?? emptySnapshot, unpaid, arrears, awaitingFee, awaitingNames };
 }
 
 /** Billed, collected and missing for each of the last six months, oldest first, from the database. */

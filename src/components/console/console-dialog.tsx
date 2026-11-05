@@ -17,7 +17,7 @@ export function ConsoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         aria-describedby={undefined}
-        className="console-dialog p-0 border-0 bg-transparent shadow-none max-w-xl max-h-[92vh] overflow-y-auto"
+        className="console-dialog !left-auto !right-0 !top-0 !translate-x-0 !translate-y-0 p-0 border-0 bg-transparent shadow-none max-w-xl max-h-[92vh] overflow-y-auto"
       >
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <div className="window">

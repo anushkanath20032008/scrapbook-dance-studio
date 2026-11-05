@@ -22,9 +22,21 @@ const steps: Record<TourRole, Step[]> = {
     },
     {
       to: "/app",
+      target: "views",
+      title: "Four ways to look",
+      text: "Switch between Table, Cards, By batch and Charts. The Table groups dancers under their batch, each in its own colour.",
+    },
+    {
+      to: "/app",
+      target: "import",
+      title: "Bring your dancers in",
+      text: "Already have a spreadsheet? Import Excel / CSV reads names, phone numbers, batches and fees, and you check them before anything is saved.",
+    },
+    {
+      to: "/app",
       target: "board",
       title: "Everyone in one table",
-      text: "Dancers who owe sit in the Unpaid group at the top. Paid dancers fall to the bottom. Click a name for a panel with their month.",
+      text: "Each batch has its own coloured bar with Mark all paid, All present today and Remind unpaid. Click a dancer's name for a panel with their month.",
     },
     {
       to: "/app",

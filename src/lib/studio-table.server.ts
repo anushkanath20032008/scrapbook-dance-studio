@@ -33,7 +33,16 @@ export async function getStudioTable(
     ),
     supabase.rpc("student_ledger_status", { p_period: firstOfMonth(input.period) }),
   ]);
-  const charges = new Map(unwrap(ledger).map((row) => [row.student_id, row]));
+  // One ledger row per charge: add up a dancer's charges for the month instead of keeping the last one.
+  const charges = new Map<string, { amount_paise: number; outstanding_paise: number; status: string }>();
+  for (const row of unwrap(ledger)) {
+    const prev = charges.get(row.student_id);
+    charges.set(row.student_id, {
+      amount_paise: Number(prev?.amount_paise ?? 0) + Number(row.amount_paise ?? 0),
+      outstanding_paise: Number(prev?.outstanding_paise ?? 0) + Number(row.outstanding_paise ?? 0),
+      status: prev && prev.outstanding_paise > 0 && Number(row.outstanding_paise) <= 0 ? prev.status : row.status,
+    });
+  }
 
   return batches.map((batch, index) => ({
     id: batch.id,
@@ -106,25 +115,36 @@ export async function markBatchPaid(context: StudioContext, input: BatchPaidInpu
   const paymentIds: string[] = [];
   const failed: { studentId: string; reason: string }[] = [];
   let totalPaise = 0;
+  // The ledger has one row per charge, so a dancer with two charges this month appears twice: add them up.
+  const perStudent = new Map<string, { owed: number; balance: number }>();
   for (const row of ledger) {
-    // What this month's row shows, not the dancer's whole-account balance: balance_paise also carries
-    // arrears from earlier months, so using it would record more than the table and the confirm dialog say.
-    const owed = Number(row.outstanding_paise);
+    const entry = perStudent.get(row.student_id) ?? { owed: 0, balance: 0 };
+    entry.owed += Number(row.outstanding_paise);
+    entry.balance = Math.max(entry.balance, Number(row.balance_paise));
+    perStudent.set(row.student_id, entry);
+  }
+  for (const [studentId, { owed, balance }] of perStudent) {
     if (owed <= 0) continue;
+    // Payments are applied to the oldest charge first, so with earlier dues this month's amount would
+    // not clear this month. Leave that dancer for the Payments page rather than say "paid" wrongly.
+    if (balance > owed) {
+      failed.push({ studentId, reason: "Has dues from earlier months: record this payment on the Payments page." });
+      continue;
+    }
     try {
       const result = await recordPayment(context, {
-        studentId: row.student_id,
+        studentId,
         amountPaise: owed,
         method: input.method,
         paidOn: input.paidOn,
         note: "Marked paid for the whole batch",
-        idempotencyKey: `${input.idempotencyKey}:${row.student_id}`,
+        idempotencyKey: `${input.idempotencyKey}:${studentId}`,
       });
       paymentIds.push(result.id);
       totalPaise += owed;
     } catch (error) {
       failed.push({
-        studentId: row.student_id,
+        studentId,
         reason: error instanceof Error ? error.message : "Could not record this payment",
       });
     }

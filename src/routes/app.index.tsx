@@ -151,7 +151,7 @@ function Overview() {
       <div className="home-head">
         <h1 className="home-title">Home</h1>
         {!sample && !brandNew && (
-          <div className="table-chips home-views" role="group" aria-label="View">
+          <div className="table-chips home-views" role="group" aria-label="View" data-tour="views">
             {(
               [
                 ["table", "Table"],

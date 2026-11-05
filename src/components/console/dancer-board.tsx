@@ -290,8 +290,9 @@ export function DancerBoard({
   const allPicked = unpaid.length > 0 && chosen.length === unpaid.length;
   const peek = peekId ? rows.find((row) => row.studentId === peekId) : undefined;
 
-  const setMark = (row: BoardRow, value: boolean) => {
+  const setMark = (row: BoardRow, value: boolean, onlyBatchId?: string) => {
     for (const batch of row.todayBatches) {
+      if (onlyBatchId && batch.batchId !== onlyBatchId) continue;
       if (batch.present === value) continue;
       if (sample && onSampleChange)
         onSampleChange(sampleMark(sample, batch.batchId, row.studentId, value));
@@ -505,7 +506,11 @@ export function DancerBoard({
             const showRemind = groupUnpaid.length > 0;
             const batchOf =
               layout === "table" && groupBy === "batch" && group.key.startsWith("batch-")
-                ? (batches ?? []).find((batch) => batch.name === group.label)
+                ? (() => {
+                    // Batch names are not unique: only act on a band when the name points at one batch.
+                    const same = (batches ?? []).filter((batch) => batch.name === group.label);
+                    return same.length === 1 ? same[0] : undefined;
+                  })()
                 : undefined;
             const tourRemind = showRemind && firstRemind;
             if (showRemind) firstRemind = false;
@@ -565,7 +570,13 @@ export function DancerBoard({
                             <Button
                               variant="retro"
                               type="button"
-                              onClick={() => group.rows.forEach((row) => setMark(row, true))}
+                              onClick={() =>
+                                rows
+                                  .filter((row) =>
+                                    row.todayBatches.some((b) => b.batchId === batchOf.id),
+                                  )
+                                  .forEach((row) => setMark(row, true, batchOf.id))
+                              }
                             >
                               All present today
                             </Button>

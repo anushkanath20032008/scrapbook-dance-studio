@@ -67,9 +67,9 @@ describe("teacher table", () => {
     expect(JSON.stringify(table)).not.toMatch(/fee|paise|outstanding|status/i);
   });
 
-  it("marks paid for what this month's row shows, never the dancer's earlier arrears", async () => {
-    // Bindu owes 5,500 this month and 4,500 from earlier, so balance_paise is 10,000. The table and the
-    // confirm dialog both show 5,500, so that is what may be recorded.
+  it("skips a dancer with earlier dues, because oldest-first allocation would leave this month unpaid", async () => {
+    // Bindu owes 5,500 this month and 4,500 from earlier, so balance_paise is 10,000. A 5,500 payment would
+    // clear the old dues first and leave this month part paid, so nothing is recorded and she is listed.
     const { client, calls } = fakeSupabase((call) => {
       if (call.fn === "student_ledger_status")
         return {
@@ -97,8 +97,8 @@ describe("teacher table", () => {
         idempotencyKey: "key",
       },
     );
-    const payment = calls.find((call) => call.fn === "record_payment");
-    expect((payment?.args?.[0] as { p_amount_paise: number }).p_amount_paise).toBe(550000);
-    expect(result.totalPaise).toBe(550000);
+    expect(calls.find((call) => call.fn === "record_payment")).toBeUndefined();
+    expect(result.totalPaise).toBe(0);
+    expect(result.failed.map((f) => f.studentId)).toEqual(["bindu"]);
   });
 });

@@ -1005,3 +1005,14 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-tick[data-mark="absent"] { background:#fde8e6; border-color:#d64545; color:#c62f2f; }
 .board-markall { display:block; margin:2px auto 0; padding:1px 6px; border:1px solid #1e3188; border-radius:999px; background:#fff; color:#1e3188; font-size:10.5px; font-weight:600; letter-spacing:0; text-transform:none; cursor:pointer; }
 .board-markall:hover { background:#1e3188; color:#fff; }
+
+/* Daily attendance gate */
+.gate { gap:12px; }
+.gate-batch { border:1px solid #e3d9cc; border-radius:8px; padding:8px 10px; background:#fffdf9; }
+.gate-batch[data-off="true"] { background:#f3f0ec; opacity:.7; }
+.gate-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.gate-people { list-style:none; margin:8px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+.gate-person { display:inline-flex; align-items:center; gap:6px; padding:4px 10px 4px 6px; border:1px solid #2f7d52; border-radius:999px; background:#e7f5ec; color:#1d5a38; font-size:12.5px; cursor:pointer; }
+.gate-person[data-absent="true"] { border-color:#d64545; background:#fde8e6; color:#b02a2a; }
+.gate-mark { display:inline-grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#2f7d52; color:#fff; font-size:11px; font-weight:700; }
+.gate-person[data-absent="true"] .gate-mark { background:#d64545; }

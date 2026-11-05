@@ -7,6 +7,7 @@ import { DancerPeek } from "@/components/console/dancer-peek";
 import { formatRupees } from "@/lib/money";
 import { markAttendance } from "@/lib/attendance.functions";
 import { sampleMark } from "@/lib/sample-studio";
+import { AttendanceGate, pendingBatches, readSkipped } from "@/components/console/attendance-gate";
 import { toneOf } from "@/lib/tone";
 import { getStudioTable } from "@/lib/studio-table.functions";
 import type { PayStatus, TableBatch } from "@/lib/studio-table";
@@ -290,10 +291,32 @@ export function DancerBoard({
   };
   const todayRows = shown.filter((row) => row.todayBatches.length > 0);
   // "Mark all present" fills in the dancers nobody has marked yet and leaves anyone marked absent alone.
-  const unmarked = todayRows.filter((row) => row.todayBatches.every((b) => b.present === null));
-  const unmarkedToday = unmarked.length;
-  const markAllPresent = () => {
-    for (const row of unmarked) setMark(row, true);
+  const [gateOpen, setGateOpen] = useState(false);
+  const [skipped, setSkipped] = useState<string[]>([]);
+  useEffect(() => setSkipped(readSkipped(today)), [today, gateOpen]);
+  const waiting = pendingBatches(batches ?? [], skipped);
+  const unmarkedToday = waiting.length;
+  // Once a day, on this device, the gate opens by itself when a batch is waiting for attendance.
+  useEffect(() => {
+    if (sample || table.isPending || waiting.length === 0) return;
+    try {
+      const flag = `choreo-gate-${today}`;
+      if (window.localStorage.getItem(flag)) return;
+      window.localStorage.setItem(flag, "1");
+    } catch {
+      return;
+    }
+    setGateOpen(true);
+  }, [sample, table.isPending, waiting.length, today]);
+  const saveGate = async (batchId: string, marks: { studentId: string; present: boolean }[]) => {
+    if (sample && onSampleChange) {
+      onSampleChange(
+        marks.reduce((acc, mark) => sampleMark(acc, batchId, mark.studentId, mark.present), sample),
+      );
+      return;
+    }
+    await attend({ data: { batchId, date: today, marks } });
+    await queryClient.invalidateQueries({ queryKey: ["studio-table"] });
   };
   const togglePick = (studentId: string) => {
     const next = new Set(picked);
@@ -424,8 +447,8 @@ export function DancerBoard({
               <th scope="col" className="board-center" data-tour="ticks">
                 Attendance today
                 {unmarkedToday > 0 && (
-                  <button type="button" className="board-markall" onClick={markAllPresent}>
-                    Mark all present
+                  <button type="button" className="board-markall" onClick={() => setGateOpen(true)}>
+                    Take attendance
                   </button>
                 )}
               </th>
@@ -636,10 +659,17 @@ export function DancerBoard({
           <p className="console-empty board-empty">No dancers match this view.</p>
         )}
       </div>
+      <AttendanceGate
+        open={gateOpen}
+        onClose={() => setGateOpen(false)}
+        batches={batches ?? []}
+        today={today}
+        onSave={saveGate}
+      />
       <p className="board-foot">
         <span>
           Click once for here (green tick), again for absent (red cross). Press and slide down the
-          column to mark several, or use Mark all present.
+          column to mark several, or use Take attendance for the whole day.
         </span>
         <span>Click a name to open the dancer's profile.</span>
       </p>

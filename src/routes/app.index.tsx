@@ -9,7 +9,7 @@ import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthCharts } from "@/components/console/month-charts";
-import { MonthTotals } from "@/components/console/month-totals";
+import { MonthStrip } from "@/components/console/month-strip";
 import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
@@ -20,12 +20,14 @@ import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
-import { formatMonthLong } from "@/lib/format";
+import { formatDayLong, formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
 import { getSetupCounts } from "@/lib/setup.functions";
 import { firstOfMonth, todayInIndia } from "@/lib/validators";
+import { sampleBatches, sampleNumbers, samplePay, isSampleId } from "@/lib/sample-studio";
+import type { TableBatch } from "@/lib/studio-table";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({ meta: [{ title: "Home | ChoreoStudio" }] }),
@@ -68,6 +70,8 @@ function Overview() {
   const [remindIds, setRemindIds] = useState<string[] | null>(null);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
   const [picked, setPicked] = useState<Set<string>>(new Set());
+  // A made-up studio for practising and demos; null means the real one is showing.
+  const [sample, setSample] = useState<TableBatch[] | null>(null);
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -135,66 +139,100 @@ function Overview() {
   return (
     <section>
       <div className="home-head">
-        <h1 className="display console-title">Home</h1>
-        <label className="console-inline-label">
-          Month
-          <input
-            className="field month-field"
-            type="month"
-            value={month}
-            onChange={(event) => {
-              if (event.target.value) {
-                setMonth(event.target.value);
-                setDueOn("");
-                setNotice("");
-                setError("");
-                setPicked(new Set());
-              }
+        <h1 className="home-title">Home</h1>
+        <span className="home-date">{formatDayLong(today)}</span>
+        <div className="home-head-right">
+          <button
+            type="button"
+            className="board-secondary"
+            data-tour="sample"
+            onClick={() => {
+              setPicked(new Set());
+              setSample(sample ? null : sampleBatches());
             }}
-          />
-        </label>
-      </div>
-      {!brandNew && (
-        <div className="home-top">
-          <div className="home-main">
-            <DancerBoard
-              period={period}
-              today={today}
-              loose={looseUnpaid}
-              reminded={remindedStudents}
-              picked={picked}
-              onPickedChange={setPicked}
-              onRecord={(student) => setPaying(student)}
-              onRemindMany={(ids) => {
-                setRemindIds(ids);
-                setBatchOpen(true);
-              }}
-              onWhatsApp={(studentId) => {
-                setRemindIds([studentId]);
-                setBatchOpen(true);
+          >
+            {sample ? "Back to my studio" : "Try with sample dancers"}
+          </button>
+          <label className="board-bar-label">
+            Month
+            <input
+              className="board-input"
+              type="month"
+              value={month}
+              onChange={(event) => {
+                if (event.target.value) {
+                  setMonth(event.target.value);
+                  setDueOn("");
+                  setNotice("");
+                  setError("");
+                  setPicked(new Set());
+                }
               }}
             />
-          </div>
-          <aside className="home-side">
-            {snapshot && <MonthTotals snapshot={snapshot} compact />}
-            {arrears.length > 0 && (
-              <p className="home-side-note" role="status">
-                <strong>{formatRupees(arrearsTotal)}</strong> unpaid from earlier months across{" "}
-                {arrears.length} dancer{arrears.length === 1 ? "" : "s"}. Open a dancer&apos;s
-                billing to record it.
-              </p>
-            )}
-            {providerConfigured && unpaidRows.length > 0 && (
-              <Button
-                variant="retroPaper"
+          </label>
+        </div>
+      </div>
+      {sample && (
+        <p className="console-banner sample-banner" role="status">
+          Sample studio: eight made-up dancers. Tick, select and record payments to practise.
+          Nothing is saved or sent.
+        </p>
+      )}
+      {(!brandNew || sample) && (
+        <>
+          {sample ? (
+            <MonthStrip numbers={sampleNumbers(sample)} arrearsPaise={0} arrearsLink={false} />
+          ) : (
+            snapshot && (
+              <MonthStrip
+                numbers={{
+                  missing_paise: Number(snapshot.missing_paise),
+                  overdue_paise: Number(snapshot.overdue_paise),
+                  billed_paise: Number(snapshot.billed_paise),
+                  collected_paise: Number(snapshot.collected_paise),
+                  paid_students: snapshot.paid_students,
+                  charged_students: snapshot.charged_students,
+                  active_students: snapshot.active_students,
+                  ongoing_batches: snapshot.ongoing_batches,
+                }}
+                arrearsPaise={arrearsTotal}
+              />
+            )
+          )}
+          <DancerBoard
+            period={period}
+            today={today}
+            loose={looseUnpaid}
+            reminded={remindedStudents}
+            picked={picked}
+            onPickedChange={setPicked}
+            sample={sample}
+            onSampleChange={setSample}
+            onRecord={(student) => {
+              if (sample && isSampleId(student.id)) setSample(samplePay(sample, student.id));
+              else setPaying(student);
+            }}
+            onRemindMany={(ids) => {
+              setRemindIds(ids);
+              setBatchOpen(true);
+            }}
+            onWhatsApp={(studentId) => {
+              setRemindIds([studentId]);
+              setBatchOpen(true);
+            }}
+          />
+          {!sample && providerConfigured && unpaidRows.length > 0 && (
+            <div className="home-auto">
+              <button
                 type="button"
+                className="board-secondary"
                 onClick={() => setReminding({ period, allUnpaid: true })}
               >
                 Queue automatic reminders
-              </Button>
-            )}
-          </aside>
-        </div>
+              </button>
+            </div>
+          )}
+        </>
       )}
       {firstRun && !setupDone && (
         <div className="window setup-card">
@@ -284,7 +322,7 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {!brandNew && (
+      {!brandNew && !sample && (
         <details className="home-more">
           <summary>Batch view — mark a whole batch paid or present</summary>
           <StudioTable
@@ -298,7 +336,7 @@ function Overview() {
           />
         </details>
       )}
-      {snapshot && !brandNew && (
+      {snapshot && !brandNew && !sample && (
         <details className="home-more">
           <summary>Charts for {formatMonthLong(period)}</summary>
           <MonthCharts snapshot={snapshot} />

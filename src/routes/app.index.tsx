@@ -255,7 +255,7 @@ function Overview() {
       )}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
 
-      {needsCharges && !brandNew && (
+      {needsCharges && !brandNew && !sample && (
         <div className="window generate-card">
           <div className="window-bar chrome-font">Charges.dialog</div>
           <div className="window-inner console-form">
@@ -291,7 +291,7 @@ function Overview() {
           </div>
         </div>
       )}
-      {snapshot && snapshot.charged_students > 0 && awaitingFee > 0 && (
+      {!sample && snapshot && snapshot.charged_students > 0 && awaitingFee > 0 && (
         <div className="console-banner" role="status">
           <span>
             <strong>

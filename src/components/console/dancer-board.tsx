@@ -79,6 +79,16 @@ export function toBoardRows(batches: TableBatch[], loose: LooseUnpaid[] = []): B
 export const hereToday = (row: BoardRow) =>
   row.todayBatches.length > 0 && row.todayBatches.every((batch) => batch.present === true);
 
+/** Today's attendance for a dancer: here, absent, or not marked yet. */
+export const markOf = (row: BoardRow): "present" | "absent" | null =>
+  row.todayBatches.length === 0
+    ? null
+    : row.todayBatches.every((batch) => batch.present === true)
+      ? "present"
+      : row.todayBatches.every((batch) => batch.present === false)
+        ? "absent"
+        : null;
+
 export const owes = (row: BoardRow) => row.outstandingPaise > 0;
 
 export type GroupBy = "status" | "batch";
@@ -278,6 +288,13 @@ export function DancerBoard({
       else present.mutate({ batchId: batch.batchId, studentId: row.studentId, present: value });
     }
   };
+  const todayRows = shown.filter((row) => row.todayBatches.length > 0);
+  // "Mark all present" fills in the dancers nobody has marked yet and leaves anyone marked absent alone.
+  const unmarked = todayRows.filter((row) => row.todayBatches.every((b) => b.present === null));
+  const unmarkedToday = unmarked.length;
+  const markAllPresent = () => {
+    for (const row of unmarked) setMark(row, true);
+  };
   const togglePick = (studentId: string) => {
     const next = new Set(picked);
     if (!next.delete(studentId)) next.add(studentId);
@@ -405,7 +422,12 @@ export function DancerBoard({
               <th scope="col">Dancer</th>
               <th scope="col">Batch</th>
               <th scope="col" className="board-center" data-tour="ticks">
-                Here today
+                Attendance today
+                {unmarkedToday > 0 && (
+                  <button type="button" className="board-markall" onClick={markAllPresent}>
+                    Mark all present
+                  </button>
+                )}
               </th>
               <th scope="col" className="board-num">
                 Fee
@@ -471,7 +493,7 @@ export function DancerBoard({
                   </th>
                 </tr>
                 {group.rows.map((row) => {
-                  const here = hereToday(row);
+                  const mark = markOf(row);
                   const hasClass = row.todayBatches.length > 0;
                   const isPicked = picked.has(row.studentId);
                   return (
@@ -522,21 +544,29 @@ export function DancerBoard({
                         <button
                           type="button"
                           className="board-tick"
-                          data-on={here}
+                          data-mark={mark}
                           disabled={!hasClass}
-                          aria-pressed={here}
-                          aria-label={`${row.name} is here today`}
-                          title={hasClass ? "Here today" : "No class today"}
+                          aria-label={`${row.name}: ${mark === "present" ? "here, click to mark absent" : mark === "absent" ? "absent, click to mark here" : "not marked, click to mark here"}`}
+                          title={
+                            !hasClass
+                              ? "No class today"
+                              : mark === "present"
+                                ? "Here. Click for absent"
+                                : mark === "absent"
+                                  ? "Absent. Click for here"
+                                  : "Click to mark here"
+                          }
                           onPointerDown={() => {
                             if (!hasClass) return;
-                            setPainting(!here);
-                            setMark(row, !here);
+                            const next = mark !== "present";
+                            setPainting(next);
+                            setMark(row, next);
                           }}
                           onPointerEnter={() => {
                             if (hasClass && painting !== null) setMark(row, painting);
                           }}
                         >
-                          {here ? "✓" : ""}
+                          {mark === "present" ? "✓" : mark === "absent" ? "✕" : ""}
                         </button>
                       </td>
                       <td className="board-num">
@@ -607,7 +637,10 @@ export function DancerBoard({
         )}
       </div>
       <p className="board-foot">
-        <span>Click a tick, or press and slide down the column to mark several.</span>
+        <span>
+          Click once for here (green tick), again for absent (red cross). Press and slide down the
+          column to mark several, or use Mark all present.
+        </span>
         <span>Click a name to open the dancer's profile.</span>
       </p>
 

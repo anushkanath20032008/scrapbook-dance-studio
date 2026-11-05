@@ -170,7 +170,7 @@ const cell = (v: unknown) =>
 
 /** Turns a grid of cells (from Excel or CSV) into headings and rows, deciding whether the first row is headings. */
 export function toSheet(grid: unknown[][]): Sheet {
-  const rows = grid.map((row) => row.map(cell)).filter((row) => row.some((c) => c !== ""));
+  const rows = grid.map((row) => row.map(cellToText)).filter((row) => row.some((c) => c !== ""));
   if (rows.length === 0) return { headers: [], rows: [], hadHeader: false };
   const width = Math.max(...rows.map((r) => r.length));
   const padded = rows.map((r) => [...r, ...Array.from({ length: width - r.length }, () => "")]);
@@ -390,7 +390,7 @@ export function recommendations(mapping: ColumnGuess[], plan: ImportPlan): Sugge
 
 /** A small CSV reader: quotes, commas inside quotes, and either line ending. Semicolon files are read too. */
 export function parseCsv(text: string): string[][] {
-  const clean = text.replace(/^﻿/, "");
+  const clean = text.replace(/^\uFEFF/, "");
   const firstLine = clean.split(/\r?\n/, 1)[0] ?? "";
   const delimiter =
     (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0)

@@ -10,6 +10,7 @@ import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { PasteDancers } from "@/components/console/paste-dancers";
+import { ImportSheet } from "@/components/console/import-sheet";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
@@ -41,6 +42,7 @@ function Dancers() {
   const [showArchived, setShowArchived] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -123,6 +125,14 @@ function Dancers() {
         >
           Paste a list
         </Button>
+        <Button
+          variant="retroPaper"
+          type="button"
+          disabled={atLimit}
+          onClick={() => setImportOpen(true)}
+        >
+          Import Excel / CSV
+        </Button>
         <label className="console-check">
           <input
             type="checkbox"
@@ -173,7 +183,11 @@ function Dancers() {
                 <strong>{student.name}</strong>
                 <span className="console-hint">
                   {student.guardian?.phone ? "" : "No phone number yet"}
-                  {student.archived_at ? (student.guardian?.phone ? "archived" : " · archived") : ""}
+                  {student.archived_at
+                    ? student.guardian?.phone
+                      ? "archived"
+                      : " · archived"
+                    : ""}
                 </span>
                 <span className="console-hint">
                   {student.batches.length > 0
@@ -209,7 +223,11 @@ function Dancers() {
                   disabled={archive.isPending}
                   onClick={() => {
                     if (openId === student.id) setOpenId(null);
-                    archive.mutate({ id: student.id, archived: !student.archived_at, name: student.name });
+                    archive.mutate({
+                      id: student.id,
+                      archived: !student.archived_at,
+                      name: student.name,
+                    });
                   }}
                 >
                   {student.archived_at ? "Restore" : "Archive"}
@@ -231,6 +249,14 @@ function Dancers() {
 
       <ConsoleDialog open={pasteOpen} onOpenChange={setPasteOpen} title="Paste a list of dancers">
         {pasteOpen && <PasteDancers onDone={() => setPasteOpen(false)} />}
+      </ConsoleDialog>
+
+      <ConsoleDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import from Excel or CSV"
+      >
+        {importOpen && <ImportSheet onDone={() => setImportOpen(false)} />}
       </ConsoleDialog>
 
       <ConsoleDialog open={addOpen} onOpenChange={setAddOpen} title="New dancer">

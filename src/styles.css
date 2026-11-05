@@ -987,3 +987,21 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 /* Inactive look for "nothing here" chips: no fill, dashed outline, faded text. */
 .bchip[data-c="none"] { background:transparent; color:#a39a90; font-weight:400; border:1px dashed #cfc6bb; opacity:.85; }
 .board-table .c-status .chip[data-tone="paid"] { opacity:1; }
+
+/* Spreadsheet import */
+.import-block { border:1px solid #e3d9cc; border-radius:8px; padding:10px 12px; background:#fffdf9; }
+.import-block h3 { margin:0 0 6px; font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#1e3188; }
+.import-ask { background:#fff6e0; border-color:#e8c46a; }
+.import-tips { background:#eef2ff; border-color:#c7d0f5; }
+.import-tips ul { margin:0; padding-left:18px; font-size:12.5px; }
+.import-cols { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.import-cols li { display:grid; grid-template-columns:minmax(90px,1fr) 16px minmax(150px,1.2fr) minmax(0,1.4fr); gap:8px; align-items:center; }
+.import-head { font-weight:600; overflow-wrap:anywhere; }
+.import-arrow { color:#8a7f74; }
+@media (max-width:640px){ .import-cols li { grid-template-columns:1fr 1fr; } .import-arrow { display:none; } }
+
+/* Attendance: green tick for here, red cross for absent. */
+.board-tick[data-mark="present"] { background:#2f7d52; border-color:#2f7d52; color:#fff; }
+.board-tick[data-mark="absent"] { background:#fde8e6; border-color:#d64545; color:#c62f2f; }
+.board-markall { display:block; margin:2px auto 0; padding:1px 6px; border:1px solid #1e3188; border-radius:999px; background:#fff; color:#1e3188; font-size:10.5px; font-weight:600; letter-spacing:0; text-transform:none; cursor:pointer; }
+.board-markall:hover { background:#1e3188; color:#fff; }

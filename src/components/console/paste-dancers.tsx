@@ -3,6 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { ConsoleDialog } from "@/components/console/console-dialog";
+import { ImportSheet } from "@/components/console/import-sheet";
 import { useRefreshMoney, useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
@@ -60,7 +62,9 @@ async function photoToBase64(file: File): Promise<string> {
 /** The studio's due day this month, or today once it has gone, so the first reminders do not read as long overdue. */
 function defaultDueDate(today: string, dueDay: number): string {
   const month = firstOfMonth(today);
-  const last = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+  const last = new Date(
+    Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0),
+  ).getUTCDate();
   const day = `${month.slice(0, 8)}${String(Math.min(dueDay, last)).padStart(2, "0")}`;
   return day >= today ? day : today;
 }
@@ -86,6 +90,7 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const readPhotoFn = useServerFn(readDancersFromPhoto);
   const caps = useQuery({ queryKey: ["import-capabilities"], queryFn: () => capsFn() });
   const fileInput = useRef<HTMLInputElement>(null);
+  const [importOpen, setImportOpen] = useState(false);
   const [reading, setReading] = useState(false);
   const listPlansFn = useServerFn(listFeePlans);
   const loadProfile = useServerFn(getProfile);
@@ -117,12 +122,17 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   const rows = useMemo(() => checkGrid(gridRows), [gridRows]);
   const good = addableFromGrid(rows);
   const problems = useMemo(
-    () => new Map(rows.flatMap((row) => (row.problem ? [[row.index, row.problem] as [number, string]] : []))),
+    () =>
+      new Map(
+        rows.flatMap((row) => (row.problem ? [[row.index, row.problem] as [number, string]] : [])),
+      ),
     [rows],
   );
   const fixes = rows.length - good.length;
   const needsFee = good.some((row) => row.feePaise === null) && defaultFeePaise === null;
-  const dueOn = /^\d{4}-\d{2}-\d{2}$/.test(dueChoice) ? dueChoice : defaultDueDate(today, profile.data?.fee_due_day ?? 5);
+  const dueOn = /^\d{4}-\d{2}-\d{2}$/.test(dueChoice)
+    ? dueChoice
+    : defaultDueDate(today, profile.data?.fee_due_day ?? 5);
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -179,12 +189,19 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
     try {
       const image = await photoToBase64(file);
       const read = await readPhotoFn({ data: { image, mediaType: "image/jpeg" } });
-      if (read.rows.length === 0) setError("No dancers could be read from that page. Try a clearer photo.");
+      if (read.rows.length === 0)
+        setError("No dancers could be read from that page. Try a clearer photo.");
       else
         setGridRows((current) => {
           const kept = current.filter((row) => row.name.trim() !== "" || row.phone.trim() !== "");
           const text = read.rows
-            .map((row) => [row.name, row.phone ?? "", row.feePaise === null ? "" : String(row.feePaise / 100)].join("\t"))
+            .map((row) =>
+              [
+                row.name,
+                row.phone ?? "",
+                row.feePaise === null ? "" : String(row.feePaise / 100),
+              ].join("\t"),
+            )
             .join("\n");
           return pasteIntoGrid(kept, kept.length, "name", ["name", "phone", "fee"], text).rows;
         });
@@ -256,11 +273,28 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
   return (
     <form className="console-form paste-form" onSubmit={submit} noValidate>
       <div className="console-field">
+        <Button variant="retro" type="button" onClick={() => setImportOpen(true)}>
+          Import your Excel or CSV sheet
+        </Button>
+        <span className="console-hint">
+          Already keep dancers in a sheet? Upload it and we match the columns for you. Or type them
+          below.
+        </span>
+      </div>
+      <ConsoleDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import from Excel or CSV"
+      >
+        {importOpen && <ImportSheet onDone={() => setImportOpen(false)} />}
+      </ConsoleDialog>
+
+      <div className="console-field">
         <span className="form-label">Type or paste your dancers</span>
         <DancerGrid rows={gridRows} onChange={setGridRows} problems={problems} />
         <span className="console-hint">
-          One dancer per row. Copy from a notebook, Excel or WhatsApp contacts and paste into the first cell. Use
-          Columns to add email, joining date, emergency contact or a note.
+          One dancer per row. Copy from a notebook, Excel or WhatsApp contacts and paste into the
+          first cell. Use Columns to add email, joining date, emergency contact or a note.
         </span>
       </div>
 
@@ -283,7 +317,8 @@ export function PasteDancers({ onDone }: { onDone?: () => void }) {
             {reading ? "Reading the page…" : "Read from a photo of your register"}
           </Button>
           <span className="console-hint">
-            The photo is only used to read the page and is not kept. You check every row before anything is saved.
+            The photo is only used to read the page and is not kept. You check every row before
+            anything is saved.
           </span>
         </div>
       )}

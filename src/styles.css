@@ -981,3 +981,5 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .peek-more { justify-self:start; }
 .peek-note { margin:0; white-space:pre-wrap; font-size:13px; }
 .board-name-btn { color:#1e3188; }
+.board-table .c-status { width:186px; } .board-table .c-batch { width:15%; } .board-table .c-rem { width:96px; }
+.board-status { white-space:nowrap; }

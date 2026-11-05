@@ -608,7 +608,7 @@ export function DancerBoard({
       </div>
       <p className="board-foot">
         <span>Click a tick, or press and slide down the column to mark several.</span>
-        <span>Click a name for the dancer panel.</span>
+        <span>Click a name to open the dancer's profile.</span>
       </p>
 
       {chosen.length > 0 && (

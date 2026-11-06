@@ -24,7 +24,7 @@ const steps: Record<TourRole, Step[]> = {
       to: "/app",
       target: "views",
       title: "Four ways to look",
-      text: "Switch between Table, Cards, By batch and Charts. The Table groups dancers under their batch, each in its own colour.",
+      text: "Switch between the Table and the Chart. The Table groups dancers under their batch, each in its own colour.",
     },
     {
       to: "/app",

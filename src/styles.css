@@ -1125,3 +1125,28 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-table .board-name button:hover, .board-table .board-name a:hover { text-decoration:underline; color:#1e3188; }
 .board-table .board-name-btn { font-weight:500; color:#2a2622; }
 .board-table .board-name-btn:hover { color:#1e3188; }
+
+/* Home numbers: a coloured top edge per figure, larger values and darker labels, so they stand out a little. */
+.strip { box-shadow:0 1px 3px rgba(26,26,26,.12); border-color:#c9b8a5; }
+.strip-cell { padding:11px 16px 10px; border-top:4px solid transparent; }
+.strip-cell:nth-child(1) { border-top-color:#d9432a; }
+.strip-cell:nth-child(2) { border-top-color:#2f8f5b; }
+.strip-cell:nth-child(3) { border-top-color:#d9a21b; }
+.strip-cell:nth-child(4) { border-top-color:#4a63c8; }
+.strip-cell:nth-child(5) { border-top-color:#b8743f; }
+.strip-label { font-size:12px; font-weight:700; color:#3b342d; }
+.strip-big { font-size:26px; }
+.strip-mid { font-size:20px; }
+.strip-of { font-size:13px; font-weight:600; color:#5f544a; }
+.strip-bar, .strip-bar > span { height:7px; }
+
+/* Table / Chart switch. */
+.view-switch { display:inline-flex; align-items:center; gap:10px; font-size:13px; font-weight:600; }
+.view-switch-label { color:#5f544a; }
+.view-switch-label[data-on="true"] { color:var(--ink); font-weight:700; }
+.view-switch-track { position:relative; width:42px; height:24px; border:2px solid var(--ink); border-radius:999px; background:#fff; cursor:pointer; padding:0; }
+.view-switch-track[aria-checked="true"] { background:#1e3188; }
+.view-switch-thumb { position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:var(--ink); transition:transform .15s; }
+.view-switch-track[aria-checked="true"] .view-switch-thumb { transform:translateX(18px); background:#fff; }
+.view-switch-track:focus-visible { outline:3px solid var(--marigold); outline-offset:2px; }
+@media (prefers-reduced-motion:reduce) { .view-switch-thumb { transition:none; } }

@@ -18,7 +18,7 @@ import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
 import { DancerBoard } from "@/components/console/dancer-board";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { ImportSheet } from "@/components/console/import-sheet";
-import { StudioTable, TeacherTable } from "@/components/console/studio-table";
+import { TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
@@ -75,7 +75,7 @@ function Overview() {
   // A made-up studio for practising and demos; null means the real one is showing.
   const [sample, setSample] = useState<TableBatch[] | null>(null);
   const [importOpen, setImportOpen] = useState(false);
-  const [view, setView] = useState<"table" | "cards" | "batches" | "charts">("table");
+  const [view, setView] = useState<"table" | "charts">("table");
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -151,25 +151,19 @@ function Overview() {
       <div className="home-head">
         <h1 className="home-title">Home</h1>
         {!sample && !brandNew && (
-          <div className="table-chips home-views" role="group" aria-label="View" data-tour="views">
-            {(
-              [
-                ["table", "Table"],
-                ["cards", "Cards"],
-                ["batches", "By batch"],
-                ["charts", "Charts"],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className="table-chip"
-                aria-pressed={view === id}
-                onClick={() => setView(id)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="view-switch home-views" data-tour="views">
+            <span className="view-switch-label" data-on={view === "table"}>Table</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={view === "charts"}
+              aria-label="Show charts instead of the table"
+              className="view-switch-track"
+              onClick={() => setView(view === "table" ? "charts" : "table")}
+            >
+              <span className="view-switch-thumb" />
+            </button>
+            <span className="view-switch-label" data-on={view === "charts"}>Chart</span>
           </div>
         )}
         <div className="home-head-right">
@@ -235,9 +229,9 @@ function Overview() {
               />
             )
           )}
-          {(sample || view === "table" || view === "cards") && (
+          {(sample || view === "table") && (
             <DancerBoard
-              layout={view === "cards" && !sample ? "cards" : "table"}
+              layout="table"
               period={period}
               today={today}
               loose={looseUnpaid}
@@ -368,19 +362,6 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {!brandNew && !sample && view === "batches" && (
-        <>
-          <StudioTable
-            period={period}
-            today={today}
-            onRecord={(student) => setPaying(student)}
-            onRemindBatch={(ids) => {
-              setRemindIds(ids);
-              setBatchOpen(true);
-            }}
-          />
-        </>
-      )}
       {snapshot && !brandNew && !sample && view === "charts" && <MonthCharts snapshot={snapshot} />}
 
       <ConsoleDialog

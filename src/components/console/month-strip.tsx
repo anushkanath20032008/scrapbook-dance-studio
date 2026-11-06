@@ -35,10 +35,11 @@ export function MonthStrip({
         </strong>
       </div>
       <div className="strip-cell">
-        <span className="strip-label">
-          Collected · {formatRupees(numbers.collected_paise)} of{" "}
-          {formatRupees(numbers.billed_paise)}
-        </span>
+        <span className="strip-label">Collected</span>
+        <strong className="strip-mid">
+          {formatRupees(numbers.collected_paise)}{" "}
+          <span className="strip-of">of {formatRupees(numbers.billed_paise)}</span>
+        </strong>
         <span
           className="strip-bar"
           role="img"

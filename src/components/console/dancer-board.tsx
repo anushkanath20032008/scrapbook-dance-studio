@@ -496,8 +496,8 @@ export function DancerBoard({
                 Fee
               </th>
               <th scope="col">Status</th>
-              <th scope="col" title="Last reminded">
-                Reminded
+              <th scope="col" title="Reminders you marked as sent today, on this device">
+                Sent today
               </th>
               <th scope="col">
                 <span className="sr-only">Actions</span>
@@ -715,7 +715,7 @@ export function DancerBoard({
                           </span>
                         )}
                       </td>
-                      <td className="board-quiet">{reminded.has(row.studentId) ? "Today" : "—"}</td>
+                      <td className="board-quiet">{reminded.has(row.studentId) ? "✓" : "—"}</td>
                       <td>
                         <span className="board-row-actions">
                           {owes(row) && (

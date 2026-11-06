@@ -9,6 +9,8 @@ import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthCharts } from "@/components/console/month-charts";
+import { MonthEndPanel } from "@/components/console/month-end-panel";
+import { InsightsPanel } from "@/components/console/insights-panel";
 import { MonthStrip } from "@/components/console/month-strip";
 import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
@@ -356,7 +358,13 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {snapshot && !brandNew && !sample && view === "charts" && <MonthCharts snapshot={snapshot} />}
+      {!brandNew && !sample && view === "charts" && (
+        <div className="charts-view">
+          {snapshot && <MonthCharts snapshot={snapshot} />}
+          <MonthEndPanel month={month} />
+          <InsightsPanel embedded />
+        </div>
+      )}
 
       <ConsoleDialog
         open={importOpen}

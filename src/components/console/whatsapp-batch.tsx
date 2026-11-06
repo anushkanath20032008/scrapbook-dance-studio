@@ -72,9 +72,13 @@ export function WhatsAppBatchDialog({
   const isDone = (chargeId: string) =>
     handled.has(chargeId) || (!explicit && reminded.has(chargeId));
   const remaining = usable.filter((item) => !isDone(item.row.charge_id));
-  const markDone = (chargeId: string) => {
+  // Opening a chat is not sending a message: WhatsApp cannot tell us whether Send was pressed, so the owner
+  // says so. Skipped dancers move on without being counted as reminded.
+  const [openedId, setOpenedId] = useState<string | null>(null);
+  const markDone = (chargeId: string, sent: boolean) => {
     setHandled((current) => new Set(current).add(chargeId));
-    onOpened(chargeId);
+    setOpenedId(null);
+    if (sent) onOpened(chargeId);
   };
   const next = remaining[0];
   const openLink = useRef<HTMLAnchorElement>(null);
@@ -97,7 +101,7 @@ export function WhatsAppBatchDialog({
         <>
           <p className="console-hint">
             {position} of {usable.length}. This opens your own WhatsApp with the message ready.
-            Press Send there, then come back here for the next one.
+            Press Send in WhatsApp, then come back and press "Sent it" so this dancer is counted.
           </p>
           <div className="console-row">
             <div>
@@ -117,12 +121,25 @@ export function WhatsAppBatchDialog({
                 target="_blank"
                 rel="noreferrer"
                 ref={openLink}
-                onClick={() => markDone(next.row.charge_id)}
+                onClick={() => setOpenedId(next.row.charge_id)}
               >
                 Open WhatsApp for {next.row.student_name}
               </a>
             </Button>
-            <Button variant="retroPaper" type="button" onClick={() => markDone(next.row.charge_id)}>
+            {openedId === next.row.charge_id && (
+              <Button
+                variant="retro"
+                type="button"
+                onClick={() => markDone(next.row.charge_id, true)}
+              >
+                Sent it · next
+              </Button>
+            )}
+            <Button
+              variant="retroPaper"
+              type="button"
+              onClick={() => markDone(next.row.charge_id, false)}
+            >
               Skip
             </Button>
           </div>
@@ -131,7 +148,7 @@ export function WhatsAppBatchDialog({
         <p role="status">
           {usable.length === 0
             ? "Nobody here has a usable phone number."
-            : "✓ All done for today. Dancers you open or skip show as reminded."}
+            : "✓ All done for today. Only the dancers you marked as sent are counted as reminded."}
         </p>
       )}
       {noPhone.length > 0 && (

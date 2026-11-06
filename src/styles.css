@@ -1165,3 +1165,21 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .holiday-set { margin:0 0 12px; font-size:13px; }
 .holiday-set summary { cursor:pointer; color:#1e3188; font-weight:600; }
 .holiday-form { display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; margin-top:8px; }
+
+/* Charts view: the month's graphs, the month-end summary and the longer trends, one after another. */
+.charts-view { display:flex; flex-direction:column; gap:18px; }
+.charts-view .console-title { font-size:18px; }
+.peek-claims { border-color:#e8c46a; background:#fff6e0; }
+.peek-claim p { margin:0 0 8px; font-size:13px; line-height:1.45; }
+
+/* Notifications */
+.bell-wrap { position:relative; margin-left:auto; }
+.bell { position:relative; border:1px solid #c9d2f0; background:#fff; border-radius:999px; width:32px; height:32px; font-size:15px; line-height:1; cursor:pointer; }
+.bell-count { position:absolute; top:-5px; right:-5px; min-width:17px; height:17px; padding:0 4px; border-radius:999px; background:#c8321b; color:#fff; font-size:10px; font-weight:700; display:grid; place-items:center; }
+.bell-panel { position:absolute; right:0; top:38px; z-index:60; width:min(330px,calc(100vw - 24px)); background:#fff; border:1px solid #1e3188; border-radius:10px; box-shadow:0 8px 24px rgba(30,49,136,.22); padding:10px 12px; }
+.bell-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.bell-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:12.5px; }
+.bell-list li { border-left:3px solid #c9d2f0; padding-left:8px; }
+.bell-list li[data-tone="warn"] { border-left-color:#c8321b; }
+.bell-list a { color:#2a2622; text-decoration:none; line-height:1.4; display:block; }
+.bell-list a:hover { text-decoration:underline; color:#1e3188; }

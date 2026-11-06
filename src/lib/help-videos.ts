@@ -4,8 +4,7 @@ import type { GroupId } from "./console-nav";
 
 export const helpVideos: Record<GroupId, string> = {
   overview: "",
-  dancers: "",
-  money: "",
+  batches: "",
   attendance: "",
   studio: "",
 };

@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getStudentAttendance } from "@/lib/attendance.functions";
+import { confirmClaim, listClaimQueue, rejectClaim } from "@/lib/claims.functions";
+import { Button } from "@/components/ui/button";
 import { formatDayWithYear, formatMonthLong, maskPhone, paymentMethodLabel } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { getStudentLedger } from "@/lib/ledger.functions";
@@ -53,6 +55,10 @@ export function DancerPeek({
   const listStudents = useServerFn(listStudentOverview);
   const loadLedger = useServerFn(getStudentLedger);
   const loadAttendance = useServerFn(getStudentAttendance);
+  const loadClaims = useServerFn(listClaimQueue);
+  const confirmFn = useServerFn(confirmClaim);
+  const rejectFn = useServerFn(rejectClaim);
+  const queryClient = useQueryClient();
   const overview = useQuery({
     queryKey: ["students-overview", false],
     queryFn: () => listStudents({ data: {} }),
@@ -68,6 +74,30 @@ export function DancerPeek({
     queryFn: () =>
       loadAttendance({ data: { studentId: row.studentId, from: dayBefore(today, 90), to: today } }),
     enabled: !sample,
+  });
+
+  // Payments this dancer says they have made, waiting to be checked. They belong on the dancer, not a page of
+  // their own, so the owner confirms them while looking at the rest of that dancer's month.
+  const claimQueue = useQuery({
+    queryKey: ["claim-queue"],
+    queryFn: () => loadClaims(),
+    enabled: !sample,
+  });
+  const claims = (claimQueue.data ?? []).filter((claim) => claim.student_id === row.studentId);
+  const afterClaim = () => {
+    void queryClient.invalidateQueries({ queryKey: ["claim-queue"] });
+    void queryClient.invalidateQueries({ queryKey: ["studio-table"] });
+    void queryClient.invalidateQueries({ queryKey: ["home-report"] });
+    void queryClient.invalidateQueries({ queryKey: ["student-payments", row.studentId] });
+  };
+  const accept = useMutation({
+    mutationFn: (claimId: string) => confirmFn({ data: { claimId, acknowledgeExcess: true } }),
+    onSuccess: afterClaim,
+  });
+  const decline = useMutation({
+    mutationFn: (claimId: string) =>
+      rejectFn({ data: { claimId, reason: "Could not find this payment" } }),
+    onSuccess: afterClaim,
   });
 
   const person = overview.data?.find((student) => student.id === row.studentId);
@@ -148,6 +178,42 @@ export function DancerPeek({
           </Link>
         )}
       </div>
+
+      {claims.length > 0 && (
+        <section className="peek-card peek-claims">
+          <h3>Payment to check</h3>
+          {claims.map((claim) => (
+            <div key={claim.claim_id} className="peek-claim">
+              <p>
+                <strong>{formatRupees(claim.amount_paise)}</strong> said to be paid on{" "}
+                {formatDayWithYear(claim.paid_on)} by {paymentMethodLabel(claim.method)}
+                {claim.reference ? ` · ${claim.reference}` : ""}.
+              </p>
+              <div className="peek-actions-row">
+                <Button
+                  variant="retro"
+                  type="button"
+                  disabled={accept.isPending || decline.isPending}
+                  onClick={() => accept.mutate(claim.claim_id)}
+                >
+                  Yes, I got it
+                </Button>
+                <Button
+                  variant="retroPaper"
+                  type="button"
+                  disabled={accept.isPending || decline.isPending}
+                  onClick={() => decline.mutate(claim.claim_id)}
+                >
+                  Not received
+                </Button>
+              </div>
+            </div>
+          ))}
+          {(accept.isError || decline.isError) && (
+            <p role="alert">That did not go through. Please try again.</p>
+          )}
+        </section>
+      )}
 
       <div className="peek-tiles">
         <div className="peek-tile" data-c="0">

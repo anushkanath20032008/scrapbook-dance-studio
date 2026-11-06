@@ -15,7 +15,7 @@ export function GroupTabs({
   const tabs = groupTabs(group, messagingConfigured);
   if (tabs.length === 0) return null;
   const current = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  const label = group === "money" ? "Payment pages" : "Studio pages";
+  const label = group === "batches" ? "Batch pages" : "Studio pages";
   return (
     <nav className="group-tabs" aria-label={label} data-tour="tabs">
       <ul>

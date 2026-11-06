@@ -18,6 +18,7 @@ import { setupCountsKey } from "@/components/console/console-data";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import { listClaimQueue } from "@/lib/claims.functions";
+import { Notifications } from "@/components/console/notifications";
 import { getConsoleContext } from "@/lib/console.functions";
 import { getMessagingStatus } from "@/lib/reminders.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
@@ -252,6 +253,7 @@ function ConsoleLayout() {
           ChoreoStudio
         </a>
         <span className="console-studio">{context.data?.studioName || session.email}</span>
+        {isOwner && <Notifications claims={claims.data ?? []} />}
       </header>
       <div className={`console-body${folded ? " folded" : ""}`}>
         {isInstructor ? (
@@ -338,7 +340,7 @@ function ConsoleLayout() {
                   exact={group.exact}
                   active={activeGroup === group.id}
                   tour={group.id}
-                  badge={group.id === "money" ? toVerify : 0}
+                  badge={group.id === "overview" ? toVerify : 0}
                   hint={group.hint}
                   onPick={() => setMenuOpen(false)}
                 >

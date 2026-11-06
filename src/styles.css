@@ -917,7 +917,7 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 /* One type scale for every console page, the same one Home uses: 13px body, 22px page title, 15px section
    headings. Controls are small and flat so a page fits on one screen. */
 .console-main { font-size:13px; line-height:1.45; }
-.console-main .console-title, .home-title { font-family:"DM Sans",Arial,sans-serif; font-size:22px; font-weight:700; line-height:1.15; letter-spacing:-.01em; text-transform:none; color:var(--blue); margin:0 0 14px; position:relative; padding-bottom:8px; }
+.console-main .console-title, .home-title { font-family:"DM Sans",Arial,sans-serif; font-size:28px; font-weight:700; line-height:1.15; letter-spacing:-.01em; text-transform:none; color:var(--blue); margin:0 0 14px; position:relative; padding-bottom:8px; }
 .console-main .console-title::after, .home-title::after { content:""; position:absolute; left:0; bottom:0; width:34px; height:3px; border-radius:2px; background:var(--marigold); }
 .home-head { align-items:flex-end; }
 .home-head .home-title { margin:0 0 0; }
@@ -1103,3 +1103,6 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-group-actions button, .board-group-actions .btn { font-size:11px; padding:0 9px; height:24px; min-height:0; box-shadow:none; border-width:1px; line-height:1; }
 /* The batch is already in the band, so the column repeating it goes away when grouped by batch. */
 .board-table[data-by="batch"] col.c-batch, .board-table[data-by="batch"] thead th:nth-child(3), .board-table[data-by="batch"] td.board-batch { display:none; }
+.console-main .console-title, .home-title { font-size:28px; }
+.console-main .console-subtitle { font-size:18px; }
+.board-group[data-kind="batch"] strong { font-size:14px; }

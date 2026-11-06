@@ -536,6 +536,7 @@ export function DancerBoard({
                             else next.add(row.studentId);
                           onPickedChange(next);
                         }}
+                        data-tour={tourRemind && batchOf ? "remind" : undefined}
                         aria-label={`Pick every dancer in ${group.label}`}
                       />
                     )}
@@ -555,58 +556,19 @@ export function DancerBoard({
                           Set their fees →
                         </Link>
                       )}
-                      {batchOf ? (
-                        <span className="board-group-actions">
-                          {showRemind && !sample && (
-                            <Button
-                              variant="retro"
+                      {batchOf
+                        ? null
+                        : showRemind && (
+                            <button
                               type="button"
-                              onClick={() =>
-                                setPayingBatch(payingBatch === batchOf.id ? null : batchOf.id)
-                              }
-                            >
-                              Mark all paid
-                            </Button>
-                          )}
-                          {batchOf.meetsToday && group.rows.length > 0 && (
-                            <Button
-                              variant="retro"
-                              type="button"
-                              onClick={() =>
-                                rows
-                                  .filter((row) =>
-                                    row.todayBatches.some((b) => b.batchId === batchOf.id),
-                                  )
-                                  .forEach((row) => setMark(row, true, batchOf.id))
-                              }
-                            >
-                              All present today
-                            </Button>
-                          )}
-                          {showRemind && (
-                            <Button
-                              variant="retroPaper"
-                              type="button"
+                              className="board-link"
                               data-tour={tourRemind ? "remind" : undefined}
                               onClick={() => remind(groupUnpaid.map((row) => row.studentId))}
                             >
-                              Remind unpaid ({groupUnpaid.length})
-                            </Button>
+                              Remind {groupUnpaid.length === 1 ? "1" : `all ${groupUnpaid.length}`}{" "}
+                              on WhatsApp
+                            </button>
                           )}
-                        </span>
-                      ) : (
-                        showRemind && (
-                          <button
-                            type="button"
-                            className="board-link"
-                            data-tour={tourRemind ? "remind" : undefined}
-                            onClick={() => remind(groupUnpaid.map((row) => row.studentId))}
-                          >
-                            Remind {groupUnpaid.length === 1 ? "1" : `all ${groupUnpaid.length}`} on
-                            WhatsApp
-                          </button>
-                        )
-                      )}
                     </span>
                   </th>
                 </tr>

@@ -1125,3 +1125,10 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-table .board-name button:hover, .board-table .board-name a:hover { text-decoration:underline; color:#1e3188; }
 .board-table .board-name-btn { font-weight:500; color:#2a2622; }
 .board-table .board-name-btn:hover { color:#1e3188; }
+
+/* Subscribe wall, shown across the console once the free month has ended. */
+.paywall { border:2px solid #1e3188; border-radius:10px; background:#eef2ff; padding:14px 16px; margin:0 0 14px; }
+.paywall strong { display:block; font-size:16px; color:#1e3188; margin-bottom:4px; }
+.paywall p { margin:0 0 10px; font-size:13px; line-height:1.5; max-width:62ch; }
+.paywall-cta { display:inline-block; padding:7px 14px; border:1px solid var(--ink); border-radius:6px; background:var(--marigold); color:var(--ink); font-weight:700; font-size:13px; text-decoration:none; box-shadow:2px 2px 0 var(--ink); }
+.paywall-cta:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }

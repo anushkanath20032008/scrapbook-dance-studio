@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { MAX_PASTED_DANCERS } from "@/lib/bulk-dancers";
 import { isoDate, paise, personName, phone, validate } from "@/lib/validators";
 
 export const bulkAddDancers = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({

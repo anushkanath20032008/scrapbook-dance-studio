@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { isoDate, listLimit, personName, phone, uuid, validate } from "@/lib/validators";
 
 const listInput = z.object({
@@ -18,7 +19,7 @@ export const listGuardians = createServerFn({ method: "GET" })
   );
 
 export const saveGuardian = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -37,7 +38,7 @@ export const saveGuardian = createServerFn({ method: "POST" })
   );
 
 export const setGuardianArchived = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(idInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/directory.server")).setGuardianArchived(context, data),
@@ -51,7 +52,7 @@ export const listStudents = createServerFn({ method: "GET" })
   );
 
 export const saveStudent = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -71,7 +72,7 @@ export const saveStudent = createServerFn({ method: "POST" })
   );
 
 export const setStudentArchived = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(idInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/directory.server")).setStudentArchived(context, data),

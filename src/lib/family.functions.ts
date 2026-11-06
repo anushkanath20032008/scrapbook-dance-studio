@@ -2,10 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { uuid, validate } from "@/lib/validators";
 
 export const createFamilyLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ guardianId: uuid })))
   .handler(async ({ data, context }) => {
     const baseUrl = process.env["PUBLIC_APP_URL"] || new URL(getRequest().url).origin;
@@ -20,7 +21,7 @@ export const listFamilyLinks = createServerFn({ method: "GET" })
   );
 
 export const revokeFamilyLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/family.server")).revokeFamilyLink(context, data),
@@ -36,7 +37,7 @@ export const getFamilyView = createServerFn({ method: "GET" })
 
 /** The private pay-claim link for each dancer, made on first use, so reminders can carry it. */
 export const getReminderLinks = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ studentIds: z.array(uuid).min(1).max(200) })))
   .handler(async ({ data, context }) => {
     const baseUrl = process.env["PUBLIC_APP_URL"] || new URL(getRequest().url).origin;

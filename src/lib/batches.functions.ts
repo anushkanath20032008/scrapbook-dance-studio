@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { batchInput } from "@/lib/schemas";
 import { isoDate, listLimit, uuid, validate } from "@/lib/validators";
 
@@ -14,21 +15,21 @@ export const listBatches = createServerFn({ method: "GET" })
   );
 
 export const saveBatch = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(batchInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/batches.server")).saveBatch(context, data),
   );
 
 export const setBatchArchived = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid, archived: z.boolean() })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/batches.server")).setBatchArchived(context, data),
   );
 
 export const addToBatch = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(z.object({ batchId: uuid, studentId: uuid, joinedOn: isoDate.optional() })),
   )
@@ -37,7 +38,7 @@ export const addToBatch = createServerFn({ method: "POST" })
   );
 
 export const removeFromBatch = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(z.object({ batchId: uuid, studentId: uuid, leftOn: isoDate.optional() })),
   )

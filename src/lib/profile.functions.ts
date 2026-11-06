@@ -5,7 +5,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const profileSchema = z.object({
   name: z.string().trim().min(2).max(100),
   studioName: z.string().trim().min(2).max(120),
-  phone: z.string().trim().regex(/^\+?[0-9\s-]{10,18}$/).or(z.literal("")),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[0-9\s-]{10,18}$/)
+    .or(z.literal("")),
   city: z.string().trim().max(100),
   feeDueDay: z.number().int().min(1).max(31).optional(),
 });
@@ -41,9 +45,11 @@ export const saveProfile = createServerFn({ method: "POST" })
 export const getProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.from("studio_profiles")
+    const { data, error } = await context.supabase
+      .from("studio_profiles")
       .select("name, studio_name, phone, city, plan, billing_status, fee_due_day")
-      .eq("user_id", context.userId).maybeSingle();
+      .eq("user_id", context.userId)
+      .maybeSingle();
     if (error) throw new Error("Could not load your studio details.");
     return data;
   });

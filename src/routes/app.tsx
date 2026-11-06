@@ -1,7 +1,16 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, ClipboardCheck, IndianRupee, LayoutGrid, ListChecks, Repeat, Users, type LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardCheck,
+  IndianRupee,
+  LayoutGrid,
+  ListChecks,
+  Repeat,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -133,7 +142,11 @@ function ConsoleLayout() {
   }, [session]);
   // Someone is asked to join only when the account is a teacher in name but has neither a studio of its own nor a
   // studio it teaches at.
-  const needsJoin = teacherIntent && teacherStudio.data !== undefined && teacherStudio.data.studioName === null && !teacherStudio.data.ownsStudio;
+  const needsJoin =
+    teacherIntent &&
+    teacherStudio.data !== undefined &&
+    teacherStudio.data.studioName === null &&
+    !teacherStudio.data.ownsStudio;
   const mustJoin = teacherIntent && (teacherStudio.isPending || needsJoin);
   const context = useQuery({
     queryKey: ["console-context"],
@@ -234,112 +247,142 @@ function ConsoleLayout() {
         >
           ☰
         </button>
-        <a className="brand" href="/" aria-label="ChoreoStudio home"><img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24"/>ChoreoStudio</a>
+        <a className="brand" href="/" aria-label="ChoreoStudio home">
+          <img className="brand-mark" src="/logo-mark.svg" alt="" width="24" height="24" />
+          ChoreoStudio
+        </a>
         <span className="console-studio">{context.data?.studioName || session.email}</span>
       </header>
       <div className={`console-body${folded ? " folded" : ""}`}>
         {isInstructor ? (
-        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
-          {instructorItems.map((item) => (
-            <NavLink key={item.to} to={item.to} exact={item.exact} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
-              {item.label}
-            </NavLink>
-          )).flatMap((link, index) =>
-            instructorItems[index]?.to === "/app/my-batches" && (myBatches.data?.length ?? 0) > 0
-              ? [
-                  <div key="batches-head" className="console-nav-fold">
-                    {link}
-                    <button
-                      type="button"
-                      className="console-fold-toggle"
-                      aria-expanded={batchesOpen}
-                      aria-label={batchesOpen ? "Hide your batches" : "Show your batches"}
-                      onClick={toggleBatches}
-                    >
-                      {batchesOpen ? "▾" : "▸"}
-                    </button>
-                  </div>,
-                  <ul key="batch-subnav" className="console-subnav" aria-label="Your batches" hidden={!batchesOpen}>
-                    {myBatches.data?.map((batch) => (
-                      <li key={batch.id}>
+          <nav
+            className={`console-nav${menuOpen ? " open" : ""}`}
+            aria-label="Dance teacher navigation"
+          >
+            {instructorItems
+              .map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  exact={item.exact}
+                  tour={item.label.toLowerCase().replace(/[^a-z]/g, "")}
+                  onPick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </NavLink>
+              ))
+              .flatMap((link, index) =>
+                instructorItems[index]?.to === "/app/my-batches" &&
+                (myBatches.data?.length ?? 0) > 0
+                  ? [
+                      <div key="batches-head" className="console-nav-fold">
+                        {link}
+                        <button
+                          type="button"
+                          className="console-fold-toggle"
+                          aria-expanded={batchesOpen}
+                          aria-label={batchesOpen ? "Hide your batches" : "Show your batches"}
+                          onClick={toggleBatches}
+                        >
+                          {batchesOpen ? "▾" : "▸"}
+                        </button>
+                      </div>,
+                      <ul
+                        key="batch-subnav"
+                        className="console-subnav"
+                        aria-label="Your batches"
+                        hidden={!batchesOpen}
+                      >
+                        {myBatches.data?.map((batch) => (
+                          <li key={batch.id}>
+                            <Link
+                              to="/app/my-batches"
+                              search={{ batch: batch.id }}
+                              className="console-nav-item console-nav-sub"
+                              activeOptions={{ includeSearch: true }}
+                              activeProps={{ className: "active" }}
+                              onClick={() => setMenuOpen(false)}
+                            >
+                              {batch.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>,
+                    ]
+                  : [link],
+              )}
+            <div className="console-nav-foot">
+              <Button
+                variant="retroPaper"
+                title="A one-minute walk through the menu"
+                onClick={() => setTourOpen(true)}
+              >
+                Take the tour
+              </Button>
+              <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
+                Sign out
+              </Button>
+            </div>
+          </nav>
+        ) : (
+          <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Console navigation">
+            {!setupDone && (
+              <NavLink to="/app/setup" onPick={() => setMenuOpen(false)}>
+                Set up your studio
+              </NavLink>
+            )}
+            {consoleGroups.map((group) => (
+              <Fragment key={group.id}>
+                <NavLink
+                  to={group.to as NavTo}
+                  exact={group.exact}
+                  active={activeGroup === group.id}
+                  tour={group.id}
+                  badge={group.id === "money" ? toVerify : 0}
+                  hint={group.hint}
+                  onPick={() => setMenuOpen(false)}
+                >
+                  {group.label}
+                </NavLink>
+                {group.id === "studio" && (
+                  <ul className="console-subnav" aria-label="Studio pages">
+                    {groupTabs("studio", false).map((tab) => (
+                      <li key={tab.to}>
                         <Link
-                          to="/app/my-batches"
-                          search={{ batch: batch.id }}
-                          className="console-nav-item console-nav-sub"
-                          activeOptions={{ includeSearch: true }}
-                          activeProps={{ className: "active" }}
+                          to={tab.to}
+                          title={tab.hint}
+                          className="console-nav-sub"
+                          aria-current={
+                            pathname.replace(/\/+$/, "") === tab.to ? "page" : undefined
+                          }
                           onClick={() => setMenuOpen(false)}
                         >
-                          {batch.name}
+                          {tab.label}
                         </Link>
                       </li>
                     ))}
-                  </ul>,
-                ]
-              : [link],
-          )}
-          <div className="console-nav-foot">
-            <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
-              Take the tour
-            </Button>
-            <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
-              Sign out
-            </Button>
-          </div>
-        </nav>
-        ) : (
-        <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Console navigation">
-          {!setupDone && (
-            <NavLink to="/app/setup" onPick={() => setMenuOpen(false)}>
-              Set up your studio
-            </NavLink>
-          )}
-          {consoleGroups.map((group) => (
-            <Fragment key={group.id}>
-            <NavLink
-              to={group.to as NavTo}
-              exact={group.exact}
-              active={activeGroup === group.id}
-              tour={group.id}
-              badge={group.id === "money" ? toVerify : 0}
-              hint={group.hint}
-              onPick={() => setMenuOpen(false)}
-            >
-              {group.label}
-            </NavLink>
-            {group.id === "studio" && (
-              <ul className="console-subnav" aria-label="Studio pages">
-                {groupTabs("studio", false).map((tab) => (
-                  <li key={tab.to}>
-                    <Link
-                      to={tab.to}
-                      title={tab.hint}
-                      className="console-nav-sub"
-                      aria-current={pathname.replace(/\/+$/, "") === tab.to ? "page" : undefined}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      {tab.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            </Fragment>
-          ))}
-          <div className="console-nav-foot">
-            {context.data?.isPlatformOwner && (
-              <Link to="/admin" className="console-nav-item">
-                Studio enquiries
-              </Link>
-            )}
-            <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
-              Take the tour
-            </Button>
-            <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
-              Sign out
-            </Button>
-          </div>
-        </nav>
+                  </ul>
+                )}
+              </Fragment>
+            ))}
+            <div className="console-nav-foot">
+              {context.data?.isPlatformOwner && (
+                <Link to="/admin" className="console-nav-item">
+                  Studio enquiries
+                </Link>
+              )}
+              <Button
+                variant="retroPaper"
+                title="A one-minute walk through the menu"
+                onClick={() => setTourOpen(true)}
+              >
+                Take the tour
+              </Button>
+              <Button variant="retroPaper" onClick={() => supabase.auth.signOut()}>
+                Sign out
+              </Button>
+            </div>
+          </nav>
         )}
         {tourOpen && tourRole && (
           <GuidedTour
@@ -349,14 +392,21 @@ function ConsoleLayout() {
           />
         )}
         <main className="console-main">
-          {session.termsVersion !== TERMS_VERSION && !termsDone && <TermsGate onAccepted={() => setTermsDone(true)} />}
+          {session.termsVersion !== TERMS_VERSION && !termsDone && (
+            <TermsGate onAccepted={() => setTermsDone(true)} />
+          )}
           {needsJoin && !joinHidden && (
-            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} onDismiss={() => setJoinHidden(true)} />
+            <JoinStudioDialog
+              onLeave={() => setTeacherIntent(false)}
+              onDismiss={() => setJoinHidden(true)}
+            />
           )}
           {needsJoin && joinHidden && (
             <div className="console-form">
               <h2>You have not joined a studio yet</h2>
-              <p>Ask your studio owner for an invite code. Nothing is set up for you until you join.</p>
+              <p>
+                Ask your studio owner for an invite code. Nothing is set up for you until you join.
+              </p>
               <div className="console-actions">
                 <Button variant="retro" type="button" onClick={() => setJoinHidden(false)}>
                   Enter an invite code
@@ -373,17 +423,40 @@ function ConsoleLayout() {
             <span className="skeleton-block skeleton-card" />
           ) : (
             <>
-              {isOwner && !billingNoticeShut && needsBillingAttention(context.data?.billingStatus) && (
-                <p className="console-banner" role="status">
-                  <span>Your subscription needs attention ({context.data?.billingStatus.replace(/_/g, " ")}).</span>
-                  <span className="console-banner-actions">
-                    <Link to="/account" className="text-link">Open account</Link>
-                    <button type="button" className="text-link" onClick={() => setBillingNoticeShut(true)}>
-                      Dismiss
-                    </button>
-                  </span>
-                </p>
+              {isOwner && context.data?.hasAccess === false && (
+                <div className="paywall" role="alert">
+                  <strong>Your free month has ended</strong>
+                  <p>
+                    Everything you have added is safe and you can still look at it. To add dancers,
+                    mark attendance, record payments or send reminders, subscribe for ₹249 a month.
+                  </p>
+                  <Link to="/account" className="paywall-cta">
+                    Subscribe for ₹249 a month →
+                  </Link>
+                </div>
               )}
+              {isOwner &&
+                !billingNoticeShut &&
+                needsBillingAttention(context.data?.billingStatus) && (
+                  <p className="console-banner" role="status">
+                    <span>
+                      Your subscription needs attention (
+                      {context.data?.billingStatus.replace(/_/g, " ")}).
+                    </span>
+                    <span className="console-banner-actions">
+                      <Link to="/account" className="text-link">
+                        Open account
+                      </Link>
+                      <button
+                        type="button"
+                        className="text-link"
+                        onClick={() => setBillingNoticeShut(true)}
+                      >
+                        Dismiss
+                      </button>
+                    </span>
+                  </p>
+                )}
               {!isInstructor && (
                 <GroupTabs
                   group={activeGroup}
@@ -392,7 +465,13 @@ function ConsoleLayout() {
                 />
               )}
               {!isInstructor && helpVideos[activeGroup] !== "" && (
-                <a className="help-video" href={helpVideos[activeGroup]} target="_blank" rel="noreferrer" title="A short video showing how this section works">
+                <a
+                  className="help-video"
+                  href={helpVideos[activeGroup]}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="A short video showing how this section works"
+                >
                   ▶ Watch how this works
                 </a>
               )}
@@ -451,7 +530,9 @@ function NavLink({
       {navIcons[to] &&
         (() => {
           const Icon = navIcons[to]!;
-          return <Icon className="console-nav-icon" size={18} strokeWidth={1.9} aria-hidden="true" />;
+          return (
+            <Icon className="console-nav-icon" size={18} strokeWidth={1.9} aria-hidden="true" />
+          );
         })()}
       <span className="console-nav-text">{children}</span>
       {badge > 0 && (

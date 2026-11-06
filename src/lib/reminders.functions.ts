@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { isoDate, listLimit, uuid, validate } from "@/lib/validators";
 
 const queueInput = z.object({
@@ -14,7 +15,7 @@ const listInput = z.object({
 });
 
 export const queueReminders = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(queueInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/reminders.server")).queueReminders(context, data),
@@ -39,7 +40,7 @@ export const getAutomation = createServerFn({ method: "GET" })
   .handler(async ({ context }) => (await import("@/lib/reminders.server")).getAutomation(context));
 
 export const setAutomation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ on: z.boolean() })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/reminders.server")).setAutomation(context, data),

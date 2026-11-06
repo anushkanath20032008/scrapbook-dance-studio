@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { feePlanInput } from "@/lib/schemas";
 import { isoDate, listLimit, uuid, validate } from "@/lib/validators";
 
@@ -14,21 +15,21 @@ export const listFeePlans = createServerFn({ method: "GET" })
   );
 
 export const saveFeePlan = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(feePlanInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/fees.server")).saveFeePlan(context, data),
   );
 
 export const setFeePlanArchived = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid, archived: z.boolean() })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/fees.server")).setFeePlanArchived(context, data),
   );
 
 export const assignFeePlan = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ studentId: uuid, planId: uuid, startsOn: isoDate })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/fees.server")).assignFeePlan(context, data),

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { generateChargesInput, paymentInput } from "@/lib/schemas";
 import { isoDate, paise, uuid, validate, voidReason } from "@/lib/validators";
 
@@ -8,28 +9,28 @@ const voidInput = z.object({ id: uuid, reason: voidReason });
 const periodInput = z.object({ period: isoDate });
 
 export const generateCharges = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(generateChargesInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/ledger.server")).generateCharges(context, data),
   );
 
 export const recordPayment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(paymentInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/ledger.server")).recordPayment(context, data),
   );
 
 export const voidCharge = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(voidInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/ledger.server")).voidCharge(context, data),
   );
 
 export const voidPayment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(voidInput))
   .handler(async ({ data, context }) =>
     (await import("@/lib/ledger.server")).voidPayment(context, data),

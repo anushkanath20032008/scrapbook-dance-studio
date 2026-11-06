@@ -56,8 +56,8 @@ export function accountPlanSummary(input: AccountPlanInput): AccountPlanSummary 
     return {
       ...base,
       canChoosePlan: true,
-      headline: billingStatus === "cancelled" ? "Subscription ended" : "Free month is over",
-      detail: `You have ${count}. ${limitNote} Dancers you already added stay. Choose a plan to add more.`,
+      headline: billingStatus === "cancelled" ? "Subscription ended" : "Your free month has ended",
+      detail: `You have ${count}, and everything you added is safe. Subscribe for ₹249 a month to add dancers, mark attendance, record payments and send reminders again.`,
     };
   }
   if (billingStatus === "past_due" || billingStatus === "on_hold") {

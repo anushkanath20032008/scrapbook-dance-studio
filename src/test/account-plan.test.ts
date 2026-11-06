@@ -20,14 +20,14 @@ describe("accountPlanSummary", () => {
     expect(summary.hasSubscription).toBe(false);
   });
 
-  it("says the free month is over, with the dancer limit, once it has passed", () => {
+  it("asks the studio to subscribe once the free month has passed", () => {
     const summary = accountPlanSummary({
       ...base,
       trialEndsAt: "2026-10-01T00:00:00Z",
       studentLimit: 50,
     });
-    expect(summary.headline).toMatch(/over/i);
-    expect(summary.detail).toMatch(/up to 50 dancers/);
+    expect(summary.headline).toMatch(/ended/i);
+    expect(summary.detail).toMatch(/₹249 a month/);
     expect(summary.trialEndsOn).toBeNull();
     expect(summary.canChoosePlan).toBe(true);
   });

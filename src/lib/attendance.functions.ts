@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { isoDate, uuid, validate } from "@/lib/validators";
 
 const marks = z
@@ -13,7 +14,7 @@ const marks = z
   );
 
 export const markAttendance = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ batchId: uuid, date: isoDate, marks })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/attendance.server")).markAttendance(context, data),

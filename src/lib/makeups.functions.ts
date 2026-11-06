@@ -1,12 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { isoDate, uuid, validate } from "@/lib/validators";
 
 // Make-up classes: open to the owner and to a Dance teacher. The database functions refuse anyone else.
 export const getMakeupBatches = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => (await import("@/lib/makeups.server")).listMakeupBatches(context));
+  .handler(async ({ context }) =>
+    (await import("@/lib/makeups.server")).listMakeupBatches(context),
+  );
 
 export const getAbsentees = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -16,7 +19,7 @@ export const getAbsentees = createServerFn({ method: "GET" })
   );
 
 export const planMakeup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -37,7 +40,7 @@ export const getMakeups = createServerFn({ method: "GET" })
   .handler(async ({ context }) => (await import("@/lib/makeups.server")).listMakeups(context));
 
 export const completeMakeup = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/makeups.server")).finishMakeup(context, data),

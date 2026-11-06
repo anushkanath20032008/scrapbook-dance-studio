@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { validate } from "@/lib/validators";
 
 // Whether the photo option should be shown. Only a yes or no: nothing about the key or the provider.
@@ -13,7 +14,7 @@ export const getImportCapabilities = createServerFn({ method: "GET" })
 // Owner only: the database function that takes the page quota refuses anyone who is not a studio owner.
 // The base64 limit is the largest photo the reading service takes (about 5 MB).
 export const readDancersFromPhoto = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({

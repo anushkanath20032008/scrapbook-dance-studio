@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { claimInput } from "@/lib/schemas";
 import { paise, uuid, validate, voidReason } from "@/lib/validators";
 
@@ -24,7 +25,7 @@ export const listClaimQueue = createServerFn({ method: "GET" })
   .handler(async ({ context }) => (await import("@/lib/claims.server")).listClaimQueue(context));
 
 export const confirmClaim = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -40,7 +41,7 @@ export const confirmClaim = createServerFn({ method: "POST" })
   });
 
 export const rejectClaim = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ claimId: uuid, reason: voidReason })))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

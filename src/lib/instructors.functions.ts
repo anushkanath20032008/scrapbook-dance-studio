@@ -2,12 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { batchInput } from "@/lib/schemas";
 import { isoDate, personName, phone, uuid, validate } from "@/lib/validators";
 
 // Owner side: invite, list and remove instructors. The database refuses anyone who is not the studio owner.
 export const inviteInstructor = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -35,7 +36,7 @@ export const listInstructors = createServerFn({ method: "GET" })
   );
 
 export const removeInstructor = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).removeInstructor(context, data),
@@ -130,14 +131,14 @@ export const listBatchRequests = createServerFn({ method: "GET" })
   );
 
 export const approveBatchRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).approveBatchRequest(context, data),
   );
 
 export const declineBatchRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ id: uuid })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).declineBatchRequest(context, data),
@@ -145,9 +146,7 @@ export const declineBatchRequest = createServerFn({ method: "POST" })
 
 export const addInstructorStudent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    validate(z.object({ batchId: uuid, name: personName, phone: phone.nullable() })),
-  )
+  .inputValidator(validate(z.object({ batchId: uuid, name: personName, phone: phone.nullable() })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/instructors.server")).addInstructorStudent(context, data),
   );

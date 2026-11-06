@@ -1,4 +1,5 @@
 import { getInstructorMe } from "./instructors.server";
+import { decideAccess } from "./access.server";
 import { ensureStudio, friendlyError, type StudioContext } from "./studio.server";
 
 /** What the console shell needs after sign-in: the studio's identity, plan and billing state, and platform role. */
@@ -8,6 +9,7 @@ export async function getConsoleContext(context: StudioContext) {
   if (instructor) {
     return {
       role: "instructor" as const,
+      hasAccess: true,
       studentLimit: null,
       studentCount: 0,
       trialEndsAt: null,
@@ -21,7 +23,11 @@ export async function getConsoleContext(context: StudioContext) {
   // A studio is only ever made for someone who has not said they teach. Without this check, any account that
   // reached the console before accepting an invite (another browser, a closed prompt) would be given an owner studio.
   const { supabase, userId } = context;
-  const existing = await supabase.from("studio_profiles").select("user_id").eq("user_id", userId).maybeSingle();
+  const existing = await supabase
+    .from("studio_profiles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
   if (!existing.error && !existing.data) {
     const { data: auth } = await supabase.auth.getUser();
     if (auth.user?.user_metadata?.["role"] === "teacher")
@@ -47,8 +53,17 @@ export async function getConsoleContext(context: StudioContext) {
   const capacity = await supabase.rpc("studio_capacity");
   const cap = capacity.error ? undefined : capacity.data?.[0];
 
+  const access = decideAccess({
+    trialEndsAt: (cap?.trial_ends_at as string | null | undefined) ?? null,
+    billingStatus: profile?.billing_status ?? "not_started",
+    isPlatformOwner: isPlatformOwner === true,
+    hasStudio: true,
+    now: new Date(),
+  });
+
   return {
     role: "owner" as const,
+    hasAccess: access.hasAccess,
     studentLimit: (cap?.student_limit as number | null | undefined) ?? null,
     studentCount: cap?.student_count ?? 0,
     trialEndsAt: cap?.trial_ends_at ?? null,

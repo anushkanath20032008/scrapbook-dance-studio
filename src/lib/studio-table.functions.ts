@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireSubscription } from "@/lib/access-middleware";
 import { paymentMethods } from "@/lib/schemas";
 import { isoDate, uuid, validate } from "@/lib/validators";
 
@@ -21,7 +22,7 @@ export const getTeacherTable = createServerFn({ method: "GET" })
   );
 
 export const markBatchPaid = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(
     validate(
       z.object({
@@ -39,7 +40,7 @@ export const markBatchPaid = createServerFn({ method: "POST" })
   );
 
 export const undoBatchPaid = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireSubscription])
   .inputValidator(validate(z.object({ paymentIds: z.array(uuid).min(1).max(300) })))
   .handler(async ({ data, context }) =>
     (await import("@/lib/studio-table.server")).undoBatchPaid(context, data),

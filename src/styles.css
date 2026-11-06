@@ -934,6 +934,17 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .console-main .console-row { padding:9px 11px; }
 .console-main .console-empty { font-size:13px; }
 .console-nav-item { font-size:13px; }
+/* Dialogs open outside the page area, so they get the same small type scale. */
+.console-dialog { font-size:13px; line-height:1.45; }
+.console-dialog h2, .console-dialog h3 { font-size:15px; line-height:1.25; }
+.console-dialog .console-hint { font-size:12px; }
+.console-dialog .chrome-font, .console-dialog .window-bar { font-size:16px; min-height:30px; }
+.console-dialog .retro-button { font-size:13px; padding:5px 12px; min-height:34px; }
+.console-dialog .field { font-size:13px; min-height:34px; padding:5px 9px; }
+.console-dialog .form-label { font-size:12px; }
+.console-dialog .status-pill { font-size:11px; padding:2px 8px; }
+.console-dialog .console-row { padding:9px 11px; }
+.console-dialog .console-empty, .console-dialog .reminder-preview { font-size:13px; }
 
 /* Status badges: a dot and a stronger tint, so Overdue, Due, Paid and No fee read at a glance. */
 .chip { gap:5px; height:22px; padding:0 9px 0 7px; font-size:11.5px; font-weight:700; letter-spacing:.01em; border:1px solid transparent; }

@@ -96,8 +96,8 @@ export function WhatsAppBatchDialog({
       {next ? (
         <>
           <p className="console-hint">
-            {position} of {usable.length}. This opens your own WhatsApp with the message ready.
-            Press Send there, then come back here for the next one.
+            {usable.length > 1 && `${position} of ${usable.length}. `}This opens your own WhatsApp with the
+            message ready. Press Send there{usable.length > 1 ? ", then come back here for the next one" : ""}.
           </p>
           <div className="console-row">
             <div>
@@ -122,9 +122,11 @@ export function WhatsAppBatchDialog({
                 Open WhatsApp for {next.row.student_name}
               </a>
             </Button>
-            <Button variant="retroPaper" type="button" onClick={() => markDone(next.row.charge_id)}>
-              Skip
-            </Button>
+            {usable.length > 1 && (
+              <Button variant="retroPaper" type="button" onClick={() => markDone(next.row.charge_id)}>
+                Skip
+              </Button>
+            )}
           </div>
         </>
       ) : (
@@ -142,7 +144,7 @@ export function WhatsAppBatchDialog({
       )}
       <div className="console-form-actions">
         <Button variant="retroPaper" type="button" onClick={onClose}>
-          {next ? "Stop here" : "Close"}
+          {remaining.length > 1 ? "Stop here" : "Close"}
         </Button>
       </div>
     </ConsoleDialog>

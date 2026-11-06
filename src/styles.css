@@ -1132,3 +1132,11 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .paywall p { margin:0 0 10px; font-size:13px; line-height:1.5; max-width:62ch; }
 .paywall-cta { display:inline-block; padding:7px 14px; border:1px solid var(--ink); border-radius:6px; background:var(--marigold); color:var(--ink); font-weight:700; font-size:13px; text-decoration:none; box-shadow:2px 2px 0 var(--ink); }
 .paywall-cta:hover { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+
+/* Tour card: small enough to read past, and it never sits on top of what it is pointing at. */
+.tour-card { width:min(300px,calc(100vw - 28px)); padding:12px 14px; border-width:2px; box-shadow:4px 4px 0 var(--ink); font-size:12.5px; }
+.tour-card .tour-step { font-size:10px; margin:0 0 2px; }
+.tour-card .tour-title { font-size:16px; line-height:1.2; margin:0 0 6px; }
+.tour-card p { margin:0 0 10px; line-height:1.45; }
+.tour-card .console-actions button { font-size:12px; padding:0 10px; height:26px; min-height:0; }
+@media (max-width:640px){ .tour-card { left:10px; right:10px; width:auto; max-height:40vh; } }

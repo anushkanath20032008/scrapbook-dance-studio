@@ -23,8 +23,8 @@ const steps: Record<TourRole, Step[]> = {
     {
       to: "/app",
       target: "views",
-      title: "Four ways to look",
-      text: "Switch between Table, Cards, By batch and Charts. The Table groups dancers under their batch, each in its own colour.",
+      title: "Two ways to look",
+      text: "Table is the list of dancers, grouped under their batch, each batch in its own colour. Charts shows the month as graphs.",
     },
     {
       to: "/app",
@@ -36,13 +36,13 @@ const steps: Record<TourRole, Step[]> = {
       to: "/app",
       target: "board",
       title: "Everyone in one table",
-      text: "Each batch has its own coloured bar with Mark all paid, All present today and Remind unpaid. Click a dancer's name for a panel with their month.",
+      text: "Each batch sits under its own coloured bar. Tick the box on a bar to pick that whole batch, or tick dancers one by one. Click a name to open that dancer's card.",
     },
     {
       to: "/app",
       target: "ticks",
       title: "Mark who is here",
-      text: "Tap a tick when a dancer arrives. Press and slide down the column to mark a whole class at once.",
+      text: "Click once for a green tick, again for a red cross. A bar at the bottom of the screen offers Take attendance: every batch meeting today, everyone already here, so you only tap the absentees.",
     },
     {
       to: "/app",
@@ -60,7 +60,7 @@ const steps: Record<TourRole, Step[]> = {
       to: "/app/students",
       target: "add-dancer",
       title: "Dancers",
-      text: "Add dancers one at a time here, or use Paste a list to add many at once, or read them from a photo of your register.",
+      text: "Add dancers one at a time here, paste a list, import your spreadsheet, or read them from a photo of your register.",
     },
     {
       to: "/app/billing",
@@ -209,6 +209,9 @@ export function GuidedTour({
   }
 
   const pad = 6;
+  // Keep the card away from the part it is explaining: if that sits low on the screen, the card goes up, and
+  // the other way round. Without a spotlight it rests in the bottom corner.
+  const atTop = box !== null && box.top + box.height / 2 > window.innerHeight / 2;
   return (
     <>
       {box ? (
@@ -225,7 +228,13 @@ export function GuidedTour({
       ) : (
         <div className="tour-dim" aria-hidden="true" />
       )}
-      <div className="tour-card" role="dialog" aria-label="Guided tour" aria-live="polite">
+      <div
+        className="tour-card"
+        role="dialog"
+        aria-label="Guided tour"
+        aria-live="polite"
+        style={atTop ? { top: 16, bottom: "auto" } : { bottom: 16, top: "auto" }}
+      >
         <p className="tour-step chrome-font">
           Step {index + 1} of {list.length}
         </p>

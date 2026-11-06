@@ -302,6 +302,8 @@ export function DancerBoard({
   };
   const todayRows = shown.filter((row) => row.todayBatches.length > 0);
   // "Mark all present" fills in the dancers nobody has marked yet and leaves anyone marked absent alone.
+  // The band already names the batch, so grouped by batch the Batch column would only repeat it.
+  const hideBatchCol = layout === "table" && groupBy === "batch";
   const [gateOpen, setGateOpen] = useState(false);
   const [skipped, setSkipped] = useState<string[]>([]);
   useEffect(() => setSkipped(readSkipped(today)), [today, gateOpen]);
@@ -472,7 +474,7 @@ export function DancerBoard({
           <colgroup>
             <col className="c-pick" />
             <col />
-            <col className="c-batch" />
+            {!hideBatchCol && <col className="c-batch" />}
             <col className="c-tick" />
             <col className="c-num" />
             <col className="c-status" />
@@ -485,7 +487,7 @@ export function DancerBoard({
                 <span className="sr-only">Pick</span>
               </th>
               <th scope="col">Dancer</th>
-              <th scope="col">Batch</th>
+              {!hideBatchCol && <th scope="col">Batch</th>}
               <th scope="col" className="board-center" data-tour="ticks">
                 Attendance today
               </th>
@@ -541,7 +543,7 @@ export function DancerBoard({
                       />
                     )}
                   </th>
-                  <th scope="colgroup" colSpan={7}>
+                  <th scope="colgroup" colSpan={hideBatchCol ? 6 : 7}>
                     <span className="board-group-row">
                       {batchOf ? null : (
                         <span className="board-dot" data-tone={group.tone} aria-hidden="true" />
@@ -574,7 +576,7 @@ export function DancerBoard({
                 </tr>
                 {batchOf && payingBatch === batchOf.id && (
                   <tr className="board-confirm">
-                    <td colSpan={8}>
+                    <td colSpan={hideBatchCol ? 7 : 8}>
                       <ConfirmPaid
                         batch={batchOf}
                         period={period}
@@ -644,19 +646,21 @@ export function DancerBoard({
                           </button>
                         </span>
                       </td>
-                      <td className="board-batch">
-                        {row.batchNames.length === 0 ? (
-                          <span className="bchip" data-c="none">
-                            No batch
-                          </span>
-                        ) : (
-                          row.batchNames.map((name) => (
-                            <span key={name} className="bchip" data-c={toneOf(name)}>
-                              {name}
+                      {!hideBatchCol && (
+                        <td className="board-batch">
+                          {row.batchNames.length === 0 ? (
+                            <span className="bchip" data-c="none">
+                              No batch
                             </span>
-                          ))
-                        )}
-                      </td>
+                          ) : (
+                            row.batchNames.map((name) => (
+                              <span key={name} className="bchip" data-c={toneOf(name)}>
+                                {name}
+                              </span>
+                            ))
+                          )}
+                        </td>
+                      )}
                       <td className="board-center">
                         <button
                           type="button"

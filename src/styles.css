@@ -1102,7 +1102,6 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-group[data-kind="batch"] th.board-pick input { accent-color:#1e3188; }
 .board-group-actions button, .board-group-actions .btn { font-size:11px; padding:0 9px; height:24px; min-height:0; box-shadow:none; border-width:1px; line-height:1; }
 /* The batch is already in the band, so the column repeating it goes away when grouped by batch. */
-.board-table[data-by="batch"] col.c-batch, .board-table[data-by="batch"] thead th:nth-child(3), .board-table[data-by="batch"] td.board-batch { display:none; }
 .console-main .console-title, .home-title { font-size:28px; }
 .console-main .console-subtitle { font-size:18px; }
 .board-group[data-kind="batch"] strong { font-size:14px; }

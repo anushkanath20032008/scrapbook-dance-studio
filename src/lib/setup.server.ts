@@ -84,7 +84,7 @@ export async function listStudentOverview(
 ) {
   let query = supabase
     .from("students")
-    .select("id, name, guardian_id, archived_at")
+    .select("id, name, guardian_id, archived_at, email, joined_on, emergency_name, emergency_phone, note")
     .order("name")
     .limit(input.limit);
   if (!input.includeArchived) query = query.is("archived_at", null);
@@ -138,6 +138,13 @@ export async function listStudentOverview(
       id: student.id,
       name: student.name,
       archived_at: student.archived_at,
+      details: {
+        email: student.email ?? null,
+        joinedOn: student.joined_on ?? null,
+        emergencyName: student.emergency_name ?? null,
+        emergencyPhone: student.emergency_phone ?? null,
+        note: student.note ?? null,
+      },
       guardian: guardian ? { id: guardian.id, name: guardian.name, phone: guardian.phone } : null,
       batches: members
         .filter((member) => member.student_id === student.id)

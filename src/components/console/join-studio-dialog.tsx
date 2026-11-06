@@ -6,10 +6,11 @@ import { ConsoleDialog } from "@/components/console/console-dialog";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { acceptInstructorInvite } from "@/lib/instructors.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { setRoleIntent } from "@/lib/role-intent";
 
-/** The first thing a dance teacher sees: which studio do you teach at? It cannot be closed without choosing. */
-export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
+/** The first thing a dance teacher sees: which studio do you teach at? */
+export function JoinStudioDialog({ onLeave, onDismiss }: { onLeave: () => void; onDismiss: () => void }) {
   const queryClient = useQueryClient();
   const accept = useServerFn(acceptInstructorInvite);
   const [code, setCode] = useState("");
@@ -35,7 +36,14 @@ export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
   }
 
   return (
-    <ConsoleDialog open onOpenChange={() => undefined} title="Which studio do you teach at?">
+    <ConsoleDialog
+      open
+      onOpenChange={(open) => {
+        // Closing is "not now". It must never open the owner console, which would create a studio for this account.
+        if (!open) onDismiss();
+      }}
+      title="Which studio do you teach at?"
+    >
       <form className="console-form" onSubmit={submit} noValidate>
         <p>Ask your studio owner for an invite code. Enter it here to join their studio.</p>
         <label className="form-label console-field">
@@ -58,7 +66,9 @@ export function JoinStudioDialog({ onLeave }: { onLeave: () => void }) {
             variant="retroPaper"
             type="button"
             title="Choose this if you own a dance studio"
-            onClick={() => {
+            onClick={async () => {
+              // The account remembers the choice, so the studio can now be made for them.
+              await supabase.auth.updateUser({ data: { role: "owner" } });
               setRoleIntent("owner");
               onLeave();
             }}

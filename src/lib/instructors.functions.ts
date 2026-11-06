@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isoDate, uuid, validate } from "@/lib/validators";
+import { batchInput } from "@/lib/schemas";
+import { isoDate, personName, phone, uuid, validate } from "@/lib/validators";
 
 // Owner side: invite, list and remove instructors. The database refuses anyone who is not the studio owner.
 export const inviteInstructor = createServerFn({ method: "POST" })
@@ -91,11 +92,68 @@ export const markInstructorAttendance = createServerFn({ method: "POST" })
     (await import("@/lib/instructors.server")).markInstructorAttendance(context, data),
   );
 
-// The studio the caller teaches at, or null. Lets the console ask a new dance teacher to join a studio
-// before it creates anything for them.
+// What the account already is: the studio it teaches at, and whether it owns a studio. The console asks someone
+// to join a studio only when it is neither, so an owner is never sent to the teacher screen.
 export const getMyTeacherStudio = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const me = await (await import("@/lib/instructors.server")).getInstructorMe(context);
-    return me ? { studioName: me.studio_name } : null;
+    const server = await import("@/lib/instructors.server");
+    const me = await server.getInstructorMe(context);
+    const ownsStudio = await server.ownsStudio(context);
+    return { studioName: me ? me.studio_name : null, ownsStudio };
   });
+
+// Batch requests: a teacher suggests, the owner decides. Nothing is a real batch until the owner approves.
+export const requestBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(batchInput))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).requestBatch(context, {
+      name: data.name,
+      weekdays: data.weekdays,
+      startsAt: data.startsAt,
+      endsAt: data.endsAt,
+      room: data.room,
+    }),
+  );
+
+export const getMyBatchRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).getMyBatchRequests(context),
+  );
+
+export const listBatchRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).listBatchRequests(context),
+  );
+
+export const approveBatchRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ id: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).approveBatchRequest(context, data),
+  );
+
+export const declineBatchRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(validate(z.object({ id: uuid })))
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).declineBatchRequest(context, data),
+  );
+
+export const addInstructorStudent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    validate(z.object({ batchId: uuid, name: personName, phone: phone.nullable() })),
+  )
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/instructors.server")).addInstructorStudent(context, data),
+  );
+
+export const getInstructorStudents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) =>
+    (await import("@/lib/instructors.server")).getInstructorStudents(context),
+  );

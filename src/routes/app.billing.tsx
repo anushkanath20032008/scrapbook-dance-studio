@@ -10,6 +10,9 @@ import { getStudentCharges, getStudentLedger } from "@/lib/ledger.functions";
 import { formatDayWithYear, formatMonthLong, paymentMethodLabel } from "@/lib/format";
 import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
+import { getConsoleContext } from "@/lib/console.functions";
+import { getReminderLinks } from "@/lib/family.functions";
+import { whatsappLink } from "@/lib/manual-reminders";
 
 export const Route = createFileRoute("/app/billing")({
   head: () => ({ meta: [{ title: "Billing | ChoreoStudio" }] }),
@@ -45,6 +48,42 @@ function Billing() {
 
   const student = students.data?.find((row) => row.id === studentId);
   const balance = ledger.data?.balance_paise;
+
+  const loadContext = useServerFn(getConsoleContext);
+  const context = useQuery({ queryKey: ["console-context"], queryFn: () => loadContext() });
+  const fetchLinks = useServerFn(getReminderLinks);
+  // The oldest fee still unpaid sets the date in the reminder; the amount is everything this dancer owes.
+  const oldestOpen = (charges.data ?? [])
+    .filter((charge) => charge.status !== "voided" && !charge.settled_on && charge.outstanding_paise > 0)
+    .sort((a, b) => a.due_on.localeCompare(b.due_on))[0];
+  const reminder =
+    student && oldestOpen && balance !== undefined && balance > 0
+      ? {
+          charge_id: oldestOpen.charge_id,
+          student_name: student.name,
+          guardian_name: student.guardian?.name ?? null,
+          phone: student.guardian?.phone ?? null,
+          outstanding_paise: balance,
+          due_on: oldestOpen.due_on,
+        }
+      : null;
+  const studioName = context.data?.studioName ?? "";
+  async function remindOnWhatsApp() {
+    if (!reminder || !student) return;
+    const plain = whatsappLink(reminder, studioName);
+    if (!plain) return;
+    // Open the chat at once so the browser allows it, then point it at the message with the dancer's private link.
+    const tab = window.open("about:blank", "_blank");
+    let target = plain;
+    try {
+      const links = await fetchLinks({ data: { studentIds: [student.id] } });
+      target = whatsappLink(reminder, studioName, links[student.id] ?? null) ?? plain;
+    } catch {
+      // Without the link the plain reminder still opens.
+    }
+    if (tab) tab.location.href = target;
+    else window.location.href = target;
+  }
 
   return (
     <section>
@@ -97,7 +136,21 @@ function Billing() {
               >
                 Record payment
               </Button>
+              {reminder && (
+                <Button
+                  variant="retroPaper"
+                  type="button"
+                  disabled={!whatsappLink(reminder, studioName)}
+                  title={whatsappLink(reminder, studioName) ? undefined : "Add a phone number for this dancer first"}
+                  onClick={() => void remindOnWhatsApp()}
+                >
+                  Remind on WhatsApp
+                </Button>
+              )}
             </div>
+            {reminder && !whatsappLink(reminder, studioName) && (
+              <p className="console-hint">Add a phone number for {student.name} on the Dancers page to send a reminder.</p>
+            )}
           </div>
 
           <div className="console-list-head">

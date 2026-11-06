@@ -677,25 +677,40 @@ export type Database = {
         Row: {
           archived_at: string | null
           created_at: string
+          email: string | null
+          emergency_name: string | null
+          emergency_phone: string | null
           guardian_id: string | null
           id: string
+          joined_on: string | null
           name: string
+          note: string | null
           studio_id: string
         }
         Insert: {
           archived_at?: string | null
           created_at?: string
+          email?: string | null
+          emergency_name?: string | null
+          emergency_phone?: string | null
           guardian_id?: string | null
           id?: string
+          joined_on?: string | null
           name: string
+          note?: string | null
           studio_id: string
         }
         Update: {
           archived_at?: string | null
           created_at?: string
+          email?: string | null
+          emergency_name?: string | null
+          emergency_phone?: string | null
           guardian_id?: string | null
           id?: string
+          joined_on?: string | null
           name?: string
+          note?: string | null
           studio_id?: string
         }
         Relationships: []
@@ -1102,6 +1117,44 @@ export type Database = {
       instructor_batch_day: {
         Args: { p_batch: string; p_on: string }
         Returns: { present: boolean | null; student_id: string; student_name: string }[]
+      }
+      instructor_request_batch: {
+        Args: { p_ends_at: string | null; p_name: string; p_room: string | null; p_starts_at: string | null; p_weekdays: number[] }
+        Returns: string
+      }
+      instructor_my_batch_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: { created_at: string; ends_at: string | null; id: string; name: string; room: string | null; starts_at: string | null; status: string; weekdays: number[] }[]
+      }
+      list_batch_requests: {
+        Args: Record<PropertyKey, never>
+        Returns: { created_at: string; ends_at: string | null; id: string; name: string; requester_email: string | null; room: string | null; starts_at: string | null; status: string; weekdays: number[] }[]
+      }
+      approve_batch_request: {
+        Args: { p_id: string }
+        Returns: string
+      }
+      decline_batch_request: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      instructor_students: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          phone: string | null
+          email: string | null
+          joined_on: string | null
+          emergency_name: string | null
+          emergency_phone: string | null
+          note: string | null
+          batches: string[]
+        }[]
+      }
+      instructor_add_student: {
+        Args: { p_batch: string; p_name: string; p_phone: string }
+        Returns: string
       }
       instructor_mark_attendance: {
         Args: { p_batch: string; p_marks: Json; p_session_on: string }

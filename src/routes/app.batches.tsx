@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { BatchRequestsPanel } from "@/components/console/batch-requests-panel";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { setupCountsKey } from "@/components/console/console-data";
 import { Field, FormAlert } from "@/components/console/form-helpers";
@@ -136,6 +137,7 @@ function Batches() {
           Show archived
         </label>
       </div>
+      <BatchRequestsPanel onApproved={refresh} />
       {notice && (
         <p role="status" className="console-notice">
           ✓ {notice}

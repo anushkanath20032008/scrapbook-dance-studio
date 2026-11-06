@@ -1,3 +1,4 @@
+import { maskPhone } from "@/lib/format";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export function WhatsAppBatchDialog({
   studioName,
   reminded,
   onOpened,
+  explicit = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -26,13 +28,22 @@ export function WhatsAppBatchDialog({
   studioName: string;
   reminded: Set<string>;
   onOpened: (chargeId: string) => void;
+  /** True when the owner picked these dancers by name. Then "reminded earlier today" does not hide them. */
+  explicit?: boolean;
 }) {
   const fetchLinks = useServerFn(getReminderLinks);
   const [payLinks, setPayLinks] = useState<Record<string, string>>({});
+  // Dancers handled since this window opened, so a dancer picked by name still moves on after one tap.
+  const [handled, setHandled] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (open) setHandled(new Set());
+  }, [open]);
+  // Keyed by the ids, not the array: callers build a new array on every render, which would refetch forever.
+  const idsKey = rows.map((row) => row.student_id ?? "").join(",");
   // Each dancer's private "I paid" link is made once and goes into the message.
   useEffect(() => {
     if (!open) return;
-    const studentIds = rows.flatMap((row) => (row.student_id ? [row.student_id] : [])).slice(0, 200);
+    const studentIds = idsKey.split(",").filter(Boolean).slice(0, 200);
     if (studentIds.length === 0) return;
     let cancelled = false;
     fetchLinks({ data: { studentIds } })
@@ -44,18 +55,27 @@ export function WhatsAppBatchDialog({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, rows]);
+  }, [open, idsKey]);
   const payLinkFor = (row: Row) => (row.student_id ? (payLinks[row.student_id] ?? null) : null);
 
   const { usable, noPhone } = useMemo(() => {
-    const withLink = rows.map((row) => ({ row, link: whatsappLink(row, studioName, payLinkFor(row)) }));
+    const withLink = rows.map((row) => ({
+      row,
+      link: whatsappLink(row, studioName, payLinkFor(row)),
+    }));
     return {
       usable: withLink.filter((item): item is { row: Row; link: string } => item.link !== null),
       noPhone: withLink.filter((item) => item.link === null).map((item) => item.row),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, studioName, payLinks]);
-  const remaining = usable.filter((item) => !reminded.has(item.row.charge_id));
+  const isDone = (chargeId: string) =>
+    handled.has(chargeId) || (!explicit && reminded.has(chargeId));
+  const remaining = usable.filter((item) => !isDone(item.row.charge_id));
+  const markDone = (chargeId: string) => {
+    setHandled((current) => new Set(current).add(chargeId));
+    onOpened(chargeId);
+  };
   const next = remaining[0];
   const openLink = useRef<HTMLAnchorElement>(null);
   const nextId = next?.row.charge_id;
@@ -68,22 +88,28 @@ export function WhatsAppBatchDialog({
   const position = usable.length - remaining.length + 1;
 
   return (
-    <ConsoleDialog open={open} onOpenChange={(value) => !value && onClose()} title="Remind on WhatsApp">
+    <ConsoleDialog
+      open={open}
+      onOpenChange={(value) => !value && onClose()}
+      title="Remind on WhatsApp"
+    >
       {next ? (
         <>
           <p className="console-hint">
-            {position} of {usable.length}. This opens your own WhatsApp with the message ready. Press Send
-            there, then come back here for the next one.
+            {position} of {usable.length}. This opens your own WhatsApp with the message ready.
+            Press Send there, then come back here for the next one.
           </p>
           <div className="console-row">
             <div>
               <strong>{next.row.student_name}</strong>
               <span className="console-hint">
-                {next.row.phone} · {formatRupees(next.row.outstanding_paise)} owed
+                {maskPhone(next.row.phone)} · {formatRupees(next.row.outstanding_paise)} owed
               </span>
             </div>
           </div>
-          <blockquote className="reminder-preview">{reminderText(next.row, studioName, undefined, payLinkFor(next.row))}</blockquote>
+          <blockquote className="reminder-preview">
+            {reminderText(next.row, studioName, undefined, payLinkFor(next.row))}
+          </blockquote>
           <div className="console-form-actions">
             <Button asChild variant="retro">
               <a
@@ -91,12 +117,12 @@ export function WhatsAppBatchDialog({
                 target="_blank"
                 rel="noreferrer"
                 ref={openLink}
-                onClick={() => onOpened(next.row.charge_id)}
+                onClick={() => markDone(next.row.charge_id)}
               >
                 Open WhatsApp for {next.row.student_name}
               </a>
             </Button>
-            <Button variant="retroPaper" type="button" onClick={() => onOpened(next.row.charge_id)}>
+            <Button variant="retroPaper" type="button" onClick={() => markDone(next.row.charge_id)}>
               Skip
             </Button>
           </div>
@@ -110,8 +136,8 @@ export function WhatsAppBatchDialog({
       )}
       {noPhone.length > 0 && (
         <p className="console-hint">
-          No usable phone number for {noPhone.map((row) => row.student_name).join(", ")}. Add one on the Dancers
-          page.
+          No usable phone number for {noPhone.map((row) => row.student_name).join(", ")}. Add one on
+          the Dancers page.
         </p>
       )}
       <div className="console-form-actions">

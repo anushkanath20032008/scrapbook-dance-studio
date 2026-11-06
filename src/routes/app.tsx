@@ -1,6 +1,7 @@
 import { Link, Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { CalendarDays, ClipboardCheck, IndianRupee, LayoutGrid, ListChecks, Repeat, Users, type LucideIcon } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,8 +18,10 @@ import { consoleGroups, groupForPath, groupTabs } from "@/lib/console-nav";
 import { helpVideos } from "@/lib/help-videos";
 import { GuidedTour, tourSeen } from "@/components/console/guided-tour";
 import { JoinStudioDialog } from "@/components/console/join-studio-dialog";
-import { getMyTeacherStudio } from "@/lib/instructors.functions";
-import { getRoleIntent } from "@/lib/role-intent";
+import { getInstructorBatches, getMyTeacherStudio } from "@/lib/instructors.functions";
+import { TermsGate } from "@/components/console/terms-gate";
+import { TERMS_VERSION } from "@/lib/terms";
+import { setRoleIntent } from "@/lib/role-intent";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -49,12 +52,15 @@ type NavTo =
   | "/app/team"
   | "/app/class"
   | "/app/my-batches"
+  | "/app/my-dancers"
   | "/app/makeups";
 
 // An instructor sees only these two screens; the database refuses everything else even if a URL is typed in.
 const instructorItems: { to: NavTo; label: string; exact: boolean }[] = [
+  { to: "/app", label: "Home", exact: true },
   { to: "/app/class", label: "Attendance", exact: false },
   { to: "/app/my-batches", label: "Batches", exact: false },
+  { to: "/app/my-dancers", label: "Dancers", exact: false },
   { to: "/app/makeups", label: "Make-ups", exact: false },
 ];
 const instructorPaths = instructorItems.map((item) => item.to as string);
@@ -87,14 +93,48 @@ function ConsoleLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const loadContext = useServerFn(getConsoleContext);
   // Someone who chose "I am a dance teacher" is asked which studio they teach at before anything is created for them.
-  const [teacherIntent, setTeacherIntent] = useState(() => (typeof window === "undefined" ? false : getRoleIntent() === "teacher"));
+  const [teacherIntent, setTeacherIntent] = useState(false);
   const loadTeacherStudio = useServerFn(getMyTeacherStudio);
   const teacherStudio = useQuery({
     queryKey: ["teacher-studio"],
     queryFn: () => loadTeacherStudio(),
     enabled: session.status === "signed-in" && teacherIntent,
   });
-  const mustJoin = teacherIntent && (teacherStudio.isPending || teacherStudio.data === null);
+  const loadMyBatches = useServerFn(getInstructorBatches);
+  const myBatches = useQuery({
+    queryKey: ["instructor-batches"],
+    queryFn: () => loadMyBatches(),
+    enabled: session.status === "signed-in" && session.teacher,
+  });
+  const [batchesOpen, setBatchesOpen] = useState(() => {
+    try {
+      return window.localStorage.getItem("choreo-batches-open") !== "no";
+    } catch {
+      return true;
+    }
+  });
+  const toggleBatches = () =>
+    setBatchesOpen((open) => {
+      try {
+        window.localStorage.setItem("choreo-batches-open", open ? "no" : "yes");
+      } catch {
+        // Not remembering the fold state is harmless.
+      }
+      return !open;
+    });
+  const [joinHidden, setJoinHidden] = useState(false);
+  const [termsDone, setTermsDone] = useState(false);
+  // A teacher who confirmed their email on another device has no local hint, but the account remembers.
+  // Only the account decides this. A browser-wide hint is not used: it outlives sign-out and would send the next
+  // person to sign in here, such as a studio owner, to the teacher screen.
+  useEffect(() => {
+    setTeacherIntent(session.status === "signed-in" && session.teacher);
+    if (session.status === "signed-in") setRoleIntent("owner");
+  }, [session]);
+  // Someone is asked to join only when the account is a teacher in name but has neither a studio of its own nor a
+  // studio it teaches at.
+  const needsJoin = teacherIntent && teacherStudio.data !== undefined && teacherStudio.data.studioName === null && !teacherStudio.data.ownsStudio;
+  const mustJoin = teacherIntent && (teacherStudio.isPending || needsJoin);
   const context = useQuery({
     queryKey: ["console-context"],
     queryFn: () => loadContext(),
@@ -137,10 +177,10 @@ function ConsoleLayout() {
     if (session.status === "signed-out") void navigate({ to: "/login" });
   }, [session.status, navigate]);
 
-  // An instructor who lands anywhere but their two screens is sent to Attendance.
+  // An instructor who lands anywhere but their two screens is sent to Home.
   useEffect(() => {
     if (isInstructor && !instructorPaths.includes(pathname.replace(/\/+$/, ""))) {
-      void navigate({ to: "/app/class", replace: true });
+      void navigate({ to: "/app", replace: true });
     }
   }, [isInstructor, pathname, navigate]);
 
@@ -201,10 +241,43 @@ function ConsoleLayout() {
         {isInstructor ? (
         <nav className={`console-nav${menuOpen ? " open" : ""}`} aria-label="Dance teacher navigation">
           {instructorItems.map((item) => (
-            <NavLink key={item.to} to={item.to} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
+            <NavLink key={item.to} to={item.to} exact={item.exact} tour={item.label.toLowerCase().replace(/[^a-z]/g, "")} onPick={() => setMenuOpen(false)}>
               {item.label}
             </NavLink>
-          ))}
+          )).flatMap((link, index) =>
+            instructorItems[index]?.to === "/app/my-batches" && (myBatches.data?.length ?? 0) > 0
+              ? [
+                  <div key="batches-head" className="console-nav-fold">
+                    {link}
+                    <button
+                      type="button"
+                      className="console-fold-toggle"
+                      aria-expanded={batchesOpen}
+                      aria-label={batchesOpen ? "Hide your batches" : "Show your batches"}
+                      onClick={toggleBatches}
+                    >
+                      {batchesOpen ? "▾" : "▸"}
+                    </button>
+                  </div>,
+                  <ul key="batch-subnav" className="console-subnav" aria-label="Your batches" hidden={!batchesOpen}>
+                    {myBatches.data?.map((batch) => (
+                      <li key={batch.id}>
+                        <Link
+                          to="/app/my-batches"
+                          search={{ batch: batch.id }}
+                          className="console-nav-item console-nav-sub"
+                          activeOptions={{ includeSearch: true }}
+                          activeProps={{ className: "active" }}
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          {batch.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>,
+                ]
+              : [link],
+          )}
           <div className="console-nav-foot">
             <Button variant="retroPaper" title="A one-minute walk through the menu" onClick={() => setTourOpen(true)}>
               Take the tour
@@ -276,8 +349,23 @@ function ConsoleLayout() {
           />
         )}
         <main className="console-main">
-          {teacherIntent && teacherStudio.data === null && (
-            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} />
+          {session.termsVersion !== TERMS_VERSION && !termsDone && <TermsGate onAccepted={() => setTermsDone(true)} />}
+          {needsJoin && !joinHidden && (
+            <JoinStudioDialog onLeave={() => setTeacherIntent(false)} onDismiss={() => setJoinHidden(true)} />
+          )}
+          {needsJoin && joinHidden && (
+            <div className="console-form">
+              <h2>You have not joined a studio yet</h2>
+              <p>Ask your studio owner for an invite code. Nothing is set up for you until you join.</p>
+              <div className="console-actions">
+                <Button variant="retro" type="button" onClick={() => setJoinHidden(false)}>
+                  Enter an invite code
+                </Button>
+                <Button variant="retroPaper" type="button" onClick={() => supabase.auth.signOut()}>
+                  Sign out
+                </Button>
+              </div>
+            </div>
           )}
           {context.isError && <p role="alert">Could not load your studio. Please refresh.</p>}
           {/* Wait to learn the role, so an instructor never briefly opens an owner screen. */}
@@ -317,6 +405,20 @@ function ConsoleLayout() {
   );
 }
 
+// One plain line icon per menu entry, for both the owner and the teacher menu.
+const navIcons: Record<string, LucideIcon> = {
+  "/app": LayoutGrid,
+  "/app/setup": ListChecks,
+  "/app/students": Users,
+  "/app/my-dancers": Users,
+  "/app/billing": IndianRupee,
+  "/app/attendance": ClipboardCheck,
+  "/app/class": ClipboardCheck,
+  "/app/batches": CalendarDays,
+  "/app/my-batches": CalendarDays,
+  "/app/makeups": Repeat,
+};
+
 function NavLink({
   to,
   exact = false,
@@ -346,7 +448,12 @@ function NavLink({
       className={`console-nav-item${active ? " active" : ""}`}
       onClick={onPick}
     >
-      {children}
+      {navIcons[to] &&
+        (() => {
+          const Icon = navIcons[to]!;
+          return <Icon className="console-nav-icon" size={18} strokeWidth={1.9} aria-hidden="true" />;
+        })()}
+      <span className="console-nav-text">{children}</span>
       {badge > 0 && (
         <span className="console-nav-badge" aria-label={`${badge} waiting`}>
           {badge}

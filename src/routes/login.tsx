@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ConsoleDialog } from "@/components/console/console-dialog";
 import { PasswordField } from "@/components/password-field";
 import { setRoleIntent } from "@/lib/role-intent";
+import { TermsAgreement } from "@/components/terms-agreement";
+import { TERMS_VERSION } from "@/lib/terms";
 import { useOwnerSession } from "@/hooks/use-owner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -86,6 +88,17 @@ function Login() {
     emailRef.current?.focus();
   }, [mode]);
 
+  // Switching between Sign in and Register starts a clean form: nothing typed carries over.
+  function switchTab(next: "sign-in" | "register") {
+    if (next !== mode) {
+      setEmail("");
+      setPassword("");
+    }
+    setMode(next);
+  }
+
+  const [agreed, setAgreed] = useState(false);
+
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
@@ -104,7 +117,11 @@ function Login() {
         const { data, error } = await supabase.auth.signUp({
           email: address,
           password,
-          options: { emailRedirectTo: `${window.location.origin}${landingPath}` },
+          // The role is kept on the account itself, so confirming the email on another device or browser still lands a teacher on the join screen.
+          options: {
+            emailRedirectTo: `${window.location.origin}${landingPath}`,
+            data: { role, terms_version: TERMS_VERSION, terms_accepted_at: new Date().toISOString() },
+          },
         });
         if (error) throw error;
         if (isExistingAccount(data.user)) {
@@ -119,6 +136,8 @@ function Login() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: address, password });
         if (error) throw error;
+        // Choosing "I teach" here is remembered on the account too, so no studio is made for it.
+        if (role === "teacher") await supabase.auth.updateUser({ data: { role: "teacher" } });
       }
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "";
@@ -237,7 +256,7 @@ function Login() {
                   role="tab"
                   aria-selected={mode === "sign-in"}
                   variant={mode === "sign-in" ? "retro" : "retroPaper"}
-                  onClick={() => setMode("sign-in")}
+                  onClick={() => switchTab("sign-in")}
                 >
                   Sign in
                 </Button>
@@ -246,7 +265,7 @@ function Login() {
                   role="tab"
                   aria-selected={registering}
                   variant={registering ? "retro" : "retroPaper"}
-                  onClick={() => setMode("register")}
+                  onClick={() => switchTab("register")}
                 >
                   Register
                 </Button>
@@ -338,11 +357,12 @@ function Login() {
                   </button>
                 </p>
               )}
+              {registering && <TermsAgreement accepted={agreed} onChange={setAgreed} />}
               <div className="login-actions">
                 <Button
                   variant="retro"
                   type="submit"
-                  disabled={busy || (registering && !rubricMet)}
+                  disabled={busy || (registering && (!rubricMet || !agreed))}
                 >
                   {busy
                     ? "One moment…"
@@ -354,12 +374,6 @@ function Login() {
                 </Button>
               </div>
             </form>
-            {registering && (
-              <p className="console-hint login-terms">
-                By creating an account you agree to our <a href="/terms">Terms</a> and{" "}
-                <a href="/privacy">Privacy Notice</a>.
-              </p>
-            )}
             {mode !== "forgot" && (
               <>
                 <p className="login-or">or</p>
@@ -414,17 +428,19 @@ function Login() {
               {sentTo.kind === "confirm" ? "One more step." : "Reset link sent."}
             </p>
             <p>
-              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"}{" "}
-              to <strong>{sentTo.email}</strong>.{" "}
+              We emailed a {sentTo.kind === "confirm" ? "confirmation link" : "password reset link"} to:
+            </p>
+            <p className="email-sent-address">{sentTo.email}</p>
+            <p>
               {sentTo.kind === "confirm"
                 ? "Open it on this device and you will land in your studio."
                 : "Open it to choose a new password."}
             </p>
-            <p className="console-hint">
-              It can take a few minutes. Check spam or promotions too. Nothing yet? Send it again,
-              try Continue with Google, or write to support@choreostudio.live and we will sort it
-              out.
-            </p>
+            <ul className="email-sent-tips">
+              <li>It can take a few minutes.</li>
+              <li>Check spam or promotions too.</li>
+              <li>Still nothing? Send it again, or write to support@choreostudio.live.</li>
+            </ul>
             {resendNote && <p role="status">{resendNote}</p>}
             <div className="console-form-actions">
               <Button variant="retro" type="button" onClick={() => setSentTo(null)}>

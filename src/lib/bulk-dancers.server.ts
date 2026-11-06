@@ -2,7 +2,20 @@ import { formatRupees } from "./money";
 import { ensureStudio, unwrap, type StudioContext } from "./studio.server";
 import { firstOfMonth, todayInIndia } from "./validators";
 
-export type BulkDancer = { name: string; phone: string | null; feePaise: number | null };
+export type BulkDancer = {
+  name: string;
+  phone: string | null;
+  feePaise: number | null;
+  email?: string | null | undefined;
+  joinedOn?: string | null | undefined;
+  emergencyName?: string | null | undefined;
+  emergencyPhone?: string | null | undefined;
+  note?: string | null | undefined;
+  /** Class names from an imported sheet. A batch with that name is used, or made if there is none. */
+  batches?: string[] | undefined;
+  /** The parent's name, so reminders can be addressed to them. */
+  parentName?: string | null | undefined;
+};
 
 const CHUNK = 8;
 const digitsOf = (phone: string | null) => (phone ?? "").replace(/\D/g, "");
@@ -61,12 +74,17 @@ export async function bulkAddDancers(
   let charged = 0;
   let added = 0;
   let plansCreated = 0;
+  let batchesCreated = 0;
   if (fresh.length > 0) {
     const guardians = unwrap(
       await supabase
         .from("guardians")
         .insert(
-          fresh.map((dancer) => ({ studio_id: studioId, name: dancer.name, phone: dancer.phone })),
+          fresh.map((dancer) => ({
+            studio_id: studioId,
+            name: dancer.parentName?.trim() || dancer.name,
+            phone: dancer.phone,
+          })),
         )
         .select("id"),
     );
@@ -80,6 +98,11 @@ export async function bulkAddDancers(
           studio_id: studioId,
           name: dancer.name,
           guardian_id: guardians[index]?.id ?? null,
+          email: dancer.email ?? null,
+          joined_on: dancer.joinedOn ?? null,
+          emergency_name: dancer.emergencyName ?? null,
+          emergency_phone: dancer.emergencyPhone ?? null,
+          note: dancer.note ?? null,
         })),
       )
       .select("id");
@@ -96,6 +119,47 @@ export async function bulkAddDancers(
     }
     const students = unwrap(studentsResult);
     added = students.length;
+
+    // Classes named in the sheet: reuse a batch with the same name, make the ones that do not exist yet.
+    try {
+      const wanted = [...new Set(fresh.flatMap((dancer) => dancer.batches ?? []))];
+      if (wanted.length > 0) {
+        const byName = new Map<string, string>();
+        for (const batch of unwrap(
+          await supabase.from("batches").select("id, name").is("archived_at", null).limit(2000),
+        ))
+          if (!byName.has(batch.name.trim().toLowerCase()))
+            byName.set(batch.name.trim().toLowerCase(), batch.id);
+        for (const name of wanted) {
+          if (byName.has(name.toLowerCase())) continue;
+          const made = unwrap(
+            await supabase
+              .from("batches")
+              .insert({ studio_id: studioId, name, weekdays: [] })
+              .select("id")
+              .single(),
+          ) as { id: string } | null;
+          if (made) {
+            byName.set(name.toLowerCase(), made.id);
+            batchesCreated += 1;
+          }
+        }
+        const memberships = students.flatMap((student, index) =>
+          (fresh[index]?.batches ?? []).flatMap((name) => {
+            const batchId = byName.get(name.toLowerCase());
+            return batchId
+              ? [{ studio_id: studioId, batch_id: batchId, student_id: student.id }]
+              : [];
+          }),
+        );
+        if (memberships.length > 0)
+          unwrap(await supabase.from("batch_members").insert(memberships).select("id"));
+      }
+    } catch {
+      throw new Error(
+        `The ${added} dancers were added, but their classes could not all be set. Open Batches to finish the rest.`,
+      );
+    }
 
     // One fee plan per distinct amount: an existing plan with that amount is reused, otherwise one is made.
     const amounts = [
@@ -173,5 +237,5 @@ export async function bulkAddDancers(
       }),
     );
   }
-  return { added, skipped, plansCreated, charged };
+  return { added, skipped, plansCreated, batchesCreated, charged };
 }

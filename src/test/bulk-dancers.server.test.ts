@@ -52,7 +52,13 @@ describe("bulkAddDancers", () => {
   it("skips a dancer already on the list, adds the rest with their fees, and bills the month", async () => {
     const { client, calls } = studio();
     const result = await bulkAddDancers({ supabase: client, userId: user }, input);
-    expect(result).toEqual({ added: 2, skipped: 1, plansCreated: 2, charged: 2 });
+    expect(result).toEqual({
+      added: 2,
+      skipped: 1,
+      plansCreated: 2,
+      batchesCreated: 0,
+      charged: 2,
+    });
 
     const guardianInsert = calls.find((c) => c.table === "guardians" && inserting(c));
     expect(stepsOf(guardianInsert!, "insert")[0]).toEqual([

@@ -2,35 +2,58 @@ import { formatRupees } from "@/lib/money";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { setupCountsKey } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { MonthCharts } from "@/components/console/month-charts";
-import { MonthTotals } from "@/components/console/month-totals";
+import { MonthStrip } from "@/components/console/month-strip";
 import { usePasteResult } from "@/components/console/paste-dancers";
 import { SetupChecklist } from "@/components/console/setup-checklist";
 import { RecordPaymentDialog, type PayingStudent } from "@/components/console/record-payment";
 import { RemindDialog, type RemindTarget } from "@/components/console/remind-dialog";
-import { UnpaidList } from "@/components/console/unpaid-list";
-import { TelegramBatchDialog } from "@/components/console/telegram-batch";
 import { WhatsAppBatchDialog } from "@/components/console/whatsapp-batch";
+import { DancerBoard } from "@/components/console/dancer-board";
+import { ConsoleDialog } from "@/components/console/console-dialog";
+import { ImportSheet } from "@/components/console/import-sheet";
+import { StudioTable, TeacherTable } from "@/components/console/studio-table";
 import { getConsoleContext } from "@/lib/console.functions";
 import { markReminded, remindedToday } from "@/lib/manual-reminders";
 import { getMessagingStatus } from "@/lib/reminders.functions";
-import { getTelegramStatus } from "@/lib/telegram.functions";
 import { formatMonthLong } from "@/lib/format";
 import { generateCharges } from "@/lib/ledger.functions";
 import { getHomeReport } from "@/lib/reports.functions";
 import { buildSetupSteps, setupProgress } from "@/lib/setup-progress";
 import { getSetupCounts } from "@/lib/setup.functions";
 import { firstOfMonth, todayInIndia } from "@/lib/validators";
+import { sampleBatches, sampleNumbers, samplePay, isSampleId } from "@/lib/sample-studio";
+import type { TableBatch } from "@/lib/studio-table";
 
 export const Route = createFileRoute("/app/")({
-  component: Overview,
+  head: () => ({ meta: [{ title: "Home | ChoreoStudio" }] }),
+  component: Home,
 });
+
+/** Teachers get their own home of tiles; the owner gets the month overview with tiles above it. */
+function Home() {
+  const loadContext = useServerFn(getConsoleContext);
+  const context = useQuery({ queryKey: ["console-context"], queryFn: () => loadContext() });
+  if (context.data?.role === "instructor") return <TeacherHome />;
+  if (!context.data) return null;
+  return <Overview />;
+}
+
+function TeacherHome() {
+  return (
+    <section>
+      <h1 className="display console-title">Home</h1>
+      <p className="console-hint">Your batches and dancers. Tick who is here today.</p>
+      <TeacherTable today={todayInIndia()} />
+    </section>
+  );
+}
 
 function Overview() {
   const queryClient = useQueryClient();
@@ -46,8 +69,13 @@ function Overview() {
   const [paying, setPaying] = useState<PayingStudent | null>(null);
   const [reminding, setReminding] = useState<RemindTarget | null>(null);
   const [batchOpen, setBatchOpen] = useState(false);
-  const [telegramOpen, setTelegramOpen] = useState(false);
+  const [remindIds, setRemindIds] = useState<string[] | null>(null);
   const [reminded, setReminded] = useState<Set<string>>(new Set());
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  // A made-up studio for practising and demos; null means the real one is showing.
+  const [sample, setSample] = useState<TableBatch[] | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [view, setView] = useState<"table" | "cards" | "batches" | "charts">("table");
   const today = todayInIndia();
   useEffect(() => setReminded(remindedToday(today)), [today]);
   const loadContext = useServerFn(getConsoleContext);
@@ -56,9 +84,6 @@ function Overview() {
   const loadMessaging = useServerFn(getMessagingStatus);
   const messaging = useQuery({ queryKey: ["messaging-status"], queryFn: () => loadMessaging() });
   const providerConfigured = messaging.data?.providerConfigured === true;
-  const loadTelegram = useServerFn(getTelegramStatus);
-  const telegram = useQuery({ queryKey: ["telegram-status"], queryFn: () => loadTelegram() });
-  const telegramConfigured = telegram.data?.configured === true;
   const markOpened = (chargeId: string) => setReminded(new Set(markReminded(chargeId, today)));
 
   const report = useQuery({
@@ -75,7 +100,8 @@ function Overview() {
     mutationFn: () => generate({ data: { period, ...(dueOn ? { dueOn } : {}) } }),
     onSuccess: ({ created }) => {
       setError("");
-      if (created === 0) setNotice("No charges created. Dancers need a monthly fee that covers this month.");
+      if (created === 0)
+        setNotice("No charges created. Dancers need a monthly fee that covers this month.");
       else
         toast.success(
           `${created} charge${created === 1 ? "" : "s"} created for ${formatMonthLong(period)}.`,
@@ -86,11 +112,34 @@ function Overview() {
   });
 
   const snapshot = report.data?.snapshot;
-  const unpaidRows = report.data?.unpaid ?? [];
+  const unpaidRows = useMemo(() => report.data?.unpaid ?? [], [report.data]);
   const arrears = report.data?.arrears ?? [];
   const arrearsTotal = arrears.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
   const awaitingFee = report.data?.awaitingFee ?? 0;
+  const awaitingNames = report.data?.awaitingNames ?? [];
   const unpaidTotal = unpaidRows.reduce((sum, row) => sum + Number(row.outstanding_paise), 0);
+  // Dancers who owe but sit in no batch: the board builds itself from batches, so they arrive this way.
+  const looseUnpaid = useMemo(
+    () =>
+      unpaidRows.map((row) => ({
+        studentId: row.student_id,
+        name: row.student_name,
+        outstandingPaise: Number(row.outstanding_paise),
+        feePaise: Number(row.amount_paise),
+        status: (row.status === "overdue" ? "overdue" : "due") as "overdue" | "due",
+      })),
+    [unpaidRows],
+  );
+  // The board keys dancers by student; the reminder log keys them by charge.
+  const remindedStudents = useMemo(
+    () =>
+      new Set(unpaidRows.filter((row) => reminded.has(row.charge_id)).map((row) => row.student_id)),
+    [unpaidRows, reminded],
+  );
+  const dialogRows = useMemo(
+    () => (remindIds ? unpaidRows.filter((row) => remindIds.includes(row.student_id)) : unpaidRows),
+    [remindIds, unpaidRows],
+  );
   const needsCharges = snapshot !== undefined && snapshot.charged_students === 0;
   // A studio with no dancers has nothing to total or charge yet: the start card is the whole page.
   const optionalLeft = counts.data ? counts.data.batches === 0 : false;
@@ -99,7 +148,131 @@ function Overview() {
 
   return (
     <section>
-      <h1 className="display console-title">Overview</h1>
+      <div className="home-head">
+        <h1 className="home-title">Home</h1>
+        {!sample && !brandNew && (
+          <div className="table-chips home-views" role="group" aria-label="View" data-tour="views">
+            {(
+              [
+                ["table", "Table"],
+                ["cards", "Cards"],
+                ["batches", "By batch"],
+                ["charts", "Charts"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className="table-chip"
+                aria-pressed={view === id}
+                onClick={() => setView(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="home-head-right">
+          {!sample && (
+            <button type="button" className="board-secondary" onClick={() => setImportOpen(true)}>
+              Import Excel / CSV
+            </button>
+          )}
+          <button
+            type="button"
+            className="board-secondary"
+            data-tour="sample"
+            onClick={() => {
+              setPicked(new Set());
+              setSample(sample ? null : sampleBatches());
+            }}
+          >
+            {sample ? "Back to my studio" : "Try with sample dancers"}
+          </button>
+          <label className="board-bar-label">
+            Month
+            <input
+              className="board-input"
+              type="month"
+              value={month}
+              onChange={(event) => {
+                if (event.target.value) {
+                  setMonth(event.target.value);
+                  setDueOn("");
+                  setNotice("");
+                  setError("");
+                  setPicked(new Set());
+                }
+              }}
+            />
+          </label>
+        </div>
+      </div>
+      {sample && (
+        <p className="console-banner sample-banner" role="status">
+          Sample studio: eight made-up dancers. Tick, select and record payments to practise.
+          Nothing is saved or sent.
+        </p>
+      )}
+      {(!brandNew || sample) && (
+        <>
+          {sample ? (
+            <MonthStrip numbers={sampleNumbers(sample)} arrearsPaise={0} arrearsLink={false} />
+          ) : (
+            snapshot && (
+              <MonthStrip
+                numbers={{
+                  missing_paise: Number(snapshot.missing_paise),
+                  overdue_paise: Number(snapshot.overdue_paise),
+                  billed_paise: Number(snapshot.billed_paise),
+                  collected_paise: Number(snapshot.collected_paise),
+                  paid_students: snapshot.paid_students,
+                  charged_students: snapshot.charged_students,
+                  active_students: snapshot.active_students,
+                  ongoing_batches: snapshot.ongoing_batches,
+                }}
+                arrearsPaise={arrearsTotal}
+              />
+            )
+          )}
+          {(sample || view === "table" || view === "cards") && (
+            <DancerBoard
+              layout={view === "cards" && !sample ? "cards" : "table"}
+              period={period}
+              today={today}
+              loose={looseUnpaid}
+              reminded={remindedStudents}
+              picked={picked}
+              onPickedChange={setPicked}
+              sample={sample}
+              onSampleChange={setSample}
+              onRecord={(student) => {
+                if (sample && isSampleId(student.id)) setSample(samplePay(sample, student.id));
+                else setPaying(student);
+              }}
+              onRemindMany={(ids) => {
+                setRemindIds(ids);
+                setBatchOpen(true);
+              }}
+              onWhatsApp={(studentId) => {
+                setRemindIds([studentId]);
+                setBatchOpen(true);
+              }}
+            />
+          )}
+          {!sample && view === "table" && providerConfigured && unpaidRows.length > 0 && (
+            <div className="home-auto">
+              <button
+                type="button"
+                className="board-secondary"
+                onClick={() => setReminding({ period, allUnpaid: true })}
+              >
+                Queue automatic reminders
+              </button>
+            </div>
+          )}
+        </>
+      )}
       {firstRun && !setupDone && (
         <div className="window setup-card">
           <div className="window-bar chrome-font">Start here.dialog</div>
@@ -119,63 +292,9 @@ function Overview() {
           </Link>
         </p>
       )}
-      <div className="console-toolbar">
-        <label className="console-inline-label">
-          Month
-          <input
-            className="field month-field"
-            type="month"
-            value={month}
-            onChange={(event) => {
-              if (event.target.value) {
-                setMonth(event.target.value);
-                setDueOn("");
-                setNotice("");
-                setError("");
-              }
-            }}
-          />
-        </label>
-      </div>
-
-      {report.isPending && <p className="console-empty">Loading this month…</p>}
       {report.isError && <p role="alert">Could not load this month. Please refresh.</p>}
-      {snapshot && !brandNew && <MonthTotals snapshot={snapshot} />}
-      {snapshot && !brandNew && <MonthCharts snapshot={snapshot} />}
 
-      {arrears.length > 0 && (
-        <p className="console-banner" role="status">
-          <span>
-            <strong>{formatRupees(arrearsTotal)}</strong> is still unpaid from earlier months across{" "}
-            {arrears.length} dancer{arrears.length === 1 ? "" : "s"}. This month&apos;s list below does
-            not include it: open a dancer&apos;s billing to see and record it.
-          </span>
-        </p>
-      )}
-      {unpaidRows.length > 0 && (
-        <div className="console-banner" role="status">
-          <span>
-            <strong>
-              {unpaidRows.length} unpaid
-            </strong>{" "}
-            · {formatRupees(unpaidTotal)} owed this month
-          </span>
-          <Button
-            variant="retro"
-            type="button"
-            onClick={() => (providerConfigured ? setReminding({ period, allUnpaid: true }) : setBatchOpen(true))}
-          >
-            {providerConfigured ? "Remind all unpaid" : "Remind on WhatsApp"}
-          </Button>
-          {telegramConfigured && (
-            <Button variant="retroPaper" type="button" onClick={() => setTelegramOpen(true)}>
-              Remind on Telegram
-            </Button>
-          )}
-        </div>
-      )}
-
-      {needsCharges && !brandNew && (
+      {needsCharges && !brandNew && !sample && (
         <div className="window generate-card">
           <div className="window-bar chrome-font">Charges.dialog</div>
           <div className="window-inner console-form">
@@ -211,12 +330,19 @@ function Overview() {
           </div>
         </div>
       )}
-      {snapshot && snapshot.charged_students > 0 && awaitingFee > 0 && (
+      {!sample && snapshot && snapshot.charged_students > 0 && awaitingFee > 0 && (
         <div className="console-banner" role="status">
           <span>
             <strong>
               {awaitingFee} dancer{awaitingFee === 1 ? "" : "s"}
-            </strong>{" "}
+            </strong>
+            {awaitingNames.length > 0 && (
+              <>
+                {" "}
+                ({awaitingNames.slice(0, 5).join(", ")}
+                {awaitingNames.length > 5 ? "…" : ""})
+              </>
+            )}{" "}
             {awaitingFee === 1 ? "has" : "have"} no fee for {formatMonthLong(period)} yet. A dancer
             needs a monthly fee first.
           </span>
@@ -242,47 +368,38 @@ function Overview() {
       )}
       <FormAlert message={error} />
 
-      {snapshot && snapshot.charged_students > 0 && (
+      {!brandNew && !sample && view === "batches" && (
         <>
-          <div className="console-list-head">
-            <h2>Who hasn&apos;t paid</h2>
-            {providerConfigured && (
-              <Button
-                variant="retroPaper"
-                type="button"
-                onClick={() => setReminding({ period })}
-                disabled={snapshot.overdue_paise === 0}
-              >
-                Remind everyone overdue
-              </Button>
-            )}
-          </div>
-          <UnpaidList
-            rows={report.data?.unpaid ?? []}
-            onRecord={(row) => setPaying({ id: row.student_id, name: row.student_name })}
-            onRemind={(row) =>
-              setReminding({ period, studentId: row.student_id, name: row.student_name })
-            }
-            studioName={studioName}
-            reminded={reminded}
-            onOpened={markOpened}
-            showQueue={providerConfigured}
+          <StudioTable
+            period={period}
+            today={today}
+            onRecord={(student) => setPaying(student)}
+            onRemindBatch={(ids) => {
+              setRemindIds(ids);
+              setBatchOpen(true);
+            }}
           />
         </>
       )}
+      {snapshot && !brandNew && !sample && view === "charts" && <MonthCharts snapshot={snapshot} />}
 
+      <ConsoleDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import from Excel or CSV"
+      >
+        {importOpen && <ImportSheet onDone={() => setImportOpen(false)} />}
+      </ConsoleDialog>
       <WhatsAppBatchDialog
         open={batchOpen}
-        onClose={() => setBatchOpen(false)}
-        rows={unpaidRows}
+        onClose={() => {
+          setBatchOpen(false);
+        }}
+        rows={dialogRows}
+        explicit={remindIds !== null}
         studioName={studioName}
         reminded={reminded}
         onOpened={markOpened}
-      />
-      <TelegramBatchDialog
-        open={telegramOpen}
-        onClose={() => setTelegramOpen(false)}
-        period={period}
       />
       <RemindDialog
         target={reminding}
@@ -297,15 +414,6 @@ function Overview() {
         onClose={() => setPaying(null)}
         onSaved={() => setError("")}
       />
-
-      {!setupDone && !firstRun && (
-        <div className="window setup-card">
-          <div className="window-bar chrome-font">Setup.dialog</div>
-          <div className="window-inner">
-            <SetupChecklist />
-          </div>
-        </div>
-      )}
     </section>
   );
 }

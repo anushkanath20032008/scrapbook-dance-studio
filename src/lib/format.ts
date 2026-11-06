@@ -28,3 +28,16 @@ export const paymentMethodLabels: Record<string, string> = {
 };
 
 export const paymentMethodLabel = (method: string) => paymentMethodLabels[method] ?? method;
+
+/** "Thursday, 5 November" */
+export const formatDayLong = (iso: string) =>
+  toDate(iso).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+
+/** A phone number with the middle hidden ("+91 ••••• 90869"), for screens where the number only needs recognising. */
+export function maskPhone(phone: string | null | undefined): string {
+  if (!phone) return "";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 6) return "•••••";
+  const prefix = phone.trim().startsWith("+") ? `+${digits.slice(0, digits.length - 10)} ` : "";
+  return `${prefix}••••• ${digits.slice(-5)}`.trim();
+}

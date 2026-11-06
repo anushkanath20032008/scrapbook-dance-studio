@@ -16,21 +16,45 @@ const steps: Record<TourRole, Step[]> = {
     },
     {
       to: "/app",
-      target: "overview",
-      title: "Overview",
-      text: "Start here each day. This is the menu item for your daily summary.",
-    },
-    {
-      to: "/app",
       target: "totals",
-      title: "This month in numbers",
-      text: "What you billed, what you collected, and how much is overdue. The red figure is the money you can chase today.",
+      title: "This month at a glance",
+      text: "What you are owed, what has come in and how many dancers have paid. The red figure is the money you can chase today.",
     },
     {
       to: "/app",
-      target: "charts",
-      title: "Charts",
-      text: "The pie shows how much of this month's fees are collected, not yet due or overdue. The bars compare the last six months.",
+      target: "views",
+      title: "Four ways to look",
+      text: "Switch between Table, Cards, By batch and Charts. The Table groups dancers under their batch, each in its own colour.",
+    },
+    {
+      to: "/app",
+      target: "import",
+      title: "Bring your dancers in",
+      text: "Already have a spreadsheet? Import Excel / CSV reads names, phone numbers, batches and fees, and you check them before anything is saved.",
+    },
+    {
+      to: "/app",
+      target: "board",
+      title: "Everyone in one table",
+      text: "Each batch has its own coloured bar with Mark all paid, All present today and Remind unpaid. Click a dancer's name for a panel with their month.",
+    },
+    {
+      to: "/app",
+      target: "ticks",
+      title: "Mark who is here",
+      text: "Tap a tick when a dancer arrives. Press and slide down the column to mark a whole class at once.",
+    },
+    {
+      to: "/app",
+      target: "remind",
+      title: "Remind in a few taps",
+      text: "Remind everyone who owes, or tick a few dancers first. WhatsApp opens each chat with the message ready; you press Send.",
+    },
+    {
+      to: "/app",
+      target: "sample",
+      title: "Practise first",
+      text: "Not sure yet? Try with sample dancers is a made-up studio where nothing is saved or sent. Come back to your own studio any time.",
     },
     {
       to: "/app/students",
@@ -67,7 +91,7 @@ const steps: Record<TourRole, Step[]> = {
     {
       target: null,
       title: "Welcome to your studio",
-      text: "This takes under a minute. You see only what you need to teach: batches, dancer names and attendance.",
+      text: "This takes under a minute. It shows you where to mark attendance, find your batches and plan make-up classes.",
     },
     {
       to: "/app/class",
@@ -125,7 +149,8 @@ function useSpotlight(target: string | null): Box | null {
     let tries = 0;
 
     const measure = () => {
-      if (!element || !element.isConnected) element = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
+      if (!element || !element.isConnected)
+        element = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
       if (!element) return false;
       if (!scrolled) {
         element.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -207,7 +232,11 @@ export function GuidedTour({
         <h2 className="display tour-title">{step.title}</h2>
         <p>{step.text}</p>
         <div className="console-actions">
-          <Button variant="retro" type="button" onClick={() => (last ? finish() : setIndex(index + 1))}>
+          <Button
+            variant="retro"
+            type="button"
+            onClick={() => (last ? finish() : setIndex(index + 1))}
+          >
             {last ? "Finish" : "Next"}
           </Button>
           {index > 0 && !last && (

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { listLimit, personName, phone, uuid, validate } from "@/lib/validators";
+import { isoDate, listLimit, personName, phone, uuid, validate } from "@/lib/validators";
 
 const listInput = z.object({
   search: z.string().trim().max(100).optional(),
@@ -58,6 +58,11 @@ export const saveStudent = createServerFn({ method: "POST" })
         id: uuid.optional(),
         name: personName,
         guardianId: uuid.nullish().transform((value) => value ?? null),
+        email: z.string().trim().email().max(200).nullable().optional(),
+        joinedOn: isoDate.nullable().optional(),
+        emergencyName: z.string().trim().max(120).nullable().optional(),
+        emergencyPhone: phone.nullable().optional(),
+        note: z.string().trim().max(500).nullable().optional(),
       }),
     ),
   )

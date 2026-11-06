@@ -10,6 +10,7 @@ import { useRefreshStudents } from "@/components/console/console-data";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf } from "@/components/console/form-utils";
 import { PasteDancers } from "@/components/console/paste-dancers";
+import { ImportSheet } from "@/components/console/import-sheet";
 import { StudentForm } from "@/components/console/student-form";
 import { StudentPanel } from "@/components/console/student-panel";
 import { listBatches } from "@/lib/batches.functions";
@@ -18,6 +19,7 @@ import { listGuardians, setStudentArchived } from "@/lib/directory.functions";
 import { listFeePlans } from "@/lib/fees.functions";
 import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
+import { registerTones, toneOf } from "@/lib/tone";
 
 export const Route = createFileRoute("/app/students")({
   head: () => ({ meta: [{ title: "Dancers | ChoreoStudio" }] }),
@@ -41,6 +43,7 @@ function Dancers() {
   const [showArchived, setShowArchived] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -82,6 +85,9 @@ function Dancers() {
     onError: (e) => setError(messageOf(e)),
   });
 
+  registerTones(
+    (students.data ?? []).flatMap((student) => student.batches.map((batch) => batch.name)),
+  );
   const needle = search.trim().toLowerCase();
   const visible = (students.data ?? []).filter(
     (student) =>
@@ -91,6 +97,24 @@ function Dancers() {
   );
 
   const ready = guardians.data && batches.data && plans.data;
+  const openStudent = openId
+    ? (students.data ?? []).find((student) => student.id === openId)
+    : undefined;
+  // Cards sit in one band per batch (the first batch for a dancer in several), each band in its own colour.
+  const groups = (() => {
+    const bands = new Map<string, typeof visible>();
+    for (const student of visible) {
+      const name = student.batches[0]?.name ?? "No batch";
+      bands.set(name, [...(bands.get(name) ?? []), student]);
+    }
+    return [...bands.entries()]
+      .sort(([a], [b]) => (a === "No batch" ? 1 : b === "No batch" ? -1 : a.localeCompare(b)))
+      .map(([name, list]) => ({
+        name,
+        students: list,
+        tone: name === "No batch" ? "none" : String(toneOf(name)),
+      }));
+  })();
 
   return (
     <section>
@@ -122,6 +146,14 @@ function Dancers() {
           onClick={() => setPasteOpen(true)}
         >
           Paste a list
+        </Button>
+        <Button
+          variant="retroPaper"
+          type="button"
+          disabled={atLimit}
+          onClick={() => setImportOpen(true)}
+        >
+          Import Excel / CSV
         </Button>
         <label className="console-check">
           <input
@@ -161,76 +193,114 @@ function Dancers() {
       {students.data && students.data.length > 0 && visible.length === 0 && (
         <p className="console-empty">No dancer matches &quot;{search.trim()}&quot;.</p>
       )}
-      <ul className="console-list">
-        {visible.map((student) => (
-          <li
-            key={student.id}
-            className="console-row-wrap"
-            data-archived={student.archived_at !== null}
-          >
-            <div className="console-row">
-              <div>
-                <strong>{student.name}</strong>
-                <span className="console-hint">
-                  {student.guardian?.phone ? "" : "No phone number yet"}
-                  {student.archived_at ? (student.guardian?.phone ? "archived" : " · archived") : ""}
-                </span>
-                <span className="console-hint">
-                  {student.batches.length > 0
-                    ? student.batches.map((batch) => batch.name).join(", ")
-                    : "No batch"}
-                  {" · "}
-                  {student.plan
-                    ? `${formatRupees(student.plan.amount_paise)} a month`
-                    : "No fee yet"}
-                </span>
-              </div>
-              <div className="console-row-actions">
-                {!student.archived_at && (
-                  <Button asChild variant="retroPaper">
-                    <Link to="/app/billing" search={{ student: student.id }}>
-                      Billing
-                    </Link>
-                  </Button>
-                )}
-                {!student.archived_at && (
-                  <Button
-                    variant="retroPaper"
-                    type="button"
-                    aria-expanded={openId === student.id}
-                    onClick={() => setOpenId(openId === student.id ? null : student.id)}
-                  >
-                    {openId === student.id ? "Close" : "Edit"}
-                  </Button>
-                )}
-                <Button
-                  variant="retroPaper"
-                  type="button"
-                  disabled={archive.isPending}
-                  onClick={() => {
-                    if (openId === student.id) setOpenId(null);
-                    archive.mutate({ id: student.id, archived: !student.archived_at, name: student.name });
-                  }}
+      <div className="card-groups">
+        {groups.map((group) => (
+          <section key={group.name} className="card-group" data-c={group.tone}>
+            <h3 className="card-group-title">
+              {group.name} <span className="seg-count">{group.students.length}</span>
+            </h3>
+            <div className="dancer-cards">
+              {group.students.map((student) => (
+                <article
+                  key={student.id}
+                  className="dancer-card"
+                  data-c={group.tone}
+                  data-archived={student.archived_at !== null}
                 >
-                  {student.archived_at ? "Restore" : "Archive"}
-                </Button>
-              </div>
+                  {student.archived_at ? (
+                    <strong className="dancer-card-name">{student.name}</strong>
+                  ) : (
+                    <button
+                      type="button"
+                      className="dancer-card-name"
+                      aria-label={`Edit ${student.name}`}
+                      onClick={() => setOpenId(student.id)}
+                    >
+                      {student.name}
+                    </button>
+                  )}
+                  <span className="dancer-card-fee">
+                    {student.plan
+                      ? `${formatRupees(student.plan.amount_paise)} a month`
+                      : "No fee yet"}
+                    {student.guardian?.phone ? "" : " · No phone yet"}
+                    {student.archived_at ? " · archived" : ""}
+                  </span>
+                  <span className="dancer-card-foot">
+                    {student.batches.length > 1 && (
+                      <span className="console-hint">
+                        {student.batches.map((b) => b.name).join(", ")}
+                      </span>
+                    )}
+                    <span className="dancer-card-actions">
+                      {!student.archived_at && (
+                        <Link
+                          className="board-ib board-ib-text"
+                          to="/app/billing"
+                          search={{ student: student.id }}
+                        >
+                          Billing
+                        </Link>
+                      )}
+                      {!student.archived_at && (
+                        <button
+                          type="button"
+                          className="board-ib board-ib-text"
+                          onClick={() => setOpenId(student.id)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="board-ib board-ib-text"
+                        disabled={archive.isPending}
+                        onClick={() => {
+                          if (openId === student.id) setOpenId(null);
+                          archive.mutate({
+                            id: student.id,
+                            archived: !student.archived_at,
+                            name: student.name,
+                          });
+                        }}
+                      >
+                        {student.archived_at ? "Restore" : "Archive"}
+                      </button>
+                    </span>
+                  </span>
+                </article>
+              ))}
             </div>
-            {openId === student.id && ready && (
-              <StudentPanel
-                student={student}
-                guardians={guardians.data ?? []}
-                batches={batches.data ?? []}
-                plans={plans.data ?? []}
-                onClose={() => setOpenId(null)}
-              />
-            )}
-          </li>
+          </section>
         ))}
-      </ul>
+      </div>
+
+      <ConsoleDialog
+        open={openStudent !== undefined && Boolean(ready)}
+        onOpenChange={(value) => !value && setOpenId(null)}
+        title={openStudent ? openStudent.name : "Dancer"}
+      >
+        {openStudent && ready && (
+          <StudentPanel
+            student={openStudent}
+            guardians={guardians.data ?? []}
+            batches={batches.data ?? []}
+            plans={plans.data ?? []}
+            onClose={() => setOpenId(null)}
+          />
+        )}
+      </ConsoleDialog>
 
       <ConsoleDialog open={pasteOpen} onOpenChange={setPasteOpen} title="Paste a list of dancers">
         {pasteOpen && <PasteDancers onDone={() => setPasteOpen(false)} />}
+      </ConsoleDialog>
+
+      <ConsoleDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import from Excel or CSV"
+      >
+        {importOpen && <ImportSheet onDone={() => setImportOpen(false)} />}
       </ConsoleDialog>
 
       <ConsoleDialog open={addOpen} onOpenChange={setAddOpen} title="New dancer">

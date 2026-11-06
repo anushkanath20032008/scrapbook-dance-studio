@@ -15,6 +15,13 @@ export const bulkAddDancers = createServerFn({ method: "POST" })
               name: personName,
               phone: phone.nullable(),
               feePaise: paise.nullable(),
+              email: z.string().trim().email().max(200).nullable().optional(),
+              joinedOn: isoDate.nullable().optional(),
+              emergencyName: z.string().trim().max(120).nullable().optional(),
+              emergencyPhone: phone.nullable().optional(),
+              note: z.string().trim().max(500).nullable().optional(),
+              batches: z.array(z.string().trim().min(1).max(60)).max(5).optional(),
+              parentName: z.string().trim().max(120).nullable().optional(),
             }),
           )
           .min(1, "Paste at least one dancer")

@@ -29,6 +29,7 @@ import { Route as AppMakeupsRouteImport } from './routes/app.makeups'
 import { Route as AppMessagesRouteImport } from './routes/app.messages'
 import { Route as AppMonthEndRouteImport } from './routes/app.month-end'
 import { Route as AppMyBatchesRouteImport } from './routes/app.my-batches'
+import { Route as AppMyDancersRouteImport } from './routes/app.my-dancers'
 import { Route as AppPlansRouteImport } from './routes/app.plans'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppStudentsRouteImport } from './routes/app.students'
@@ -39,7 +40,6 @@ import { Route as ApiJobsOwnerNudgeRouteImport } from './routes/api/jobs/owner-n
 import { Route as ApiJobsPurgeScreenshotsRouteImport } from './routes/api/jobs/purge-screenshots'
 import { Route as ApiJobsSendRemindersRouteImport } from './routes/api/jobs/send-reminders'
 import { Route as ApiWebhooksDodoRouteImport } from './routes/api/webhooks/dodo'
-import { Route as ApiWebhooksTelegramRouteImport } from './routes/api/webhooks/telegram'
 import { Route as ApiWebhooksWhatsappRouteImport } from './routes/api/webhooks/whatsapp'
 
 const IndexRoute = IndexRouteImport.update({
@@ -142,6 +142,11 @@ const AppMyBatchesRoute = AppMyBatchesRouteImport.update({
   path: '/my-batches',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMyDancersRoute = AppMyDancersRouteImport.update({
+  id: '/my-dancers',
+  path: '/my-dancers',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlansRoute = AppPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
@@ -192,11 +197,6 @@ const ApiWebhooksDodoRoute = ApiWebhooksDodoRouteImport.update({
   path: '/api/webhooks/dodo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiWebhooksTelegramRoute = ApiWebhooksTelegramRouteImport.update({
-  id: '/api/webhooks/telegram',
-  path: '/api/webhooks/telegram',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiWebhooksWhatsappRoute = ApiWebhooksWhatsappRouteImport.update({
   id: '/api/webhooks/whatsapp',
   path: '/api/webhooks/whatsapp',
@@ -223,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -234,7 +235,6 @@ export interface FileRoutesByFullPath {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesByTo {
@@ -256,6 +256,7 @@ export interface FileRoutesByTo {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -267,7 +268,6 @@ export interface FileRoutesByTo {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRoutesById {
@@ -291,6 +291,7 @@ export interface FileRoutesById {
   '/app/messages': typeof AppMessagesRoute
   '/app/month-end': typeof AppMonthEndRoute
   '/app/my-batches': typeof AppMyBatchesRoute
+  '/app/my-dancers': typeof AppMyDancersRoute
   '/app/plans': typeof AppPlansRoute
   '/app/setup': typeof AppSetupRoute
   '/app/students': typeof AppStudentsRoute
@@ -302,7 +303,6 @@ export interface FileRoutesById {
   '/api/jobs/purge-screenshots': typeof ApiJobsPurgeScreenshotsRoute
   '/api/jobs/send-reminders': typeof ApiJobsSendRemindersRoute
   '/api/webhooks/dodo': typeof ApiWebhooksDodoRoute
-  '/api/webhooks/telegram': typeof ApiWebhooksTelegramRoute
   '/api/webhooks/whatsapp': typeof ApiWebhooksWhatsappRoute
 }
 export interface FileRouteTypes {
@@ -327,6 +327,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -338,7 +339,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -360,6 +360,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -371,7 +372,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   id:
     | '__root__'
@@ -394,6 +394,7 @@ export interface FileRouteTypes {
     | '/app/messages'
     | '/app/month-end'
     | '/app/my-batches'
+    | '/app/my-dancers'
     | '/app/plans'
     | '/app/setup'
     | '/app/students'
@@ -405,7 +406,6 @@ export interface FileRouteTypes {
     | '/api/jobs/purge-screenshots'
     | '/api/jobs/send-reminders'
     | '/api/webhooks/dodo'
-    | '/api/webhooks/telegram'
     | '/api/webhooks/whatsapp'
   fileRoutesById: FileRoutesById
 }
@@ -425,7 +425,6 @@ export interface RootRouteChildren {
   ApiJobsPurgeScreenshotsRoute: typeof ApiJobsPurgeScreenshotsRoute
   ApiJobsSendRemindersRoute: typeof ApiJobsSendRemindersRoute
   ApiWebhooksDodoRoute: typeof ApiWebhooksDodoRoute
-  ApiWebhooksTelegramRoute: typeof ApiWebhooksTelegramRoute
   ApiWebhooksWhatsappRoute: typeof ApiWebhooksWhatsappRoute
 }
 
@@ -571,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMyBatchesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/my-dancers': {
+      id: '/app/my-dancers'
+      path: '/my-dancers'
+      fullPath: '/app/my-dancers'
+      preLoaderRoute: typeof AppMyDancersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/plans': {
       id: '/app/plans'
       path: '/plans'
@@ -641,13 +647,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksDodoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/webhooks/telegram': {
-      id: '/api/webhooks/telegram'
-      path: '/api/webhooks/telegram'
-      fullPath: '/api/webhooks/telegram'
-      preLoaderRoute: typeof ApiWebhooksTelegramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/webhooks/whatsapp': {
       id: '/api/webhooks/whatsapp'
       path: '/api/webhooks/whatsapp'
@@ -668,6 +667,7 @@ interface AppRouteChildren {
   AppMessagesRoute: typeof AppMessagesRoute
   AppMonthEndRoute: typeof AppMonthEndRoute
   AppMyBatchesRoute: typeof AppMyBatchesRoute
+  AppMyDancersRoute: typeof AppMyDancersRoute
   AppPlansRoute: typeof AppPlansRoute
   AppSetupRoute: typeof AppSetupRoute
   AppStudentsRoute: typeof AppStudentsRoute
@@ -686,6 +686,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMessagesRoute: AppMessagesRoute,
   AppMonthEndRoute: AppMonthEndRoute,
   AppMyBatchesRoute: AppMyBatchesRoute,
+  AppMyDancersRoute: AppMyDancersRoute,
   AppPlansRoute: AppPlansRoute,
   AppSetupRoute: AppSetupRoute,
   AppStudentsRoute: AppStudentsRoute,
@@ -712,7 +713,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiJobsPurgeScreenshotsRoute: ApiJobsPurgeScreenshotsRoute,
   ApiJobsSendRemindersRoute: ApiJobsSendRemindersRoute,
   ApiWebhooksDodoRoute: ApiWebhooksDodoRoute,
-  ApiWebhooksTelegramRoute: ApiWebhooksTelegramRoute,
   ApiWebhooksWhatsappRoute: ApiWebhooksWhatsappRoute,
 }
 export const routeTree = rootRouteImport

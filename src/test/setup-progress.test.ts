@@ -167,11 +167,12 @@ describe("listStudentOverview", () => {
         id: "s1",
         name: "Asha",
         archived_at: null,
+        details: { email: null, joinedOn: null, emergencyName: null, emergencyPhone: null, note: null },
         guardian: { id: "g1", name: "Mira", phone: "9876543210" },
         batches: [{ id: "b1", name: "Hip Hop" }],
         plan: { id: "p1", name: "Monthly", amount_paise: 150000, starts_on: "2026-10-01" },
       },
-      { id: "s2", name: "Ben", archived_at: null, guardian: null, batches: [], plan: null },
+      { id: "s2", name: "Ben", archived_at: null, details: { email: null, joinedOn: null, emergencyName: null, emergencyPhone: null, note: null }, guardian: null, batches: [], plan: null },
     ]);
   });
 

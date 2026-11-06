@@ -104,3 +104,71 @@ export async function markInstructorAttendance(
   );
   return { marked: count };
 }
+
+export type BatchRequestInput = {
+  name: string;
+  weekdays: number[];
+  startsAt: string | null;
+  endsAt: string | null;
+  room: string | null;
+};
+
+/** A teacher suggests a batch. It exists only as a request until the studio owner approves it. */
+export async function requestBatch({ supabase }: StudioContext, input: BatchRequestInput) {
+  const id = unwrap(
+    await supabase.rpc("instructor_request_batch", {
+      p_name: input.name,
+      p_weekdays: input.weekdays,
+      p_starts_at: input.startsAt,
+      p_ends_at: input.endsAt,
+      p_room: input.room,
+    }),
+  );
+  return { id };
+}
+
+export async function getMyBatchRequests({ supabase }: StudioContext) {
+  return unwrap(await supabase.rpc("instructor_my_batch_requests"));
+}
+
+/** Owner side: waiting requests first, then the latest decided ones. */
+export async function listBatchRequests({ supabase }: StudioContext) {
+  return unwrap(await supabase.rpc("list_batch_requests"));
+}
+
+export async function approveBatchRequest({ supabase }: StudioContext, input: { id: string }) {
+  return { batchId: unwrap(await supabase.rpc("approve_batch_request", { p_id: input.id })) };
+}
+
+export async function declineBatchRequest({ supabase }: StudioContext, input: { id: string }) {
+  unwrap(await supabase.rpc("decline_batch_request", { p_id: input.id }));
+  return { declined: true };
+}
+
+export async function addInstructorStudent(
+  { supabase }: StudioContext,
+  input: { batchId: string; name: string; phone: string | null },
+) {
+  return unwrap(
+    await supabase.rpc("instructor_add_student", {
+      p_batch: input.batchId,
+      p_name: input.name,
+      p_phone: input.phone ?? "",
+    }),
+  );
+}
+
+export async function getInstructorStudents({ supabase }: StudioContext) {
+  return unwrap(await supabase.rpc("instructor_students"));
+}
+
+/** Whether the caller already has a studio of their own. Read-only: it never creates one. */
+export async function ownsStudio({ supabase, userId }: StudioContext) {
+  const { data, error } = await supabase
+    .from("studio_profiles")
+    .select("user_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw friendlyError(error);
+  return data !== null;
+}

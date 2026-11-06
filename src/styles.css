@@ -1086,3 +1086,20 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-group[data-kind="batch"][data-c="none"] { --bh:#6b625a; }
 .board-group[data-kind="batch"] th { background:var(--bh); }
 .board-group[data-kind="batch"] .board-group-meta { color:#fff; opacity:.9; }
+
+/* Calmer table: dark Choreo blue only on the column heading row; each batch band is its own soft colour. */
+.board-table thead th { background:#1e3188; color:#fff; border-bottom:0; font-size:11px; letter-spacing:.02em; }
+.board-group[data-kind="batch"] { --bg:#e8e3dd; --fg:#5f544a; }
+.board-group[data-kind="batch"][data-c="0"] { --bg:#f8cfc9; --fg:#7a1f12; }
+.board-group[data-kind="batch"][data-c="1"] { --bg:#cfe3f8; --fg:#14396b; }
+.board-group[data-kind="batch"][data-c="2"] { --bg:#d3ecd9; --fg:#14502e; }
+.board-group[data-kind="batch"][data-c="3"] { --bg:#fbe3a6; --fg:#5e4300; }
+.board-group[data-kind="batch"][data-c="4"] { --bg:#e2d5f5; --fg:#41206e; }
+.board-group[data-kind="batch"][data-c="5"] { --bg:#f7d4e6; --fg:#6e1a47; }
+.board-group[data-kind="batch"] th { background:var(--bg); color:var(--fg); height:32px; font-size:12px; border-bottom:1px solid rgba(0,0,0,.08); }
+.board-group[data-kind="batch"] strong { font-size:13px; color:var(--fg); }
+.board-group[data-kind="batch"] .board-group-meta { color:var(--fg); opacity:.8; }
+.board-group[data-kind="batch"] th.board-pick input { accent-color:#1e3188; }
+.board-group-actions button, .board-group-actions .btn { font-size:11px; padding:0 9px; height:24px; min-height:0; box-shadow:none; border-width:1px; line-height:1; }
+/* The batch is already in the band, so the column repeating it goes away when grouped by batch. */
+.board-table[data-by="batch"] col.c-batch, .board-table[data-by="batch"] thead th:nth-child(3), .board-table[data-by="batch"] td.board-batch { display:none; }

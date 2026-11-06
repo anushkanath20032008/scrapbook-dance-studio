@@ -468,7 +468,7 @@ export function DancerBoard({
         </div>
       )}
       <div className="board-scroll" hidden={layout === "cards"}>
-        <table className="board-table">
+        <table className="board-table" data-by={groupBy}>
           <colgroup>
             <col className="c-pick" />
             <col />

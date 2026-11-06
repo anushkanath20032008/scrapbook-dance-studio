@@ -150,26 +150,6 @@ function Overview() {
     <section>
       <div className="home-head">
         <h1 className="home-title">Home</h1>
-        {!sample && !brandNew && (
-          <div className="table-chips home-views" role="group" aria-label="View" data-tour="views">
-            {(
-              [
-                ["table", "Table"],
-                ["charts", "Charts"],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className="table-chip"
-                aria-pressed={view === id}
-                onClick={() => setView(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
         <div className="home-head-right">
           {!sample && (
             <button type="button" className="board-secondary" onClick={() => setImportOpen(true)}>
@@ -206,6 +186,17 @@ function Overview() {
           </label>
         </div>
       </div>
+      {!sample && !brandNew && (
+        <div className="view-switch" data-view={view} data-tour="views">
+          <button type="button" aria-pressed={view === "table"} onClick={() => setView("table")}>
+            Table
+          </button>
+          <button type="button" aria-pressed={view === "charts"} onClick={() => setView("charts")}>
+            Charts
+          </button>
+          <span className="view-switch-knob" aria-hidden="true" />
+        </div>
+      )}
       {sample && (
         <p className="console-banner sample-banner" role="status">
           Sample studio: eight made-up dancers. Tick, select and record payments to practise.

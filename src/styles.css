@@ -1140,3 +1140,20 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .tour-card p { margin:0 0 10px; line-height:1.45; }
 .tour-card .console-actions button { font-size:12px; padding:0 10px; height:26px; min-height:0; }
 @media (max-width:640px){ .tour-card { left:10px; right:10px; width:auto; max-height:40vh; } }
+
+/* A real sliding switch for the two Home views, on its own line under the heading. */
+.view-switch { position:relative; display:inline-grid; grid-template-columns:1fr 1fr; align-items:stretch; margin:0 0 14px; padding:3px; border:1px solid #c9d2f0; border-radius:999px; background:#e8edfb; }
+.view-switch button { position:relative; z-index:1; border:0; background:transparent; padding:0 20px; height:28px; border-radius:999px; font-size:12.5px; font-weight:600; color:#4a5a99; cursor:pointer; transition:color .18s ease; }
+.view-switch button[aria-pressed="true"] { color:#fff; }
+.view-switch-knob { position:absolute; top:3px; left:3px; width:calc(50% - 3px); height:calc(100% - 6px); border-radius:999px; background:#1e3188; transition:transform .18s ease; }
+.view-switch[data-view="charts"] .view-switch-knob { transform:translateX(100%); }
+
+/* The month's numbers are the first thing to read, so they are bigger than anything else on the page. */
+.strip { gap:0; }
+.strip-cell { padding:12px 14px; }
+.strip-label { font-size:12px; font-weight:600; letter-spacing:.01em; }
+.strip-big { font-size:30px; line-height:1.1; }
+.strip-mid { font-size:22px; line-height:1.15; }
+.strip-link, .strip-quiet { font-size:14px; }
+.strip-bar { height:10px; }
+@media (max-width:900px){ .strip-big { font-size:24px; } .strip-mid { font-size:19px; } }

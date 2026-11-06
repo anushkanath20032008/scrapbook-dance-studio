@@ -41,6 +41,7 @@ export function AttendanceGate({
   open,
   onOpen,
   onClose,
+  onHoliday,
   waiting,
   batches,
   today,
@@ -54,6 +55,8 @@ export function AttendanceGate({
   batches: TableBatch[];
   today: string;
   onSave: (batchId: string, marks: { studentId: string; present: boolean }[]) => Promise<void>;
+  /** Records a class that did not happen, so it is never mistaken for nobody turning up. */
+  onHoliday: (batchId: string) => Promise<void>;
 }) {
   const [absent, setAbsent] = useState<Set<string>>(new Set());
   const [off, setOff] = useState<Set<string>>(new Set());
@@ -82,6 +85,7 @@ export function AttendanceGate({
       for (const batch of todays) {
         if (off.has(batch.id)) {
           skipped.add(batch.id);
+          await onHoliday(batch.id);
           continue;
         }
         skipped.delete(batch.id);

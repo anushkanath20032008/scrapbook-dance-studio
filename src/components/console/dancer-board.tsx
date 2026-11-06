@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DancerPeek } from "@/components/console/dancer-peek";
 import { formatRupees } from "@/lib/money";
-import { markAttendance } from "@/lib/attendance.functions";
+import { markAttendance, setClassHoliday } from "@/lib/attendance.functions";
 import { sampleMark } from "@/lib/sample-studio";
 import { AttendanceGate, pendingBatches, readSkipped } from "@/components/console/attendance-gate";
 import { registerTones, toneOf } from "@/lib/tone";
@@ -186,6 +186,7 @@ export function DancerBoard({
   const queryClient = useQueryClient();
   const load = useServerFn(getStudioTable);
   const attend = useServerFn(markAttendance);
+  const holiday = useServerFn(setClassHoliday);
   const key = useMemo(() => ["studio-table", period, today], [period, today]);
   const table = useQuery({
     queryKey: key,
@@ -765,6 +766,11 @@ export function DancerBoard({
         batches={batches ?? []}
         today={today}
         onSave={saveGate}
+        onHoliday={async (batchId) => {
+          if (sample) return;
+          await holiday({ data: { batchId, date: today, off: true, reason: null } });
+          await queryClient.invalidateQueries({ queryKey: ["studio-table"] });
+        }}
       />
       <p className="board-foot">
         <span>

@@ -46,3 +46,32 @@ export const getAttendanceSummary = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) =>
     (await import("@/lib/attendance-summary.server")).getAttendanceSummary(context, data),
   );
+
+export const setClassHoliday = createServerFn({ method: "POST" })
+  .middleware([requireSubscription])
+  .inputValidator(
+    validate(
+      z.object({
+        batchId: uuid,
+        date: isoDate,
+        off: z.boolean(),
+        reason: z.string().trim().max(80).nullish(),
+      }),
+    ),
+  )
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/attendance.server")).setClassHoliday(context, data),
+  );
+
+export const listClassHolidays = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    validate(
+      z
+        .object({ from: isoDate, to: isoDate })
+        .refine((range) => range.to >= range.from, "The end date cannot be before the start date"),
+    ),
+  )
+  .handler(async ({ data, context }) =>
+    (await import("@/lib/attendance.server")).listClassHolidays(context, data),
+  );

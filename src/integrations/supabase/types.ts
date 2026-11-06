@@ -941,6 +941,14 @@ export type Database = {
           student_name: string
         }[]
       }
+      set_class_holiday: {
+        Args: { p_batch: string; p_on: string; p_off: boolean; p_reason?: string | null }
+        Returns: boolean
+      }
+      class_holidays: {
+        Args: { p_from: string; p_to: string }
+        Returns: { batch_id: string; batch_name: string; session_on: string; reason: string | null }[]
+      }
       batch_day: {
         Args: { p_batch: string; p_on: string }
         Returns: {

@@ -33,3 +33,27 @@ export async function getStudentAttendance(
     }),
   );
 }
+
+/** Record that a class did not happen (a festival, a holiday, the teacher away), or put it back on. */
+export async function setClassHoliday(
+  { supabase }: StudioContext,
+  input: { batchId: string; date: string; off: boolean; reason?: string | null | undefined },
+) {
+  const off = unwrap(
+    await supabase.rpc("set_class_holiday", {
+      p_batch: input.batchId,
+      p_on: input.date,
+      p_off: input.off,
+      p_reason: input.reason ?? null,
+    }),
+  );
+  return { off };
+}
+
+/** The classes called off between two dates, newest first. */
+export async function listClassHolidays(
+  { supabase }: StudioContext,
+  input: { from: string; to: string },
+) {
+  return unwrap(await supabase.rpc("class_holidays", { p_from: input.from, p_to: input.to }));
+}

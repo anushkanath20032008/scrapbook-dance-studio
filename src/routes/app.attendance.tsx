@@ -6,7 +6,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FormAlert } from "@/components/console/form-helpers";
 import { messageOf, weekdayNames } from "@/components/console/form-utils";
-import { getBatchDay, getAttendanceSummary, markAttendance } from "@/lib/attendance.functions";
+import {
+  getBatchDay,
+  getAttendanceSummary,
+  listClassHolidays,
+  markAttendance,
+  setClassHoliday,
+} from "@/lib/attendance.functions";
 import { rangeFor, rangeLabels, type RangeKind } from "@/lib/attendance-stats";
 import { listBatches } from "@/lib/batches.functions";
 import { todayInIndia } from "@/lib/validators";
@@ -32,6 +38,8 @@ function Attendance() {
   const listBatchesFn = useServerFn(listBatches);
   const dayFn = useServerFn(getBatchDay);
   const markFn = useServerFn(markAttendance);
+  const holidayFn = useServerFn(setClassHoliday);
+  const holidaysFn = useServerFn(listClassHolidays);
   const summaryFn = useServerFn(getAttendanceSummary);
 
   const today = todayInIndia();
@@ -52,11 +60,49 @@ function Attendance() {
     queryFn: () => dayFn({ data: { batchId, date } }),
     enabled: batchId !== "" && date !== "",
   });
-  const longWeekdays = ["Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays"];
+  const longWeekdays = [
+    "Sundays",
+    "Mondays",
+    "Tuesdays",
+    "Wednesdays",
+    "Thursdays",
+    "Fridays",
+    "Saturdays",
+  ];
+  // Classes called off, so a festival or a closed studio is not mistaken for nobody turning up.
+  const holidays = useQuery({
+    queryKey: ["class-holidays", date],
+    queryFn: () => holidaysFn({ data: { from: date, to: date } }),
+    enabled: date !== "",
+  });
+  const isHoliday = (holidays.data ?? []).some((day) => day.batch_id === batchId);
+  const holidayReason =
+    (holidays.data ?? []).find((day) => day.batch_id === batchId)?.reason ?? null;
+  const [reason, setReason] = useState("");
+  const holiday = useMutation({
+    mutationFn: (off: boolean) =>
+      holidayFn({ data: { batchId, date, off, reason: off ? reason || null : null } }),
+    onSuccess: (result) => {
+      setReason("");
+      setNotice(
+        result.off
+          ? "Marked as a holiday. Nobody is counted present or absent for this class."
+          : "Class put back on. Mark who came as usual.",
+      );
+      void queryClient.invalidateQueries({ queryKey: ["class-holidays"] });
+      void queryClient.invalidateQueries({ queryKey: ["batch-day"] });
+      void queryClient.invalidateQueries({ queryKey: ["attendance-summary"] });
+    },
+    onError: (err) => setError(messageOf(err)),
+  });
+
   const pickedBatch = batches.data?.find((batch) => batch.id === batchId);
   const pickedWeekday = date ? new Date(`${date}T00:00:00`).getDay() : -1;
   const offDay =
-    pickedBatch && pickedBatch.weekdays.length > 0 && pickedWeekday >= 0 && !pickedBatch.weekdays.includes(pickedWeekday)
+    pickedBatch &&
+    pickedBatch.weekdays.length > 0 &&
+    pickedWeekday >= 0 &&
+    !pickedBatch.weekdays.includes(pickedWeekday)
       ? {
           name: pickedBatch.name,
           weekday: pickedWeekday,
@@ -88,9 +134,7 @@ function Attendance() {
     const saved = roster.data.some((row) => row.present !== null);
     setStartedAllPresent(!saved && roster.data.length > 0);
     setMarks(
-      Object.fromEntries(
-        roster.data.map((row) => [row.student_id, saved ? row.present : true]),
-      ),
+      Object.fromEntries(roster.data.map((row) => [row.student_id, saved ? row.present : true])),
     );
   }, [roster.data]);
 
@@ -192,16 +236,58 @@ function Attendance() {
               </Link>
             </p>
           )}
-          {batchId && roster.isPending && <p>Loading the roster…</p>}
+          {batchId && isHoliday && (
+            <div className="holiday-note" role="status">
+              <strong>No class on this day</strong>
+              <p>
+                {holidayReason ? `Marked as a holiday: ${holidayReason}.` : "Marked as a holiday."}{" "}
+                Nobody is counted present or absent, and it is left out of attendance reports.
+              </p>
+              <Button
+                variant="retroPaper"
+                type="button"
+                disabled={holiday.isPending}
+                onClick={() => holiday.mutate(false)}
+              >
+                The class did happen
+              </Button>
+            </div>
+          )}
+          {batchId && !isHoliday && (
+            <details className="holiday-set">
+              <summary>Class did not happen? Mark it a holiday</summary>
+              <div className="holiday-form">
+                <label className="board-bar-label">
+                  Reason (optional)
+                  <input
+                    className="board-input"
+                    value={reason}
+                    maxLength={80}
+                    placeholder="Diwali, teacher away…"
+                    onChange={(event) => setReason(event.target.value)}
+                  />
+                </label>
+                <Button
+                  variant="retroPaper"
+                  type="button"
+                  disabled={holiday.isPending}
+                  onClick={() => holiday.mutate(true)}
+                >
+                  {holiday.isPending ? "Saving…" : "No class on this day"}
+                </Button>
+              </div>
+            </details>
+          )}
+          {batchId && !isHoliday && roster.isPending && <p>Loading the roster…</p>}
           {batchId && roster.isError && (
             <p role="alert">Could not load this class. Please refresh.</p>
           )}
-          {batchId && roster.data && rows.length === 0 && (
+          {batchId && !isHoliday && roster.data && rows.length === 0 && (
             <p className="console-empty">
               No dancers are on this batch for that date. Add dancers to it on the Dancers page.
             </p>
           )}
-          {rows.length > 0 && (
+          {rows.length > 0 && !isHoliday && (
             <>
               {startedAllPresent && (
                 <p className="console-hint">
@@ -304,7 +390,9 @@ function Attendance() {
           </li>
         ))}
       </ul>
-      {summary.data?.batches.length === 0 && <p className="console-empty">No batches yet. Add one on the Batches page.</p>}
+      {summary.data?.batches.length === 0 && (
+        <p className="console-empty">No batches yet. Add one on the Batches page.</p>
+      )}
 
       <div className="console-list-head">
         <h2>Dancers</h2>

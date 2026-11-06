@@ -1106,3 +1106,23 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .console-main .console-title, .home-title { font-size:28px; }
 .console-main .console-subtitle { font-size:18px; }
 .board-group[data-kind="batch"] strong { font-size:14px; }
+
+/* One colour per batch, three clearly different type levels:
+   column headings = small caps on dark blue, batch band = bold, dancers = regular. */
+.board-table thead th { text-transform:uppercase; letter-spacing:.06em; font-size:10.5px; font-weight:700; }
+.board-group[data-kind="batch"] strong { font-size:14px; font-weight:700; letter-spacing:0; }
+.board-table tbody[data-c] { --bg:#e8e3dd; --tint:#f6f3ef; }
+.board-table tbody[data-c="0"] { --bg:#f8cfc9; --tint:#fdefed; --edge:#c8321b; }
+.board-table tbody[data-c="1"] { --bg:#cfe3f8; --tint:#edf5fd; --edge:#2f6fb8; }
+.board-table tbody[data-c="2"] { --bg:#d3ecd9; --tint:#eef8f1; --edge:#2f7d52; }
+.board-table tbody[data-c="3"] { --bg:#fbe3a6; --tint:#fef6dc; --edge:#c99200; }
+.board-table tbody[data-c="4"] { --bg:#e2d5f5; --tint:#f5effc; --edge:#6b3fa8; }
+.board-table tbody[data-c="5"] { --bg:#f7d4e6; --tint:#fcedf4; --edge:#b0306f; }
+.board-table tbody[data-c] tr:not(.board-group) { background:var(--tint); }
+.board-table tbody[data-c] tr:not(.board-group) > :first-child { box-shadow:inset 4px 0 0 var(--edge, #b9b0a6); }
+.board-table tbody[data-c] tr:not(.board-group):hover { background:var(--bg); }
+.board-table tbody[data-c] td, .board-table tbody[data-c] th[scope="row"] { font-size:13px; font-weight:400; }
+.board-table .board-name, .board-table .board-name a, .board-table .board-name button { font-weight:400; color:#2a2622; }
+.board-table .board-name button:hover, .board-table .board-name a:hover { text-decoration:underline; color:#1e3188; }
+.board-table .board-name-btn { font-weight:500; color:#2a2622; }
+.board-table .board-name-btn:hover { color:#1e3188; }

@@ -516,7 +516,7 @@ export function DancerBoard({
             const tourRemind = showRemind && firstRemind;
             if (showRemind) firstRemind = false;
             return (
-              <tbody key={group.key}>
+              <tbody key={group.key} data-c={batchOf ? toneOf(group.label) : undefined}>
                 <tr
                   className="board-group"
                   data-tone={group.tone}

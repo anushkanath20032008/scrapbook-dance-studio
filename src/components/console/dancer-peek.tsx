@@ -226,7 +226,9 @@ export function DancerPeek({
                 <dt>Emergency</dt>
                 <dd>
                   {person.details.emergencyName ? `${person.details.emergencyName} · ` : ""}
-                  {person.details.emergencyPhone}
+                  {showPhone
+                    ? person.details.emergencyPhone
+                    : maskPhone(person.details.emergencyPhone)}
                 </dd>
               </div>
             )}

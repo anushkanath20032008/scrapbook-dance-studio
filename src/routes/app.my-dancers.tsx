@@ -62,7 +62,8 @@ function InstructorDancers() {
               </span>
               {(d.emergency_name || d.emergency_phone) && (
                 <span className="console-hint">
-                  Emergency: {[d.emergency_name, d.emergency_phone].filter(Boolean).join(" · ")}
+                  Emergency:{" "}
+                  {[d.emergency_name, maskPhone(d.emergency_phone)].filter(Boolean).join(" · ")}
                 </span>
               )}
               {d.note && <span className="console-hint">{d.note}</span>}

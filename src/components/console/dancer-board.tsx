@@ -368,7 +368,7 @@ export function DancerBoard({
               data-active={tab === value}
               onClick={() => setTab(value)}
             >
-              {label} <span className="seg-count">{count}</span>
+              {label} <span className="seg-count">({count})</span>
             </button>
           ))}
         </div>
@@ -769,7 +769,11 @@ export function DancerBoard({
       <p className="board-foot">
         <span>
           Click once for here (green tick), again for absent (red cross). Press and slide down the
-          column to mark several, or use Take attendance for the whole day.
+          column to mark several, or{" "}
+          <button type="button" className="text-link" onClick={() => setGateOpen(true)}>
+            take attendance for the whole day
+          </button>
+          .
         </span>
         <span>Click a name to open the dancer's profile.</span>
       </p>

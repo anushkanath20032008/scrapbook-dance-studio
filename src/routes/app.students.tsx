@@ -19,7 +19,7 @@ import { listGuardians, setStudentArchived } from "@/lib/directory.functions";
 import { listFeePlans } from "@/lib/fees.functions";
 import { formatRupees } from "@/lib/money";
 import { listStudentOverview } from "@/lib/setup.functions";
-import { toneOf } from "@/lib/tone";
+import { registerTones, toneOf } from "@/lib/tone";
 
 export const Route = createFileRoute("/app/students")({
   head: () => ({ meta: [{ title: "Dancers | ChoreoStudio" }] }),
@@ -85,6 +85,9 @@ function Dancers() {
     onError: (e) => setError(messageOf(e)),
   });
 
+  registerTones(
+    (students.data ?? []).flatMap((student) => student.batches.map((batch) => batch.name)),
+  );
   const needle = search.trim().toLowerCase();
   const visible = (students.data ?? []).filter(
     (student) =>

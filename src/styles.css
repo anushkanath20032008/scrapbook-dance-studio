@@ -1071,3 +1071,15 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .board-group-actions { margin-left:auto; display:inline-flex; gap:8px; flex-wrap:wrap; }
 .board-group-actions button { white-space:nowrap; }
 .board-confirm td { padding:0; white-space:normal; overflow:visible; }
+
+/* Each batch's header bar takes the batch's own colour (same slots as the cards and chips). */
+.board-group[data-kind="batch"] { --bh:var(--blue); }
+.board-group[data-kind="batch"][data-c="0"] { --bh:#c8321b; }
+.board-group[data-kind="batch"][data-c="1"] { --bh:#273fa3; }
+.board-group[data-kind="batch"][data-c="2"] { --bh:#2f7d52; }
+.board-group[data-kind="batch"][data-c="3"] { --bh:#9a6b00; }
+.board-group[data-kind="batch"][data-c="4"] { --bh:#6b3fa8; }
+.board-group[data-kind="batch"][data-c="5"] { --bh:#b0306f; }
+.board-group[data-kind="batch"][data-c="none"] { --bh:#6b625a; }
+.board-group[data-kind="batch"] th { background:var(--bh); }
+.board-group[data-kind="batch"] .board-group-meta { color:#fff; opacity:.9; }

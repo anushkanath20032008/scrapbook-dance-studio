@@ -8,7 +8,7 @@ import { formatRupees } from "@/lib/money";
 import { markAttendance } from "@/lib/attendance.functions";
 import { sampleMark } from "@/lib/sample-studio";
 import { AttendanceGate, pendingBatches, readSkipped } from "@/components/console/attendance-gate";
-import { toneOf } from "@/lib/tone";
+import { registerTones, toneOf } from "@/lib/tone";
 import { getStudioTable, markBatchPaid, undoBatchPaid } from "@/lib/studio-table.functions";
 import { ConfirmPaid } from "@/components/console/studio-table";
 import { Button } from "@/components/ui/button";
@@ -256,6 +256,7 @@ export function DancerBoard({
   });
 
   const batches = sample ?? table.data;
+  registerTones((batches ?? []).map((batch) => batch.name));
   const rows = useMemo(
     () => toBoardRows(batches ?? [], sample ? [] : loose),
     [batches, loose, sample],
@@ -520,6 +521,7 @@ export function DancerBoard({
                   className="board-group"
                   data-tone={group.tone}
                   data-kind={batchOf ? "batch" : undefined}
+                  data-c={batchOf ? toneOf(group.label) : undefined}
                 >
                   <th scope="row" className="board-pick">
                     {showRemind && (

@@ -117,7 +117,7 @@ export async function handleOwnerNudgeJob(request: Request): Promise<Response> {
   const result = await runOwnerNudge({
     mailer: getMailer(),
     today,
-    appUrl: (process.env["PUBLIC_APP_URL"] ?? "https://choreostudio.live").replace(/\/$/, ""),
+    appUrl: (process.env["PUBLIC_APP_URL"] ?? "https://www.choreostudio.live").replace(/\/$/, ""),
     summary: async () => {
       const { data, error } = await supabaseAdmin.rpc("owner_nudge_summary", { p_today: today });
       if (error) throw new Error("Could not load the nudge summary.");

@@ -1183,3 +1183,11 @@ div.bg-black\/80[data-state] { background:rgba(0,0,0,.12) !important; }
 .bell-list li[data-tone="warn"] { border-left-color:#c8321b; }
 .bell-list a { color:#2a2622; text-decoration:none; line-height:1.4; display:block; }
 .bell-list a:hover { text-decoration:underline; color:#1e3188; }
+.blog-list { list-style:none; padding:0; display:grid; gap:18px; margin-top:18px; }
+.blog-list h2 { margin:0 0 6px; }
+.blog-page article h2 { margin-top:28px; }
+.blog-page article h3 { font-size:17px; margin:18px 0 6px; }
+.blog-page article ol { padding-left:22px; margin:6px 0 10px; }
+.blog-msg { margin:12px 0; border:2px solid var(--ink); background:#fffaf3; }
+.blog-msg figcaption { background:var(--yellow,#f2c14a); font-weight:800; font-size:13px; padding:6px 12px; border-bottom:2px solid var(--ink); }
+.blog-msg blockquote { margin:0; padding:12px; font-size:15px; line-height:1.55; }

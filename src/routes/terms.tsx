@@ -1,14 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { LegalPage } from "@/components/legal-page";
 import { TERMS_POINTS } from "@/lib/terms";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms of Service | ChoreoStudio" },
-      { name: "description", content: "The terms for using ChoreoStudio, the fee and attendance tool for dance studios." },
-    ],
-  }),
+  head: () => pageHead("/terms", "Terms of Service | ChoreoStudio", "The terms for using ChoreoStudio, the fee and attendance tool for dance studios."),
   component: Terms,
 });
 

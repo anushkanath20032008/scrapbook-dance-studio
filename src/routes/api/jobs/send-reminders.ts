@@ -5,6 +5,9 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/jobs/send-reminders")({
   server: {
     handlers: {
+      // Vercel Cron calls with GET and `Authorization: Bearer <CRON_SECRET>` (see vercel.json).
+      GET: async ({ request }) =>
+        (await import("@/lib/reminder-job.server")).handleReminderJob(request),
       POST: async ({ request }) =>
         (await import("@/lib/reminder-job.server")).handleReminderJob(request),
     },

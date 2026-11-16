@@ -134,6 +134,13 @@ describe("authenticateJobRequest", () => {
     expect(authenticateJobRequest(withAuth("Basic s3cret"), env)?.status).toBe(401);
   });
 
+  it("also allows Vercel Cron's own secret, and only that value", () => {
+    const cron = { CRON_SECRET: "vercel-cron" };
+    expect(authenticateJobRequest(withAuth("Bearer vercel-cron"), cron)).toBeNull();
+    expect(authenticateJobRequest(withAuth("Bearer s3cret"), cron)?.status).toBe(401);
+    expect(authenticateJobRequest(withAuth("Bearer vercel-cron"), { ...env, ...cron })).toBeNull();
+  });
+
   it("fails closed when the secret is not configured", () => {
     expect(authenticateJobRequest(withAuth("Bearer x"), {})?.status).toBe(500);
   });
@@ -207,7 +214,14 @@ describe("VobizWhatsAppProvider", () => {
   const req = {
     to: "+919999999999",
     templateName: "fee_due_reminder",
-    variables: { guardian: "Meera", student: "Aarav", studio: "S", amount: "₹1", month: "M", due_date: "5 Oct" },
+    variables: {
+      guardian: "Meera",
+      student: "Aarav",
+      studio: "S",
+      amount: "₹1",
+      month: "M",
+      due_date: "5 Oct",
+    },
     text: "hi",
   };
 
@@ -221,7 +235,12 @@ describe("VobizWhatsAppProvider", () => {
     expect(url).toBe("https://api.vobiz.ai/api/v1/messaging/messages");
     expect((init.headers as Record<string, string>)["X-Auth-ID"]).toBe("id");
     const body = JSON.parse(String(init.body));
-    expect(body).toMatchObject({ channel_id: "ch", waba_id: "123", to: "+919999999999", type: "template" });
+    expect(body).toMatchObject({
+      channel_id: "ch",
+      waba_id: "123",
+      to: "+919999999999",
+      type: "template",
+    });
     expect(body.template.components[0].parameters).toHaveLength(6);
   });
 

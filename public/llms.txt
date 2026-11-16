@@ -1,0 +1,29 @@
+# ChoreoStudio
+
+> Fee tracking and WhatsApp reminders for dance studio owners in India. ChoreoStudio shows which dancers have paid, who is due and who is overdue, and opens a WhatsApp reminder with each dancer's amount filled in. The studio owner presses Send. First month free, no card needed.
+
+## Facts
+- Product: ChoreoStudio, a web app for owner-run dance studios. Website: https://www.choreostudio.live
+- Who it is for: dance studio owners. Dancers are adults and do not need an app or an account.
+- What it does: keeps fees, attendance and batches in one place; records payments by cash, UPI, bank transfer or other, with an optional reference; shows what is still owed after part payments; opens a WhatsApp reminder for each unpaid dancer.
+- What it does not do: it does not send messages automatically (automated WhatsApp messages are planned for Studio+ and are labelled "coming soon"), and it never holds or processes dancers' money. Dancers pay the studio directly.
+- Pricing (INR, per month, as of November 2026): first month free with every feature and no card. Regular Rs 249 for up to 50 dancers. Studio+ (Rs 479, for more than 50 dancers) is coming soon. Cancel any time.
+- Data: records are stored in Mumbai. Only the studio can see them. A dancer sees only their own fees, through a private link the studio sends.
+- Contact: support@choreostudio.live
+
+## Pages
+- [Home, features, pricing and FAQ](https://www.choreostudio.live/)
+- [Blog: guides for dance studio owners in India](https://www.choreostudio.live/blog)
+- [Privacy notice](https://www.choreostudio.live/privacy)
+- [Terms of service](https://www.choreostudio.live/terms)
+
+## Guides
+
+- [How to run a dance studio in India](https://www.choreostudio.live/blog/how-to-run-a-dance-studio-in-india)
+- [How to price dance classes in India](https://www.choreostudio.live/blog/how-to-price-dance-classes-in-india)
+- [GST on dance classes in India](https://www.choreostudio.live/blog/gst-on-dance-classes-in-india)
+- [Why adult dancers quit classes](https://www.choreostudio.live/blog/why-adult-dancers-quit-dance-classes)
+- [How to get your first 30 dancers](https://www.choreostudio.live/blog/how-to-get-your-first-dancers)
+- [How to hire and pay dance instructors](https://www.choreostudio.live/blog/how-to-pay-dance-instructors)
+- [Missed classes and holidays: write the rules](https://www.choreostudio.live/blog/dance-class-missed-classes-and-holiday-policy)
+- [How to plan a dance showcase](https://www.choreostudio.live/blog/how-to-plan-a-dance-showcase)

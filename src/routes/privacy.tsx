@@ -1,14 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { LegalPage } from "@/components/legal-page";
 import { openConsentChoice } from "@/components/analytics";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({
-    meta: [
-      { title: "Privacy Notice | ChoreoStudio" },
-      { name: "description", content: "What personal data ChoreoStudio collects, why, who sees it, how long we keep it and how to use your rights." },
-    ],
-  }),
+  head: () => pageHead("/privacy", "Privacy Notice | ChoreoStudio", "What personal data ChoreoStudio collects, why, who sees it, how long we keep it and how to use your rights."),
   component: Privacy,
 });
 

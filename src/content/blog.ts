@@ -25,779 +25,531 @@ export type Post = {
 
 export const SITE = "https://www.choreostudio.live";
 
+const p = (text: string): Block => ({ t: "p", text });
+const h2 = (text: string): Block => ({ t: "h2", text });
+const h3 = (text: string): Block => ({ t: "h3", text });
+const ul = (...items: string[]): Block => ({ t: "ul", items });
+const ol = (...items: string[]): Block => ({ t: "ol", items });
+const msg = (label: string, text: string): Block => ({ t: "msg", label, text });
+const note = (text: string): Block => ({ t: "note", text });
+
+const DATE = "2026-11-17";
+
+/* Shared sources, so every post cites the same pages the same way. */
+const SRC = {
+  superprof: {
+    label: "Superprof, Cost of dance lessons in India (20 January 2026)",
+    url: "https://www.superprof.co.in/blog/cost-of-dance-lessons",
+    note: "Monthly group-class ranges by style for India as a whole. Not city-specific, and Superprof runs a tutor marketplace.",
+  },
+  ramis: {
+    label: "Rami's Dance, BTM Layout, Bengaluru: class listing on mytribe.in",
+    url: "https://mytribe.in/ramisdanceinc_btm/hip-hop-dance-classes",
+    note: "Lists adult classes at ₹1,800 to ₹3,000 a month. Undated listing, one studio only.",
+  },
+  upi: {
+    label: "Inc42, UPI MDR regime explained (15 September 2026)",
+    url: "https://inc42.com/features/upi-mdr-regime-explained-heres-what-will-be-charged-after-oct-15/",
+    note: "The 0.4% charge above ₹2,000, the ₹1 lakh a month small-merchant rule and the ban on passing the charge on. A news explainer, not the NPCI circular itself.",
+  },
+  sec22: {
+    label: "CGST Act 2017, section 22: persons liable for registration",
+    url: "https://www.knowyourgst.com/gstlaw/the-central-goods-and-services-tax-act-2017/22-persons-liable-for-registration-22",
+    note: "The ₹20 lakh threshold, and ₹10 lakh for special category states. Section text reproduced by KnowYourGST.",
+  },
+  entry66: {
+    label: "Taxo, Entry 66 exemption limited to educational institutions (2 May 2026)",
+    url: "https://taxo.online/latest-news/02-05-2026-gst-exemption-under-entry-66-is-restricted-to-institutions-meeting-the-precise-definition-of-educational-institution-supplementary-coaching-institutes-fall-outside-its-a/",
+    note: "Summary of a Gujarat advance ruling: coaching that is not an 'educational institution' does not get the Entry 66 exemption.",
+  },
+  masterminds: {
+    label: "AAR Andhra Pradesh, Master Minds (AAR No. 08/AP/GST/2020)",
+    url: "https://gstcouncil.gov.in/sites/default/files/AAR/aar_no.8-2020_mater_mind.pdf",
+    note: "Advance ruling holding that a coaching provider is not an educational institution for the exemption. About exam coaching, not dance.",
+  },
+  dropoutCdc: {
+    label: "CDC Stacks: study of women starting an exercise programme",
+    url: "https://stacks.cdc.gov/view/cdc/192791/cdc_192791_DS1.pdf",
+    note: "Cites dropout as high as 50% in the first 3 to 6 months of group exercise programmes. About exercise in general, not dance.",
+  },
+  dropoutOlder: {
+    label: "Stiggelbout et al., Dropout from exercise programs for seniors (Journal of Aging and Physical Activity, 2005)",
+    url: "https://research.ou.nl/en/publications/dropout-from-exercise-programs-for-seniors-a-prospective-cohort-s/",
+    note: "Cites earlier reports of about 50% dropout in the first 6 months, mostly in the first 12 weeks. Its own group of 1,725 adults aged 50+ dropped out much less: 15% per 6 months.",
+  },
+  gbp: {
+    label: "Google Business Profile Help: add or claim your Business Profile",
+    url: "https://support.google.com/business/answer/2911778",
+    note: "Google's own steps for creating a free listing on Search and Maps.",
+  },
+};
+
+/* ------------------------------------------------------------------ */
+
 const runStudio: Post = {
   slug: "how-to-run-a-dance-studio-in-india",
-  title: "How to run a dance studio in India",
-  metaTitle: "How to Run a Dance Studio in India | ChoreoStudio",
+  title: "How to run a dance studio in India, by the numbers",
+  metaTitle: "How to Run a Dance Studio in India, by the Numbers",
   description:
-    "Most dance studios in India are started by a dancer, not a business person. Here are the five things to get in order as you grow: dancers, fees, attendance, batches and enquiries.",
-  date: "2026-10-31",
-  readingMinutes: 8,
-  related: ["how-to-price-dance-classes-in-india", "how-to-get-your-first-dancers", "how-to-pay-dance-instructors", "gst-on-dance-classes-in-india"],
+    "A worked month for a 60-dancer studio in Bengaluru: what comes in, what goes out, the break-even number, and the two thresholds (UPI and GST) a growing studio hits.",
+  date: DATE,
+  readingMinutes: 7,
+  related: ["how-to-price-dance-classes-in-india", "upi-charges-on-dance-class-fees", "gst-on-dance-classes-in-india", "why-adult-dancers-quit-dance-classes"],
   blocks: [
-    {
-      t: "p",
-      text: "Most studio owners start because they love to dance and teach, and the studio grows from a few students into a few batches. For a while that works on memory and goodwill. Then a second instructor joins, a weekend batch fills up, payments start arriving through three different UPI apps, and the WhatsApp group becomes the place where everything happens at once.",
-    },
-    {
-      t: "p",
-      text: "Nothing is wrong with your teaching at that point. What is missing is the business side, which nobody taught you and which you never had time to build. This guide covers the five things worth getting in order, roughly in the order they start to hurt.",
-    },
-    { t: "h2", text: "A studio is a small business that sells a skill" },
-    {
-      t: "p",
-      text: "What you sell is scheduled access to a space, a good teacher and a group of people who keep each other motivated. Your income is the number of paying dancers multiplied by the fee, and your costs are mostly fixed: rent, instructor pay, electricity, sound and your own time. Because the costs do not change much from month to month, the dancers who stay and pay on time are what decide whether the studio is comfortable or stressful.",
-    },
-    {
-      t: "p",
-      text: "That is why the five systems below are about keeping dancers and money straight. None of them needs special software to start. They need a decision about where the truth lives and the habit of using it.",
-    },
-    { t: "h2", text: "1. One list of every dancer" },
-    {
-      t: "p",
-      text: "Start with a single list that holds, for each dancer, their name, phone number, batch, monthly fee, the month they joined and how they usually pay. One row per person, kept in one place. When the same dancer appears in a notebook, a spreadsheet and a chat group with slightly different spellings, you will eventually charge someone twice or forget someone entirely.",
-    },
-    {
-      t: "p",
-      text: "Dancers at most studios are adults, so you talk to the dancer directly. Keep their number on the list and keep the list private. It should not live only on your phone, because the day your phone breaks is the day you need it.",
-    },
-    { t: "h2", text: "2. Fees, with one due date and three states" },
-    {
-      t: "p",
-      text: "Fees are the system that decides whether you can pay the rent. Give every dancer the same due date each month, or at least a due date you wrote down, and mark each dancer as paid, due or overdue. That is the whole model. It sounds too simple, but most fee confusion comes from having a fourth state in your head, which is something like 'I think they paid, but I am not sure'.",
-    },
-    {
-      t: "p",
-      text: "Record every payment against the person it belongs to, with the date and how it arrived: cash, UPI or bank transfer. If a dancer pays part of the fee, write down how much is still owed rather than rounding it away. And when someone says they have paid by UPI, check your bank or UPI statement before you mark it. A screenshot is easy to send and easy to get wrong, and the statement is the only thing you can trust.",
-    },
-    {
-      t: "p",
-      text: "Talk about money in private. A reminder about someone's fee does not belong in the class group, where everyone reads it. A short personal message with their own amount and due date is more polite and gets a faster answer.",
-    },
-    { t: "h2", text: "3. Attendance as an early warning" },
-    {
-      t: "p",
-      text: "Attendance is more than a register. A dancer who stops coming usually stops paying a few weeks later, so the register tells you about next month's income before the money does. A simple rule helps: when someone misses three classes in a row, send them a friendly message. You are not chasing them, you are asking if everything is alright and if they need a different batch.",
-    },
-    {
-      t: "p",
-      text: "Many dancers leave quietly because life got busy and nobody asked. One message at the right moment keeps some of them. We cannot tell you the exact number, because it differs from studio to studio, but you will learn your own after a few months of noting who you contacted and who came back.",
-    },
-    { t: "h2", text: "4. Batches and capacity" },
-    {
-      t: "p",
-      text: "Write each batch down with its day, time, level, instructor and a maximum size based on what your floor can comfortably hold. Then you can answer, without thinking, which batches are full and which have space. Full batches are where you consider a waiting list or a second slot. Half-empty batches are where you ask whether the time or the level is wrong.",
-    },
-    {
-      t: "p",
-      text: "Capacity is also where money is lost without anyone noticing. A batch that holds twenty dancers but has twelve is leaving the same rent and the same instructor cost spread across fewer fees.",
-    },
-    { t: "h2", text: "5. Enquiries and trial classes" },
-    {
-      t: "p",
-      text: "Every enquiry that arrives through Instagram, a phone call, a WhatsApp message or a walk-in is a possible dancer. Most studios lose some of them simply because the message got buried. Keep a short list with the name, the date they asked, what they asked about and when you will follow up.",
-    },
-    {
-      t: "p",
-      text: "Decide your trial class rule once: free, paid or credited against the first month. Then say it the same way every time, so nobody has to negotiate it and you do not have to remember what you told whom.",
-    },
-    { t: "h2", text: "Five numbers to look at once a month" },
-    {
-      t: "ul",
-      items: [
-        "How many dancers were enrolled this month",
-        "How much you billed",
-        "How much you collected",
-        "How much is still owed, and how late it is",
-        "How many dancers left, and how many joined",
-      ],
-    },
-    {
-      t: "p",
-      text: "These five numbers, compared with last month, tell you whether the studio is growing, standing still or leaking. You do not need a dashboard for this. You need ten minutes at the end of the month and the habit of writing the numbers down.",
-    },
-    { t: "h2", text: "Do you need software?" },
-    {
-      t: "p",
-      text: "Not at first. A notebook and a spreadsheet are enough for a single batch and one person taking payments. They start to strain once you have three or more batches, an instructor who also collects money, or dancers paying across several UPI apps. At that point it is worth choosing a tool that does fees and attendance well, and ignoring the ones that try to do everything.",
-    },
-    {
-      t: "note",
-      text: "If you want to try one built for owner-run dance studios, ChoreoStudio tracks fees and attendance and opens a WhatsApp reminder with each dancer's own amount filled in, which you send yourself. The first month is free and no card is needed.",
-    },
-    { t: "h2", text: "Where to start" },
-    {
-      t: "p",
-      text: "Do not try to set up all five this week. Start with fees, because they affect the rent. Then build the dancer list and attendance, then batches, then enquiries, and finally the monthly numbers. One system a month is plenty.",
-    },
-    {
-      t: "p",
-      text: "If you do only one thing today, take a sheet of paper or a spreadsheet and write every dancer's name with three columns: owed, paid and pending. That single page will show you more about your studio than you probably expect.",
-    },
+    p("Most advice about running a studio stays vague: keep good records, look after your dancers, watch your money. This post does it with one studio's month, in rupees, so you can swap in your own figures and see where you stand."),
+    p("The studio below is an example we made up. Its fee sits inside the range real Bengaluru studios list for adult classes (one BTM Layout studio lists ₹1,800 to ₹3,000 a month). The costs are placeholders. Replace every number with yours."),
+    h2("The example studio"),
+    ul(
+      "One room in Bengaluru, six batches a week, about 10 dancers per batch: 60 dancers in total",
+      "Fee: ₹2,500 a month for two classes a week, so 8 classes a month",
+      "Rent ₹45,000, one part-time instructor ₹30,000, electricity and internet ₹6,000, cleaning, music and small repairs ₹9,000",
+      "The owner teaches the other batches and is paid from whatever is left",
+    ),
+    h2("What it bills, what it collects"),
+    p("Billed: 60 dancers × ₹2,500 = ₹1,50,000. Fixed costs: ₹45,000 + ₹30,000 + ₹6,000 + ₹9,000 = ₹90,000. On paper that leaves ₹60,000 for the owner."),
+    p("Now the real month. Say 9 dancers have not paid by month end and 3 paid only half. Collected is 48 × ₹2,500 + 3 × ₹1,250 = ₹1,23,750. The owner's ₹60,000 has become ₹33,750. Nothing changed about the teaching. The gap between billed and collected took 44% of the owner's pay."),
+    p("That gap is the first number to watch. Write billed and collected down every month, side by side. If collected stays below about 90% of billed two months in a row, fees need attention before anything else does."),
+    h2("Your break-even number"),
+    p("Divide fixed costs by the fee: ₹90,000 ÷ ₹2,500 = 36. This studio needs 36 paying dancers to cover its costs before the owner earns a rupee. Every paying dancer after the 36th is the owner's income."),
+    p("Two things follow. Losing 5 dancers costs the owner ₹12,500 a month, more than a fifth of their pay. And a fee rise of ₹200 on 60 dancers brings in ₹12,000 a month, almost the same as keeping those 5 dancers. Here, keeping dancers and pricing are worth about the same, which is useful to know before you spend time on either."),
+    h2("Capacity: where the room loses money"),
+    p("If the room comfortably holds 15, six batches can hold 90 dancers. At 60, the studio uses two thirds of what it pays rent for. Look batch by batch. A batch with 14 is nearly full and may need a waiting list or a second slot. A batch with 5 costs almost as much to run as the full one. Ask whether its time or level is wrong before you cut it."),
+    h2("Two thresholds a growing studio hits"),
+    h3("UPI: ₹1 lakh a month"),
+    p("Since 15 October 2026, UPI payments above ₹2,000 to a merchant account carry a 0.4% charge, paid by the business. Small merchants receiving up to ₹1 lakh a month by UPI QR stay at zero. This studio collects ₹1,23,750, so if most of it arrives by UPI it can cross that line. On a ₹2,500 fee, 0.4% is ₹10. Across 50 UPI payments that is ₹500 a month. Small, but worth knowing, and the studio may not pass it on to dancers. Our post on UPI charges has the details."),
+    h3("GST: ₹20 lakh a year"),
+    p("At ₹1,50,000 billed a month, the studio bills ₹18 lakh a year. Add a showcase and two workshops and it can cross ₹20 lakh, the point where GST registration becomes compulsory in most states. Keep a running yearly total from April. Our GST post has the details."),
+    h2("The five numbers to write down each month"),
+    ol(
+      "Dancers enrolled",
+      "Billed",
+      "Collected, and collected as a percentage of billed",
+      "Still owed, split into under 30 days and over 30 days",
+      "Dancers who joined, and dancers who left",
+    ),
+    p("Ten minutes at month end, in a notebook or a spreadsheet, is enough. Compare each number with last month. The trend tells you more than any single month."),
+    note("ChoreoStudio shows billed, collected and who is still owed for each month, and opens a WhatsApp reminder with each dancer's own amount that you send yourself. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "What systems does a dance studio need?",
-      a: "Five are worth having: one list of dancers, a fee record with a due date, attendance, a list of batches with their capacity, and a simple record of enquiries and trial classes. Add a monthly look at five numbers: enrolled, billed, collected, still owed, and dancers who left.",
+      q: "How many dancers does a dance studio need to break even?",
+      a: "Divide your monthly fixed costs by your monthly fee. With ₹90,000 of costs and a ₹2,500 fee, you need 36 paying dancers before the owner earns anything.",
     },
     {
-      q: "How should a small dance studio collect fees?",
-      a: "Pick one due date, tell every dancer their amount, record each payment against the dancer when it arrives, and check UPI claims against your bank statement. Send reminders privately, not in the class group.",
-    },
-    {
-      q: "Do I need software to run a dance studio?",
-      a: "Not for one batch. A notebook and a spreadsheet work until you have several batches, more than one person taking payments, or dancers paying through different channels.",
+      q: "What should a dance studio owner track every month?",
+      a: "Five numbers: dancers enrolled, amount billed, amount collected, amount still owed by age, and dancers who joined and left. Compare each with the previous month.",
     },
   ],
+  sources: [SRC.ramis, SRC.upi, SRC.sec22],
 };
+
+/* ------------------------------------------------------------------ */
+
+const upiCharges: Post = {
+  slug: "upi-charges-on-dance-class-fees",
+  title: "UPI charges on dance class fees from 15 October 2026",
+  metaTitle: "UPI Charges on Dance Class Fees from October 2026",
+  description:
+    "Merchant UPI payments above ₹2,000 now cost the business 0.4%. What that means for a dance studio collecting monthly fees, with worked examples.",
+  date: DATE,
+  readingMinutes: 5,
+  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "gst-on-dance-classes-in-india"],
+  blocks: [
+    p("Since 15 October 2026, some UPI payments to businesses carry a fee. Many monthly dance fees are above ₹2,000, which is exactly where the fee starts. Here is what changed, who it applies to, and what it costs a studio in rupees."),
+    h2("What changed"),
+    ul(
+      "Person-to-merchant (P2M) UPI payments above ₹2,000 carry a merchant discount rate of 0.4%",
+      "Payments of ₹2,000 or less stay free",
+      "The business pays it. Merchants are not allowed to pass it on to the customer",
+      "Small merchants receiving up to ₹1 lakh a month through UPI QR into their own bank account stay at zero",
+      "A merchant above ₹1 lakh for three months in a row moves to the paid category",
+      "Payments between people (P2P), such as to friends and family, stay free",
+    ),
+    p("These details come from Inc42's explainer of the new rules, published a month before they started. Check with your bank for the exact terms on your account."),
+    h2("What it costs a studio"),
+    p("0.4% of ₹2,500 is ₹10. Of ₹3,000, it is ₹12. A ₹1,800 fee costs nothing, because it is under ₹2,000."),
+    p("Example: a studio with 50 dancers paying ₹2,500 each by UPI receives ₹1,25,000 a month, over the ₹1 lakh small-merchant line. If it stays there for three months, each payment costs ₹10: ₹500 a month, or ₹6,000 a year."),
+    p("A studio with 35 dancers at ₹2,500 receives ₹87,500 by UPI, under ₹1 lakh. It pays nothing."),
+    h2("What to do"),
+    ol(
+      "Ask your bank or payment app which category your UPI account is in: the small-merchant track or regular P2M.",
+      "Add up how much comes in by UPI each month. If you are near ₹1 lakh, you now know why that number matters.",
+      "Put the cost in your monthly costs. ₹500 on ₹1,25,000 is 0.4% of income, less than one dancer leaving.",
+      "Do not add it to the dancer's fee. The rules do not allow it.",
+    ),
+    p("Splitting one fee into two payments of ₹2,000 or less to dodge the charge is not worth it. It doubles your reconciling work, and the bank sees both payments."),
+    h2("What does not change"),
+    p("Your dancers pay the same way they always did. Cash and bank transfers are not part of this change. The GST threshold is a separate rule, based on your total yearly income from every payment method, not on UPI alone."),
+    note("ChoreoStudio records each payment as cash, UPI or bank transfer, so at month end you can see how much came in by UPI. First month free, no card needed."),
+  ],
+  faq: [
+    {
+      q: "Is there a charge on UPI payments for dance class fees?",
+      a: "From 15 October 2026, merchant UPI payments above ₹2,000 carry a 0.4% charge paid by the business. Merchants receiving up to ₹1 lakh a month through UPI QR stay at zero.",
+    },
+    {
+      q: "Can a dance studio pass the UPI charge on to dancers?",
+      a: "No. The rules described in Inc42's explainer say merchants cannot pass the charge on to customers.",
+    },
+    {
+      q: "How much does the UPI charge cost on a ₹2,500 fee?",
+      a: "0.4% of ₹2,500 is ₹10. Fees of ₹2,000 or less are not charged.",
+    },
+  ],
+  sources: [SRC.upi],
+};
+
+/* ------------------------------------------------------------------ */
 
 const priceClasses: Post = {
   slug: "how-to-price-dance-classes-in-india",
   title: "How to price dance classes in India",
-  metaTitle: "How to Price Dance Classes in India | ChoreoStudio",
+  metaTitle: "How to Price Dance Classes in India (with 2026 Ranges)",
   description:
-    "Copying the studio down the road is how many owners end up under-charging. Work out your monthly costs, your realistic number of dancers and the fee that covers both.",
-  date: "2026-10-31",
-  readingMinutes: 7,
-  related: ["how-to-run-a-dance-studio-in-india", "gst-on-dance-classes-in-india", "why-adult-dancers-quit-dance-classes"],
+    "What studios in India charge per month by style, how to work out your own floor price, what that means per class, and a fee-rise message you can send.",
+  date: DATE,
+  readingMinutes: 6,
+  related: ["how-to-run-a-dance-studio-in-india", "upi-charges-on-dance-class-fees", "dance-class-missed-classes-and-holiday-policy"],
   blocks: [
-    {
-      t: "p",
-      text: "Many owners set their fee by asking what the studio down the road charges, and then charging a little less to attract dancers. It feels safe, but the neighbour may have cheaper rent, an owner who teaches every batch, or a bigger room. Their number tells you what the market will tolerate, not what your studio needs to stay open.",
-    },
-    {
-      t: "p",
-      text: "A better way is to work out your own number in three steps and then compare it with the market. The figures below are made up to show the method. They are not a suggested price, because rent, city and class type change everything.",
-    },
-    { t: "h2", text: "Step 1: add up what the studio costs each month" },
-    {
-      t: "p",
-      text: "Write down every cost that repeats: rent, instructor pay, electricity, cleaning, music and sound equipment upkeep, internet, any software, marketing, and a portion of the larger costs you pay yearly, such as flooring repairs or mirrors, divided by twelve. Then add the pay you want for yourself, because a studio that only covers its costs is not yet a livelihood.",
-    },
-    {
-      t: "p",
-      text: "Suppose the total comes to ₹60,000 a month, including a modest amount for you. That is the amount your fees need to cover.",
-    },
-    { t: "h2", text: "Step 2: be honest about how many dancers you will really have" },
-    {
-      t: "p",
-      text: "Multiply the number of batches by the size each batch can hold, and you get the best case. Then be realistic. Batches are rarely full all month, dancers miss months, and new ones take time to arrive. A helpful habit is to use the number of dancers you had on an ordinary month, not the best one.",
-    },
-    {
-      t: "p",
-      text: "Say you have six batches that could hold 10 dancers each, so 60 at the very most, and on an ordinary month you have 40 paying.",
-    },
-    { t: "h2", text: "Step 3: divide, then test what happens when it goes wrong" },
-    {
-      t: "p",
-      text: "Break-even is the monthly cost divided by the dancers you expect: ₹60,000 divided by 40 is ₹1,500 per dancer. Anything above that is the room you have left for slow months, repairs and growth.",
-    },
-    {
-      t: "p",
-      text: "Now test it. If you charge ₹2,000 and 40 dancers pay, you collect ₹80,000 and have ₹20,000 left over. If only 28 pay in a quiet month, you collect ₹56,000, which is below your ₹60,000 costs. The same fee that looked comfortable at 40 dancers loses money at 28. Looking at the bad month before you commit to a fee is the most useful part of this exercise.",
-    },
-    { t: "h2", text: "Ways to structure the fee" },
-    {
-      t: "ul",
-      items: [
-        "A fixed monthly fee for a set number of classes. It is the easiest to explain and gives you predictable income, but dancers who miss classes may feel they are paying for nothing.",
-        "A pack of classes, such as eight or twelve, valid for a set time. It suits dancers with unpredictable schedules, but you need to track how many are left and when the pack expires.",
-        "A drop-in price for a single class. Keep it higher than the per-class cost inside a pack, so the pack or monthly fee is clearly the better value.",
-        "A discount for paying a quarter at once. It improves your cash flow, but only offer it if you are comfortable holding a few months of someone's fee in case they leave.",
-      ],
-    },
-    { t: "h2", text: "Write the rules next to the price" },
-    {
-      t: "p",
-      text: "A price on its own invites arguments. Write down, and tell every new dancer, what happens when someone misses a class, when the studio is closed for a holiday, when someone joins in the middle of the month, and when a payment is late. Settling these once saves you dozens of small awkward conversations. If you want to be generous, decide in advance how, for example one make-up class per month, so it is a rule and not a favour.",
-    },
-    { t: "h2", text: "When and how to raise your fees" },
-    {
-      t: "p",
-      text: "Costs go up, so fees eventually have to as well. Give your dancers at least a month's notice, say plainly why, and apply the new fee to new dancers first. Dancers are generally more understanding of a clear, early message than of a surprise on the day the fee is due.",
-    },
-    {
-      t: "note",
-      text: "Whichever fee you choose, keep a record of what each dancer owes and what they have paid each month. A simple list with owed, paid and pending columns is enough to start.",
-    },
+    p("Pricing has two sides: what the market will pay, and what your studio needs to stay open. Most owners only look at the first. Here are both, with the numbers we could find."),
+    h2("What studios charge"),
+    p("A January 2026 guide from Superprof gives these monthly ranges for group classes across India:"),
+    ul(
+      "Bollywood: ₹1,000 to ₹2,500",
+      "Hip-hop and urban: ₹1,200 to ₹3,000",
+      "Classical (Bharatanatyam, Kathak, Odissi): ₹1,000 to ₹2,000 for beginners, more for advanced training",
+      "Contemporary and jazz: ₹1,500 to ₹3,000",
+    ),
+    p("Those are national figures, and Superprof runs a tutor marketplace. For a city check, one BTM Layout studio in Bengaluru lists adult classes at ₹1,800 to ₹3,000 a month. Use both as a band to sanity-check against, not a price to copy. The best data is the fee at three studios near you, asked as a prospective dancer."),
+    h2("Your floor price"),
+    p("Add every cost that repeats each month, including the pay you want for yourself. Divide by the number of dancers you can realistically keep, not the number the room holds."),
+    p("Example: costs of ₹90,000, owner pay of ₹40,000, and 55 dancers you can realistically keep. Floor: ₹1,30,000 ÷ 55 = ₹2,364. Round to ₹2,400. Below that, the studio pays you less than you planned, every month."),
+    p("If your floor is above the market band, charging less rarely fixes it. Filling empty batch slots, cutting a cost, or adding a workshop or private classes usually does."),
+    h2("What the fee means per class"),
+    p("Dancers compare per class without saying so. ₹2,400 for 8 classes is ₹300 a class. ₹2,400 for 12 classes is ₹200. Write the number of classes on your fee sheet, so the comparison works in your favour."),
+    p("Price drop-ins above the per-class rate of the monthly fee, for example ₹450 against ₹300. That makes the monthly plan the obvious choice, which is better for your cash flow and for the dancer's progress."),
+    h2("Quarterly plans"),
+    p("A small discount for paying three months ahead brings cash in early and cuts the number of reminders you send. 5% off ₹7,200 is ₹360, and you collect ₹6,840 on day one instead of chasing three payments. Keep the discount small. A large one becomes the real price."),
+    h2("The ₹2,000 line"),
+    p("If your studio's merchant UPI account receives more than ₹1 lakh a month, payments above ₹2,000 now cost you 0.4%. That is ₹10 on a ₹2,500 fee: too small to set your price around, and you may not add it to the dancer's bill. Count it in your costs. Our UPI post has the details."),
+    h2("Raising your fee"),
+    p("Give one month's notice, say the new amount and the date, and give a reason if you have one. Send it privately to each dancer, not in the group."),
+    msg("Fee change, one month ahead", "Hi [name], a quick note from [studio]. From 1 [month], the monthly fee for [batch] will be ₹[new amount] (it is ₹[old amount] now). [Reason, for example: our rent went up this year.] Nothing else changes. Thank you for dancing with us, and message me if you have any questions."),
+    note("ChoreoStudio shows who has paid, who is due and who is overdue each month, and opens a WhatsApp reminder with each dancer's own amount that you send yourself. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "How do I decide what to charge for dance classes?",
-      a: "Add up your monthly costs including your own pay, estimate how many dancers you will have in an ordinary month, and divide. That is your break-even fee per dancer. Then check it against what nearby studios charge and adjust.",
+      q: "How much do dance classes cost per month in India?",
+      a: "A January 2026 Superprof guide puts group classes at roughly ₹1,000 to ₹3,000 a month depending on style. One Bengaluru studio lists adult classes at ₹1,800 to ₹3,000. Check three studios near you for local prices.",
     },
     {
-      q: "Is a monthly fee or a class pack better for a dance studio?",
-      a: "A monthly fee is simpler and gives steadier income. A class pack suits dancers with irregular schedules but needs expiry and balance tracking. Many studios offer both, with the monthly fee as the better value.",
-    },
-    {
-      q: "How much notice should I give before raising fees?",
-      a: "At least a month. Explain the reason briefly and start with new dancers.",
+      q: "How do I calculate the right fee for my dance studio?",
+      a: "Add your monthly costs and the pay you want, then divide by the number of dancers you can realistically keep. With ₹1,30,000 and 55 dancers, the floor is about ₹2,400.",
     },
   ],
+  sources: [SRC.superprof, SRC.ramis, SRC.upi],
 };
+
+/* ------------------------------------------------------------------ */
 
 const gstClasses: Post = {
   slug: "gst-on-dance-classes-in-india",
   title: "GST on dance classes in India",
-  metaTitle: "GST on Dance Classes in India | ChoreoStudio",
+  metaTitle: "GST on Dance Classes in India: Threshold and Rules",
   description:
-    "Dance classes run as a business are generally taxable at 18% GST, with registration needed once yearly turnover crosses a threshold. Here is how it works, with a worked example.",
-  date: "2026-10-31",
+    "When a dance studio has to register for GST, what counts towards the ₹20 lakh limit, why the education exemption usually does not apply, and what to track.",
+  date: DATE,
   readingMinutes: 6,
-  related: ["how-to-price-dance-classes-in-india", "how-to-run-a-dance-studio-in-india"],
+  related: ["how-to-run-a-dance-studio-in-india", "upi-charges-on-dance-class-fees", "how-to-plan-a-dance-showcase"],
   blocks: [
-    {
-      t: "note",
-      text: "This is general information, not tax or legal advice. GST rules and thresholds change, so confirm the current position with a chartered accountant or on the official GST portal before you act.",
-    },
-    {
-      t: "p",
-      text: "GST is one of the questions studio owners ask last and worry about most. Many wonder whether dance classes are exempt because they are cultural or educational, and whether a small studio has to register at all. The short answer from the commentary we read is that dance classes run as a commercial service are generally taxable, and registration depends on how much the studio earns in a year.",
-    },
-    { t: "h2", text: "Are dance classes taxable?" },
-    {
-      t: "p",
-      text: "The exemptions for education in GST law are aimed mainly at recognised schools and similar institutions. Tax professionals who have written about dance workshops and dance classes generally conclude that a studio teaching dance as a business does not fall under those exemptions, whether the style is classical, Western or fitness-based. The usual rate applied to coaching and training services of this kind is 18%.",
-    },
-    {
-      t: "p",
-      text: "Some of the writing on this is a few years old and comes from consultants rather than from a ruling about your specific studio. If your situation is unusual, for example you teach inside a school or a trust, ask your accountant which treatment applies.",
-    },
-    { t: "h2", text: "When does a studio have to register?" },
-    {
-      t: "p",
-      text: "For services, registration is generally required once your total turnover in a financial year goes above ₹20 lakh, with a lower limit in some special category states. Turnover means all your taxable income, so it includes workshops, special events and any other classes you teach through the same registration, not only the monthly fees from regular batches.",
-    },
-    {
-      t: "p",
-      text: "A studio below the threshold does not have to register, but it can choose to. Some do so because corporate clients or other businesses want tax invoices, or because they want to claim credit for GST paid on their own purchases.",
-    },
-    { t: "h2", text: "A worked example: a fee that includes GST" },
-    {
-      t: "p",
-      text: "Suppose you are registered and you advertise a fee of ₹2,000 that includes 18% GST. The tax is not added on top. It is already inside the ₹2,000, so you only keep part of it.",
-    },
-    {
-      t: "ul",
-      items: [
-        "Fee the dancer pays: ₹2,000",
-        "Value before tax: ₹2,000 divided by 1.18, which is about ₹1,695",
-        "GST included: about ₹305, which you pay to the government",
-      ],
-    },
-    {
-      t: "p",
-      text: "If you had planned your costs around keeping the full ₹2,000, registration would leave you about ₹305 per dancer short. This is why it matters to decide whether your published fee includes tax before you cross the threshold, and to factor it into your pricing.",
-    },
-    { t: "h2", text: "What registration involves day to day" },
-    {
-      t: "ul",
-      items: [
-        "Giving each dancer a proper invoice that shows the tax",
-        "Keeping a clear record of every payment, whether cash, UPI or bank transfer",
-        "Filing GST returns on time, usually monthly or quarterly depending on your choice and turnover",
-        "Paying the tax you collected, less any credit you are entitled to",
-      ],
-    },
-    {
-      t: "p",
-      text: "The record keeping is where studios struggle. If you cannot say how much you received in a month and who paid it, filing a return becomes guesswork. Whether or not you are registered yet, keep a clean record of payments from the start. It makes the day you cross the threshold much easier.",
-    },
-    { t: "h2", text: "Questions to take to your accountant" },
-    {
-      t: "ul",
-      items: [
-        "Does my studio's turnover, counted across all my classes and workshops, cross the threshold this year or the next?",
-        "Should my published fee include or exclude GST once I am registered?",
-        "Do the workshops I run, or the classes I teach inside other institutions, change the answer?",
-        "Is voluntary registration worth it for us?",
-      ],
-    },
-  ],
-  sources: [
-    {
-      label: "CAclubindia: GST on dance classes and workshops",
-      url: "https://www.caclubindia.com/articles/gst-on-dance-classes-workshops-50442.asp",
-      note: "A tax professional's view that dance classes and workshops are not covered by the education exemptions.",
-    },
-    {
-      label: "Taxclue: Is GST registration required for a dance academy?",
-      url: "https://taxclue.in/blog/is-gst-registration-required-for-a-dance-academy",
-      note: "A guide to registration for dance academies. Check its thresholds against current rules.",
-    },
+    p("This is a summary of the rules as we read them, written for studio owners. It is not tax advice. Before you register, charge GST or decide not to, check with a chartered accountant."),
+    h2("When registration becomes compulsory"),
+    p("Under section 22 of the CGST Act, a business must register once its aggregate turnover in a financial year exceeds ₹20 lakh. In special category states the limit is ₹10 lakh. Karnataka, Maharashtra, Delhi and Tamil Nadu are not special category states, so studios there use ₹20 lakh."),
+    p("Aggregate turnover is counted across your PAN, from April to March. It includes everything the business earns from its services: monthly fees, admission fees, workshops, private classes, showcase tickets and costume charges. How you are paid makes no difference. Cash counts the same as UPI."),
+    h2("A worked example"),
+    p("60 dancers × ₹2,500 × 12 months = ₹18 lakh. Add 2 workshops at ₹1,000 for 40 dancers each (₹80,000) and a showcase bringing in ₹1,50,000 from tickets and costumes. The year comes to ₹20.3 lakh, just over the limit."),
+    p("That is why a studio this size should keep a running total from April. Once you cross ₹20 lakh, you have 30 days to apply for registration."),
+    h2("Why the education exemption usually does not apply"),
+    p("Entry 66 of Notification 12/2017 exempts services provided by an 'educational institution'. The definition is narrow: it covers schools, and courses that lead to a qualification recognised by law. Advance rulings have said coaching providers fall outside it, for example the Andhra Pradesh ruling on Master Minds and a Gujarat ruling in 2026."),
+    p("Those rulings are about exam coaching, and we found no ruling specifically on dance classes. A private dance studio is in a similar position, since it does not award a qualification recognised by law. Most advisers therefore treat studio fees as taxable once you are registered, at 18%. Confirm the rate and the classification with your CA."),
+    h2("What changes after you register"),
+    ul(
+      "Your fee either includes GST or has it added. Decide which before you tell dancers. ₹2,500 including GST means ₹2,119 is yours and ₹381 is tax.",
+      "You issue tax invoices and file returns, usually through your CA.",
+      "You can usually claim credit for GST you pay on business costs, such as rent where the landlord charges GST.",
+    ),
+    h2("What to do now"),
+    ol(
+      "Keep a running total of everything the studio earns from 1 April, including showcases and workshops.",
+      "When you reach about ₹15 lakh, talk to a CA so the switch is planned, not rushed.",
+      "If you register, tell each dancer their new fee one month ahead, in a private message.",
+    ),
+    note("ChoreoStudio shows what you billed and collected each month, which makes the yearly total easy to keep. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "Is GST applicable on dance classes?",
-      a: "Tax professionals generally treat dance classes run as a business as taxable services, usually at 18%. Exemptions for education are aimed at recognised schools and similar institutions. Confirm with a chartered accountant for your case.",
+      q: "Do dance classes need GST registration?",
+      a: "Only once the business's aggregate turnover in a financial year exceeds ₹20 lakh, or ₹10 lakh in special category states. Check with a chartered accountant before you decide.",
     },
     {
-      q: "Does a small dance studio need GST registration?",
-      a: "Registration for services is generally needed once yearly turnover goes above ₹20 lakh, lower in some special category states. Below that you can still register voluntarily.",
+      q: "Are dance classes exempt from GST as education?",
+      a: "Usually not. The exemption in Entry 66 of Notification 12/2017 applies to 'educational institutions' as defined, and advance rulings have held that coaching providers fall outside it.",
     },
     {
-      q: "Is the 18% GST added on top of my class fee?",
-      a: "It depends on how you price. If your published fee is inclusive of GST, the tax is a part of it. At ₹2,000 inclusive of 18%, about ₹305 is GST.",
+      q: "What counts towards the ₹20 lakh GST limit for a dance studio?",
+      a: "Everything the business earns from its services in the financial year: fees, admission, workshops, private classes, showcase tickets and costume charges, however they are paid.",
     },
   ],
+  sources: [SRC.sec22, SRC.entry66, SRC.masterminds],
 };
+
+/* ------------------------------------------------------------------ */
 
 const adultsQuit: Post = {
   slug: "why-adult-dancers-quit-dance-classes",
-  title: "Why adult dancers quit classes",
-  metaTitle: "Why Adult Dancers Quit Dance Classes | ChoreoStudio",
+  title: "Why adult dancers quit, and the first 12 weeks",
+  metaTitle: "Why Adult Dancers Quit Dance Classes (and When)",
   description:
-    "Adults rarely quit dance because they stopped liking it. They quit because of schedules, feeling lost in class, or nobody noticing they stopped coming. Here is what studios can do.",
-  date: "2026-10-31",
+    "Research on group exercise puts dropout near half within six months, mostly in the first 12 weeks. A week-by-week plan and messages for keeping new adult dancers.",
+  date: DATE,
   readingMinutes: 6,
-  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india"],
+  related: ["how-to-get-your-first-dancers", "dance-class-missed-classes-and-holiday-policy", "how-to-run-a-dance-studio-in-india"],
   blocks: [
-    {
-      t: "p",
-      text: "Anyone who has run a studio for a year has seen the pattern. A new dancer arrives full of energy, comes regularly for three or four weeks, then misses a class, then another, and one day you realise you have not seen them for a month. Nobody argued with anyone and nobody complained. They just drifted away.",
-    },
-    {
-      t: "p",
-      text: "This is a list of the reasons we think are most common, based on how owners describe it rather than on a study, and a few things that cost very little to try. Treat it as a set of ideas to test in your own studio.",
-    },
-    { t: "h2", text: "Why adults leave" },
-    { t: "h3", text: "Their schedule changed" },
-    {
-      t: "p",
-      text: "Work deadlines, travel, family events and exams move around, and a fixed weekly slot is the first thing to give way. When a dancer misses two classes because of work, the third one starts to feel like catching up on something they have already lost.",
-    },
-    { t: "h3", text: "They felt lost in the class" },
-    {
-      t: "p",
-      text: "A beginner placed with people who already know the routine feels behind every week, and adults do not like feeling behind in public. Some of them never say so. They just stop coming.",
-    },
-    { t: "h3", text: "They stopped seeing progress" },
-    {
-      t: "p",
-      text: "The first few weeks are exciting because everything is new. After that, improvement feels slow, and without a clear sign that they are getting better, motivation fades.",
-    },
-    { t: "h3", text: "Nobody knew them" },
-    {
-      t: "p",
-      text: "A dancer who has made one friend in class has a reason to come back, even on a tired evening. A dancer who arrives, dances and leaves without speaking to anyone has no one to notice that they are gone.",
-    },
-    { t: "h3", text: "The money conversation was awkward" },
-    {
-      t: "p",
-      text: "Being chased in a group message, or by more than one person, is unpleasant enough that some dancers would rather leave than deal with it. A single, private and polite reminder keeps the money question from turning into a reason to quit.",
-    },
-    { t: "h2", text: "What studios can do about it" },
-    { t: "h3", text: "Make the first three classes easy" },
-    {
-      t: "p",
-      text: "Introduce every new dancer to the group in the first class, pair them with someone friendly, and check in with them after the third class. The aim is that nobody spends their first weeks feeling invisible.",
-    },
-    { t: "h3", text: "Be clear about levels" },
-    {
-      t: "p",
-      text: "Say plainly who each batch is for, and let people move up or down without embarrassment. A beginner who is happy in the right batch is worth more than a beginner who struggles in the wrong one.",
-    },
-    { t: "h3", text: "Give people a visible finish line" },
-    {
-      t: "p",
-      text: "A short routine taught over a month, which the batch performs for each other at the end, gives dancers something to look forward to and something to be proud of. It does not need a stage or an audience.",
-    },
-    { t: "h3", text: "Notice absences early" },
-    {
-      t: "p",
-      text: "When a dancer misses three classes in a row, send a message. Something like this works:",
-    },
-    {
-      t: "msg",
-      label: "After three missed classes",
-      text: "Hi [name], we have missed you in class the last few weeks. Is everything alright? If your schedule has changed, tell me and we can look at a different batch. No pressure, just checking in.",
-    },
-    {
-      t: "p",
-      text: "The message asks about the dancer and not about the fee. Many people answer it, and some of them come back.",
-    },
-    { t: "h3", text: "Make pausing easier than quitting" },
-    {
-      t: "p",
-      text: "Offer a way to pause for a month, for travel or a busy period, without losing their place. It is much easier to come back from a pause than to rejoin after quitting.",
-    },
-    { t: "h3", text: "Ask why they left" },
-    {
-      t: "p",
-      text: "When someone does leave, send one short question: what could we have done better? You will not always get an answer, but the ones you do get tell you something no register or spreadsheet can.",
-    },
-    { t: "h2", text: "A small habit to start with" },
-    {
-      t: "p",
-      text: "Keep a list of dancers you have not seen in three weeks and message each of them this week. It takes about ten minutes, and it costs nothing. Write down who replied and who came back, and in a month you will know how much it is worth to your studio.",
-    },
-    {
-      t: "note",
-      text: "If you track attendance and fees in one place, it is easier to spot who has stopped coming. ChoreoStudio keeps attendance and fees together for owner-run dance studios, and the first month is free with no card needed.",
-    },
+    p("We found no study of adult dancers in India. The closest research is on group exercise programmes, and papers there keep reporting the same pattern: up to about half of new members drop out within three to six months, most of them in the first 12 weeks. One paper on older adults found much lower dropout in its own group, so the size varies. The timing is the useful part."),
+    p("If most leaving happens early, the first 12 weeks are where your effort pays. A dancer still coming in month four is much less likely to leave."),
+    h2("Why adults stop"),
+    p("Adults rarely quit because the class was bad. More often a busy week turns into two missed weeks, and coming back feels awkward because the batch has learned a routine they missed. Some feel they are the slowest in the room. Some never made a friend in the batch. None of these arrive as a complaint. They arrive as an empty spot."),
+    h2("A plan for the first 12 weeks"),
+    h3("Week 1: a welcome"),
+    msg("After the first class", "Hi [name], it was lovely having you in [batch] today. The first few classes are the hardest, so don't worry if the routine felt fast. See you on [day]!"),
+    h3("Weeks 1 to 3: a name and a buddy"),
+    p("Learn their name by the second class and use it. Pair them with a regular for partner work. A dancer who knows one other person in the batch has a reason to come back that has nothing to do with you."),
+    h3("After two missed classes: ask, don't chase"),
+    msg("Two classes missed", "Hi [name], we missed you in [batch] this week. All okay? If the timing isn't working, [other batch] on [day] covers the same routine."),
+    p("Send this after two misses, not three. By the third, the habit has usually broken."),
+    h3("Week 6: show progress"),
+    p("With everyone's agreement, record the batch doing the routine at week 6 and share it in the group. Most adults can't see their own progress. A video shows it."),
+    h3("Week 12: ask one question"),
+    msg("Three months in", "Hi [name], you've been with us three months now! One quick question: is there anything that would make class better for you? Even a small thing helps."),
+    h2("Watch the register, not the fee list"),
+    p("A dancer who stops coming usually stops paying a few weeks later, so attendance is the earlier warning. Each week, look for anyone in their first 12 weeks who missed the last two classes, and message them that day."),
+    note("ChoreoStudio keeps attendance for each batch and shows each dancer's attendance as a percentage, so a new dancer who is slipping is easy to spot. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "Why do adults quit dance classes?",
-      a: "Common reasons are schedule changes, feeling behind the rest of the class, not seeing progress, not knowing anyone, and awkward conversations about money. Most do not complain; they simply stop coming.",
+      q: "How many people drop out of dance or exercise classes?",
+      a: "Research on group exercise programmes reports dropout of up to about 50% within three to six months, mostly in the first 12 weeks. We found no study specific to adult dance classes in India.",
     },
     {
-      q: "How can a dance studio keep adult dancers coming?",
-      a: "Make the first three classes welcoming, be clear about levels, give dancers a short routine to work towards, message anyone who misses three classes in a row, and offer a way to pause.",
-    },
-    {
-      q: "What should I say to a dancer who has stopped coming?",
-      a: "Ask how they are and offer a different batch if their schedule has changed. Do not mention fees in that first message.",
+      q: "When should I message a dancer who stopped coming?",
+      a: "After two missed classes in a row. Ask whether everything is okay and offer another batch, rather than mentioning fees.",
     },
   ],
+  sources: [SRC.dropoutCdc, SRC.dropoutOlder],
 };
+
+/* ------------------------------------------------------------------ */
 
 const firstDancers: Post = {
   slug: "how-to-get-your-first-dancers",
   title: "How to get your first 30 dancers",
-  metaTitle: "How to Get Your First 30 Dancers | ChoreoStudio",
+  metaTitle: "How to Get Your First 30 Dancers for a New Studio",
   description:
-    "A new dance studio in India does not need a big marketing budget. It needs a clear offer, a trial class, and a way to follow up with everyone who asks.",
-  date: "2026-10-31",
+    "Work backwards from 30 dancers to the enquiries you need, then fill the top: a Google Business Profile, Instagram that shows the class, and a fast, fixed trial.",
+  date: DATE,
   readingMinutes: 6,
-  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "why-adult-dancers-quit-dance-classes"],
+  related: ["why-adult-dancers-quit-dance-classes", "how-to-price-dance-classes-in-india", "how-to-run-a-dance-studio-in-india"],
   blocks: [
-    {
-      t: "p",
-      text: "The first thirty dancers are the hardest, and almost nobody gets them through advertising. They come from people who already trust you, people who saw you teach, and people who heard from a friend that your class is worth a try. The work in the early months is to make it easy for those people to find you and easy for them to say yes.",
-    },
-    { t: "h2", text: "Decide who the class is for" },
-    {
-      t: "p",
-      text: "A studio that says it teaches everyone usually attracts no one in particular. Pick one group to start with, such as working adults who want a weekend class, or beginners who have never danced, or women who want a class close to home. Then describe the class in their words: the day, the time, the style, the level, and what a first class will feel like.",
-    },
-    {
-      t: "p",
-      text: "The more specific the description, the easier it is for the right person to think this is for me. A vague post gets a like and a quick scroll. A post that says Saturday 8 am, beginner Bollywood, no experience needed, gets a message from someone who is already thinking about it.",
-    },
-    { t: "h2", text: "Start with the people who already know you" },
-    {
-      t: "ul",
-      items: [
-        "Friends, relatives and colleagues who have seen you dance or teach. Ask them directly, and ask them to bring a friend.",
-        "Your own social accounts. Post the class details with a short video of a real class, not only a poster.",
-        "Housing societies, offices and community groups in your area, where a weekend class can fill quickly through a single message to the right group.",
-        "Other local studios and instructors who teach a different style and may send you people who ask for yours.",
-      ],
-    },
-    { t: "h2", text: "Make the first step small" },
-    {
-      t: "p",
-      text: "Most people hesitate for the same reasons: they are not sure they will like it, they worry they will be the only beginner, and they do not want to commit money to something they have not tried. A trial class answers all three. Decide your rule once, whether it is free, a small fee or a fee that counts towards the first month, and say it the same way every time.",
-    },
-    {
-      t: "p",
-      text: "Give trial dancers a warm first class. Introduce them to the group, put them next to someone friendly, and message them the next day. The follow-up is where many studios win or lose the dancer.",
-    },
-    { t: "h2", text: "Answer enquiries quickly and keep a list" },
-    {
-      t: "p",
-      text: "Someone who asks about a class on Instagram or WhatsApp is usually asking several studios at once. The one who replies first, with the day, time, fee and a clear next step, often gets the trial. Keep a simple list of every enquiry with the date, the person's name, what they asked about, and when you will follow up. A message that sits unread for three days has usually already lost the person.",
-    },
-    {
-      t: "p",
-      text: "When someone says they will think about it, ask if you can message them again on a specific date. Then do it. A short, friendly follow-up is not pushy, and many people simply needed a reminder.",
-    },
-    { t: "h2", text: "Ask for referrals at the right moment" },
-    {
-      t: "p",
-      text: "A dancer who has just enjoyed a good class is the best person to ask, and the right time is right then. Invite them to bring a friend to the next class for free, or to share one short video from class with their own message. People trust a friend's recommendation far more than a studio's own post.",
-    },
-    { t: "h2", text: "A realistic first month" },
-    {
-      t: "ol",
-      items: [
-        "Week 1: write down who the class is for and describe it in one clear message with day, time, level and fee.",
-        "Week 2: send it personally to thirty people who might know someone interested, and post it in two or three relevant local groups.",
-        "Week 3: run trial classes, follow up with each person the next day, and note who said yes, who said maybe and why.",
-        "Week 4: ask each new dancer to bring one friend, and adjust the time or description based on what people asked.",
-      ],
-    },
-    {
-      t: "p",
-      text: "Do not worry if the numbers are small at first. Ten dancers who keep coming and tell their friends are worth more than thirty who arrive once. Keep notes on where each dancer came from, and in two or three months you will know which of these routes is actually working for your studio.",
-    },
+    h2("Work backwards from 30"),
+    p("Start with how many enquiries 30 dancers takes. The rates below are guesses to show the method. Replace them with yours after your first month."),
+    ul(
+      "If 1 in 2 trial dancers join, 30 dancers needs 60 trials",
+      "If 1 in 3 enquiries books a trial, 60 trials needs 180 enquiries",
+      "Over three months, that is about 15 enquiries a week",
+    ),
+    p("Two things move these numbers more than anything else: how fast you reply, and whether the trial is easy to say yes to. Both are free."),
+    h2("Be findable: a Google Business Profile"),
+    p("When someone searches 'dance classes near me', the map results come from Google Business Profiles. Creating one is free, and Google's help pages walk through it. Fill in the styles you teach, your batch times, photos of a real class and your WhatsApp number. Once your first dancers have been coming for a month, ask them for a review."),
+    h2("Instagram: show the class, not the poster"),
+    p("A 15-second clip of a real batch doing the routine tells a stranger more than a designed poster does: the level, the mood, the people. Post the end of each routine as a short reel, with the batch name, day and time in the caption. Put your area's name in the caption too, because people search by neighbourhood."),
+    h2("Reply within the hour"),
+    p("Someone asking about classes is often asking two other studios at the same time, and the first useful reply usually wins. Keep a ready answer to the questions everyone asks."),
+    msg("First reply to an enquiry", "Hi [name], thanks for asking! [Batch] runs [days] at [time], ₹[fee] a month for [n] classes. Beginners are welcome. Would you like to try a class this [day]? The first one is [free / ₹ amount, adjusted in your first month's fee]."),
+    h2("Make the trial a yes"),
+    p("Decide your trial rule once and say it the same way every time: free, or paid and adjusted against the first month. Book a specific class on a specific day in the first reply. 'Come any time' turns into never."),
+    p("After the trial, ask the same day, while the class is fresh."),
+    msg("After the trial", "Hi [name], so glad you came today! If you'd like to join [batch], the fee is ₹[fee] for [month], and your spot is held till [date]. Any questions, just ask."),
+    h2("Write every enquiry down"),
+    p("Name, date, where they found you, and what happened. After a month you have your real rates and know which channel works. Without the list, you are guessing."),
+    note("ChoreoStudio keeps your dancers, batches and fees in one place, so each new dancer is set up once. First month free, no card needed."),
   ],
   faq: [
     {
       q: "How do I get students for a new dance studio?",
-      a: "Start with people who already know you, describe one class clearly for one group, offer a trial class, reply to enquiries quickly and ask happy dancers to bring a friend.",
-    },
-    {
-      q: "Should a trial dance class be free?",
-      a: "Either works. Free lowers the barrier, a small fee filters for people who will come, and a fee credited to the first month does both. Choose one and say it the same way every time.",
-    },
-    {
-      q: "How long does it take to build a full batch?",
-      a: "It differs a lot by area and style, so there is no reliable number. Track where each dancer came from and you will see how long it takes in your own studio.",
+      a: "Work out how many enquiries you need, then fill the top: a free Google Business Profile, short Instagram clips of real classes, a reply within the hour, and a fixed trial class rule.",
     },
   ],
+  sources: [SRC.gbp],
 };
+
+/* ------------------------------------------------------------------ */
 
 const payInstructors: Post = {
   slug: "how-to-pay-dance-instructors",
-  title: "How to hire and pay dance instructors",
-  metaTitle: "How to Hire and Pay Dance Instructors | ChoreoStudio",
+  title: "How to pay dance instructors: three models compared",
+  metaTitle: "How to Pay Dance Instructors: Three Models Compared",
   description:
-    "Three common ways to pay a dance instructor, what each costs you, and what to agree in writing before the first class so there are no surprises later.",
-  date: "2026-10-31",
+    "Per class, fixed monthly or a share of the batch fee, worked through for one batch, plus what to put in writing before an instructor starts.",
+  date: DATE,
   readingMinutes: 6,
-  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "dance-class-missed-classes-and-holiday-policy"],
+  related: ["how-to-run-a-dance-studio-in-india", "how-to-price-dance-classes-in-india", "gst-on-dance-classes-in-india"],
   blocks: [
-    {
-      t: "p",
-      text: "At some point you cannot teach every batch yourself, and the first instructor you bring in changes how the studio works. Money is the part that most often goes wrong, usually because the two of you assumed different things and never wrote them down. This post covers the common ways to pay an instructor and what to settle before the first class.",
-    },
-    { t: "h2", text: "Three ways to pay" },
-    { t: "h3", text: "A fixed amount per class" },
-    {
-      t: "p",
-      text: "You pay the instructor a set amount for every class they teach, whether ten dancers show up or four. It is simple to understand and easy to budget, and it protects the instructor from a quiet week. The risk is yours: if a batch is small, you still pay the full amount.",
-    },
-    { t: "h3", text: "A fixed monthly amount" },
-    {
-      t: "p",
-      text: "You agree a monthly amount for a set number of classes a week. It works for a regular instructor who teaches the same batches every week. Be clear about what happens when there are five weeks in a month, when the studio closes for a holiday, and when the instructor takes a day off.",
-    },
-    { t: "h3", text: "A share of the fees" },
-    {
-      t: "p",
-      text: "The instructor receives a percentage of what their batch pays. It lines up your interests, because both of you gain when the batch fills. It needs a clear record of who paid, because the instructor will want to see how their share was worked out, and a rule for dancers who pay late or only part of the fee.",
-    },
-    {
-      t: "p",
-      text: "Some studios combine these, such as a small fixed amount per class plus a share above a certain number of dancers. Whichever you choose, work out what it costs you at a good month and at a quiet month before you agree, as in the pricing example in our guide to pricing classes.",
-    },
-    { t: "h2", text: "What to agree before the first class" },
-    {
-      t: "ul",
-      items: [
-        "Which batches they teach, on which days and at what times.",
-        "How and when they are paid, and who records the classes taught.",
-        "What happens when a class is cancelled, by you, by them or because of a holiday.",
-        "Who finds a replacement when they are unwell, and how that is paid.",
-        "Whether they may teach elsewhere, and whether they may take your dancers to a competitor's class or a private class.",
-        "Who owns the choreography they create for your batches and showcase.",
-        "How either of you ends the arrangement, and how much notice is fair.",
-      ],
-    },
-    {
-      t: "p",
-      text: "Put it in a short written agreement that both of you sign, even if you are friends. A page is enough. The agreement is not a sign of distrust. It protects both of you from remembering the same conversation differently six months later. For anything involving tax or employment status, ask a chartered accountant or a lawyer, because the rules depend on how the arrangement is set up.",
-    },
-    { t: "h2", text: "How to choose an instructor" },
-    {
-      t: "p",
-      text: "A great dancer is not always a great teacher. Before you hire, ask the person to teach a trial class to your own dancers and watch how they explain a step, how they treat beginners, how they handle a mixed-level room and whether they arrive on time. Ask a couple of their former students how it was to learn from them. The dancers who will be in the room are the best judges of whether it works.",
-    },
-    { t: "h2", text: "Keeping instructors informed without sharing everything" },
-    {
-      t: "p",
-      text: "An instructor needs to know who is in their batch, who attended, and who has not been coming. They do not need to know how much each dancer pays or who is late with their fee. Decide what each instructor can see, and keep the money information with the owner.",
-    },
-    {
-      t: "p",
-      text: "Share the batch list and attendance with the instructor each week, and ask them to tell you when a dancer has stopped coming. They are often the first to notice.",
-    },
+    p("There are three common ways to pay an instructor, and each moves risk between you and them. Here they are worked through for the same batch, with example numbers you should replace with your own."),
+    h2("The example batch"),
+    p("15 dancers at ₹2,500 a month, 8 classes a month. The batch bills ₹37,500."),
+    h2("1. Per class"),
+    p("Example: ₹800 a class, so ₹6,400 a month, which is 17% of what the batch bills."),
+    p("Simple, and the instructor is paid for exactly what they teach. But they earn the same whether the batch has 6 dancers or 20, so they have no reason to help it grow. You carry all the risk of a half-empty batch."),
+    h2("2. Fixed monthly"),
+    p("Example: ₹25,000 a month for teaching four batches, about ₹6,250 per batch."),
+    p("Steady for the instructor and predictable for you. It suits someone who also helps run the studio. It can feel unfair in either direction when batches grow or shrink a lot, so review it every six months."),
+    h2("3. A share of the batch fee"),
+    p("Example: 30% of what the batch collects. With all 15 dancers paid, that is ₹11,250. If only 12 pay, it is ₹9,000."),
+    p("The instructor shares the risk and the upside, so they care about filling and keeping the batch. Base it on what is collected, not billed, and agree that in writing. It also means showing them the batch's numbers each month, which needs a clean record."),
+    h2("The same batch, three ways"),
+    ul(
+      "15 dancers, all paid (₹37,500): per class ₹6,400, fixed ₹6,250, 30% share ₹11,250",
+      "8 dancers, all paid (₹20,000): per class ₹6,400, fixed ₹6,250, 30% share ₹6,000",
+    ),
+    p("Many studios combine them: a small amount per class plus a share above a set number of dancers. For example, ₹500 a class plus 20% of collected fees above 10 dancers."),
+    h2("Put it in writing before day one"),
+    ul(
+      "How pay is worked out, and the date it is paid",
+      "Who covers a class if they are ill, and how much notice they give",
+      "The notice period if either side wants to stop",
+      "Whether they may teach the same dancers privately or at a studio nearby",
+      "Who owns choreography made for the studio's showcase",
+    ),
+    p("One page signed by both of you prevents most disputes. For tax questions, such as deducting TDS on payments to instructors, ask your CA."),
+    note("ChoreoStudio tracks fees and attendance for each batch, which keeps the numbers you need for a fair conversation about pay in one place. First month free, no card needed."),
   ],
   faq: [
     {
       q: "How much should I pay a dance instructor?",
-      a: "There is no standard figure, because it depends on your city, the style and the instructor's experience. Work out what you can afford at a quiet month, then agree a per-class amount, a monthly amount or a share of fees.",
-    },
-    {
-      q: "Should I pay instructors per class or monthly?",
-      a: "Per class is simple and flexible. Monthly suits a regular instructor with fixed batches. A share of fees ties pay to how full the batch is. Agree what happens on holidays and cancelled classes whichever you choose.",
-    },
-    {
-      q: "Do I need a written agreement with an instructor?",
-      a: "It is a good idea. A one-page agreement covering pay, cancellations, replacements, choreography and notice prevents most disagreements. For tax or legal questions, ask a professional.",
+      a: "It depends on your fees and city. Work it out as a share of what the batch earns: ₹800 a class on a ₹37,500 batch is 17%. Many studios combine a per-class rate with a share of collected fees.",
     },
   ],
 };
+
+/* ------------------------------------------------------------------ */
 
 const missedClasses: Post = {
   slug: "dance-class-missed-classes-and-holiday-policy",
-  title: "Missed classes and holidays: write the rules",
-  metaTitle: "Dance Class Missed Class and Holiday Policy | ChoreoStudio",
+  title: "Missed classes and holidays: a policy you can copy",
+  metaTitle: "Dance Class Missed Classes and Holiday Policy Template",
   description:
-    "Dancers miss classes, studios close for holidays, and someone always joins mid-month. Settle the rules once so you are not negotiating every time.",
-  date: "2026-10-31",
+    "A short fee policy for missed classes, studio holidays, pauses and late payment, ready to copy and adapt, plus the arithmetic for pro-rating a month.",
+  date: DATE,
   readingMinutes: 5,
-  related: ["how-to-price-dance-classes-in-india", "how-to-pay-dance-instructors", "why-adult-dancers-quit-dance-classes"],
+  related: ["how-to-price-dance-classes-in-india", "why-adult-dancers-quit-dance-classes", "how-to-run-a-dance-studio-in-india"],
   blocks: [
-    {
-      t: "p",
-      text: "Every studio owner has had the same conversation more than once. A dancer says they were travelling and asks if they can skip the fee this month, or if they can attend a different batch to make up for it. You say yes because it feels unkind to say no, and then the next dancer asks the same thing, and soon your rules are whatever you agreed last.",
-    },
-    {
-      t: "p",
-      text: "The fix is not to be stricter. It is to decide the rules once, write them down, and tell every new dancer before their first class. People accept a clear rule far more easily than a decision made on the spot.",
-    },
-    { t: "h2", text: "The situations to decide in advance" },
-    { t: "h3", text: "A dancer misses a class" },
-    {
-      t: "p",
-      text: "Most studios treat the monthly fee as paying for a place in the batch, not for each class, so a missed class is not refunded. Then you choose how generous to be. You might allow one make-up class a month in another batch at the same level, if there is room, and ask the dancer to tell you the day before.",
-    },
-    { t: "h3", text: "The studio closes for a holiday" },
-    {
-      t: "p",
-      text: "Decide whether a closed week reduces the fee, is made up with an extra class later, or is already built into your yearly pricing. Tell dancers the holiday dates at the start of the month, not the week before.",
-    },
-    { t: "h3", text: "Someone joins in the middle of the month" },
-    {
-      t: "p",
-      text: "You can charge the full month, charge for the remaining weeks, or start the fee from the next month and let the first weeks count as a trial. The part-month option takes a small calculation, so decide the rule and an easy way to work it out, such as charging by the number of weeks left.",
-    },
-    { t: "h3", text: "Someone needs a break" },
-    {
-      t: "p",
-      text: "Offering a pause of up to a month, for travel, illness or a busy period, keeps people connected to the studio. Decide how much notice you need and whether their place in the batch is held. A dancer who can pause is more likely to return than one who has to quit.",
-    },
-    { t: "h3", text: "A payment is late" },
-    {
-      t: "p",
-      text: "Pick a date after which you send a reminder, and a date after which the dancer cannot attend until the fee is settled, if you want a hard line. Many owners prefer a friendly reminder first and a firm rule only for repeated lateness. Whatever you choose, make it the same for everyone.",
-    },
-    { t: "h2", text: "A short policy you can adapt" },
-    {
-      t: "msg",
-      label: "Studio rules, one short message",
-      text: "Fees are due by the 5th for the month. A missed class is not refunded, but you may attend one make-up class a month in another batch at your level if there is room. Please tell us the day before. If we close for a holiday, we will tell you the dates at the start of the month. If you join mid-month, you pay for the weeks that remain. If you need a break, tell us a week before and we will hold your place for one month.",
-    },
-    {
-      t: "p",
-      text: "Change the numbers and wording to suit your studio, but keep it short. A message that fits on one screen is one that people actually read.",
-    },
-    { t: "h2", text: "Tell people at the start, and be consistent" },
-    {
-      t: "p",
-      text: "Send the rules to every new dancer when they join, and pin them in the announcement group. Then apply them the same way each time. If you decide to make an exception, make it clear that it is an exception, and keep a note of it, so that the next dancer who asks gets the same answer.",
-    },
-    {
-      t: "note",
-      text: "Keeping an attendance record and a fee record in one place makes these rules easier to apply, because you can see who missed what and who has paid. ChoreoStudio tracks attendance and fees for owner-run dance studios, and the first month is free with no card needed.",
-    },
+    p("Most fee arguments come from a rule nobody wrote down. Write it once, send it when a dancer joins, and point to it when a question comes up. Below is a policy you can copy and adapt."),
+    h2("The policy"),
+    msg(
+      "Fee policy (copy and adapt)",
+      "1. The monthly fee is ₹[amount] for [n] classes and is due by the [5th] of each month. 2. Missed classes are not refunded. You can make up to [2] missed classes a month in another batch of the same level, in the same month. 3. When the studio closes for a holiday, we tell you at least [2] weeks ahead. If we cancel more than [2] classes in a month, that month's fee is reduced for the cancelled classes. 4. You can pause for one full month, up to twice a year, if you tell us before the month starts. Your spot is held. 5. If the fee is not paid by the [15th], we will check in with you before the next month starts.",
+    ),
+    h2("Why each rule is there"),
+    h3("Make-ups instead of refunds"),
+    p("A refund for every missed class turns a monthly fee into a per-class fee, with all the counting that goes with it. A make-up in another batch keeps the dancer dancing at no cost to you, since that class is running anyway."),
+    h3("Studio holidays"),
+    p("Diwali week, exam season and your own breaks are fine. Tell dancers early and stick to your rule for when the fee drops. Pro-rate by classes: with 8 classes for ₹2,400, each is ₹300. If the studio cancels 3, that month's fee is ₹1,500."),
+    h3("Pauses"),
+    p("A dancer who travels for a month is more likely to come back if they paused than if they quit. Asking for notice before the month starts lets you offer the spot to someone waiting."),
+    h3("Late payment"),
+    p("A late fee looks firm on paper, but collecting it from adults you see twice a week is awkward, and many owners end up waiving it. A clear due date and a private reminder usually work better."),
+    msg("Reminder after the due date", "Hi [name], a quick reminder that the [month] fee of ₹[amount] for [batch] was due on the [5th]. You can pay by [UPI ID / cash at the studio]. Thank you!"),
+    h2("Send it when someone joins"),
+    p("Send the policy with the first fee message, before any dispute. A rule someone read before joining is a rule they agreed to."),
+    note("ChoreoStudio keeps due dates and what's still owed for each dancer, and opens a WhatsApp reminder with their own amount that you send yourself. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "Should a dance studio refund fees for missed classes?",
-      a: "Most studios do not, because the fee pays for a place in the batch. Many offer one make-up class a month if there is room. Write the rule down and tell dancers when they join.",
+      q: "Should a dance studio refund missed classes?",
+      a: "Most monthly-fee studios do not refund missed classes but allow make-ups in another batch of the same level in the same month. Write the rule down and share it when a dancer joins.",
     },
     {
-      q: "How should I charge a dancer who joins mid-month?",
-      a: "Common options are the full month, the weeks that remain, or starting the fee next month. Pick one and apply it to everyone.",
-    },
-    {
-      q: "What should a dance studio do about holidays?",
-      a: "Decide whether the fee changes, whether you add a make-up class, or whether closures are already in your yearly pricing, and share the dates at the start of the month.",
+      q: "How do I pro-rate a dance class fee for studio holidays?",
+      a: "Divide the monthly fee by the number of classes. With ₹2,400 for 8 classes, each class is ₹300, so cancelling 3 classes makes that month ₹1,500.",
     },
   ],
 };
 
+/* ------------------------------------------------------------------ */
+
 const showcase: Post = {
   slug: "how-to-plan-a-dance-showcase",
-  title: "How to plan a dance showcase",
-  metaTitle: "How to Plan a Dance Showcase for Your Studio | ChoreoStudio",
+  title: "How to plan a dance showcase without losing money",
+  metaTitle: "How to Plan a Dance Showcase: Budget and Timeline",
   description:
-    "A showcase gives dancers a goal and your studio a day to be proud of. Here is a timeline, a budget checklist and the mistakes that cost studios the most.",
-  date: "2026-10-31",
-  readingMinutes: 7,
-  related: ["how-to-run-a-dance-studio-in-india", "why-adult-dancers-quit-dance-classes", "how-to-get-your-first-dancers"],
+    "A budget you can fill in, a 12-week timeline worked back from the show date, and how to keep showcase money separate from monthly fees.",
+  date: DATE,
+  readingMinutes: 6,
+  related: ["gst-on-dance-classes-in-india", "how-to-pay-dance-instructors", "why-adult-dancers-quit-dance-classes"],
   blocks: [
-    {
-      t: "p",
-      text: "A showcase is the single most useful event a studio can run. It gives dancers something to work towards, gives their friends and family a reason to come, and gives you photos and videos that bring in the next batch. It is also easy to overspend on and easy to leave too late. This guide is a way to plan one without losing money or sleep.",
-    },
-    { t: "h2", text: "Decide what kind of showcase it is" },
-    {
-      t: "p",
-      text: "It does not have to be a ticketed evening in a large auditorium. A studio showcase can be an open class for friends and family, a performance in your own studio space, a small hall booked for two hours, or a combined event with another studio. Start with the smallest version that would make your dancers proud, and grow it in later years.",
-    },
-    { t: "h2", text: "A timeline that works backwards from the date" },
-    {
-      t: "ul",
-      items: [
-        "Ten to twelve weeks before: choose the date and venue, announce it to your dancers and decide which batches will perform.",
-        "Eight weeks before: choose music and routines, and tell each batch what they will perform.",
-        "Six weeks before: confirm the venue booking in writing, and start collecting any costume or participation fees.",
-        "Four weeks before: finalise the running order and the costumes, and send parents or friends the invitation and the details.",
-        "Two weeks before: rehearse in the order you will perform, and check the sound system and music files.",
-        "The week of the event: confirm times with everyone, and have one printed running order and a backup copy of every track.",
-      ],
-    },
-    { t: "h2", text: "Budget: list the costs before you promise anything" },
-    {
-      t: "p",
-      text: "Write down every cost you can think of, and then add a margin, because something will always cost more than you expect.",
-    },
-    {
-      t: "ul",
-      items: [
-        "Venue hire, including the time needed for set-up and rehearsal.",
-        "Sound and lighting, and someone to run them on the day.",
-        "Costumes, whether the studio buys them or dancers do.",
-        "Photographer or videographer, if you want proper photos.",
-        "Printing, such as invitations and the running order.",
-        "Refreshments or small thank-you gifts for instructors and helpers.",
-        "A reserve for the things you did not think of.",
-      ],
-    },
-    {
-      t: "p",
-      text: "Then decide how it is paid for: a participation fee, ticket sales, sponsors from local businesses, or the studio absorbing it as marketing. Be clear with dancers about what the fee covers before they commit.",
-    },
-    { t: "h2", text: "Running order and the day itself" },
-    {
-      t: "p",
-      text: "Put the youngest or newest dancers early, when the audience is fresh and the nerves are fewest, and keep a strong piece for the end. Leave a gap between batches for costume changes, and nominate one person to keep time. Plan to start a little late and finish a little late, and tell the venue so.",
-    },
-    {
-      t: "p",
-      text: "Ask a few dancers or helpers to take photos and short videos on the day, so you have material for weeks afterwards. Do not rely on a single person with a single phone.",
-    },
-    { t: "h2", text: "Mistakes to avoid" },
-    {
-      t: "ul",
-      items: [
-        "Booking the venue before you know the budget.",
-        "Collecting fees with no clear list of who has paid and for what.",
-        "Leaving music and sound checks to the last day.",
-        "Trying to include every batch in a single long programme.",
-        "Skipping a written confirmation with the venue about time, price and cancellation.",
-      ],
-    },
-    { t: "h2", text: "After the showcase" },
-    {
-      t: "p",
-      text: "Send a thank-you message to every dancer and helper within a day. Share the best photos and videos, with the dancers' permission, and ask people who enjoyed the event to bring a friend to a class next month. This is the moment when new dancers are most likely to say yes.",
-    },
+    p("A showcase gives dancers a goal and gives the studio photos, videos and new enquiries. It can also cost far more than planned, because the costs arrive in pieces. Plan the money first."),
+    h2("The budget"),
+    p("The numbers below are an example for a 300-seat hall and 60 dancers. Get real quotes for yours."),
+    ul(
+      "Hall hire for the day, including rehearsal: ₹60,000",
+      "Sound and lights: ₹25,000",
+      "Photographer and videographer: ₹20,000",
+      "Printing and stage decoration: ₹10,000",
+      "Extra instructor hours for rehearsals: ₹15,000",
+      "Buffer for things you forgot: ₹10,000",
+    ),
+    p("Total: ₹1,40,000. That is ₹2,333 for each of 60 dancers, before costumes."),
+    h2("Who pays"),
+    p("Most studios use one of these, or a mix:"),
+    ul(
+      "A participation fee per dancer, for example ₹1,500 × 60 = ₹90,000",
+      "Audience tickets, for example 250 sold at ₹200 = ₹50,000",
+      "Costumes charged at cost, collected separately",
+    ),
+    p("Here, ₹90,000 + ₹50,000 covers the ₹1,40,000. Decide the split before you announce the date, and say exactly what the participation fee includes."),
+    h2("Keep showcase money separate"),
+    p("Collect the participation fee as its own payment with its own due date, not added to the monthly fee. Mixed together, you lose track of who paid for what, and a part payment leaves you unsure which bill is still open. Ticket and showcase income also counts towards your yearly GST total."),
+    h2("A 12-week timeline"),
+    ol(
+      "Week 12: book the hall, set the date and pay the deposit.",
+      "Week 11: announce the date, the participation fee, what it includes and the payment deadline.",
+      "Week 10: choreography starts in every batch.",
+      "Week 8: participation fees due. Final list of who is performing.",
+      "Week 6: costume sizes collected and ordered.",
+      "Week 4: running order fixed. Tickets on sale.",
+      "Week 2: full run-through. Photographer and sound confirmed.",
+      "Week 1: technical rehearsal at the hall.",
+      "After the show: share the video within a week, while dancers still feel it.",
+    ),
+    h2("After the show"),
+    p("Showcases bring enquiries. Have your trial class reply ready, and post the best clips with your batch times in the caption."),
+    note("ChoreoStudio shows who has paid and who still owes, so a showcase month doesn't bury the monthly fees. First month free, no card needed."),
   ],
   faq: [
     {
-      q: "How far in advance should a studio plan a dance showcase?",
-      a: "Ten to twelve weeks gives time to book a venue, choose music and routines, and rehearse without rushing.",
+      q: "How much does a dance showcase cost?",
+      a: "It depends on the hall and the city. Add up hall hire, sound and lights, photography, printing, extra instructor hours and a buffer. An example for a 300-seat hall comes to about ₹1,40,000 before costumes.",
     },
     {
-      q: "How do dance studios pay for a showcase?",
-      a: "Common ways are a participation fee, ticket sales, local sponsors, or the studio covering it as marketing. Tell dancers what any fee covers before they commit.",
-    },
-    {
-      q: "Does a dance showcase need a big venue?",
-      a: "No. An open class for friends and family or a performance in your own studio is a good start. Grow it in later years.",
+      q: "How should a studio charge for a showcase?",
+      a: "Usually a per-dancer participation fee plus audience tickets, with costumes charged at cost. Collect the showcase fee separately from monthly fees.",
     },
   ],
 };
 
 export const posts: Post[] = [
   runStudio,
+  upiCharges,
   priceClasses,
   gstClasses,
   adultsQuit,
